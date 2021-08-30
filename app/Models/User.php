@@ -65,4 +65,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * The roles that belong to the user
+     */
+    public function roles() 
+    {
+        return $this->belongsToMany(Role::class, 'user_role');
+    }
 }
