@@ -34,9 +34,6 @@ class AuthController extends Controller
             'password'  => Hash::make($request->password)
         ]);
 
-        // Save the user
-        $user->save();
-
         // Attach user's role id in relationship
         $user->roles()->attach($role->id);
 
@@ -109,7 +106,8 @@ class AuthController extends Controller
             $user->delete();
 
             // return success message
-            return response()->json('User delete successful');
+            $response = ['message' => 'User delete success'];
+            return response()->json($response, 200);
         }
         
         // return error message
