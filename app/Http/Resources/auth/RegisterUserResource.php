@@ -23,7 +23,7 @@ class RegisterUserResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'message'       => 'User register successful',
+            'message'       => 'User register success',
             'id'            => $this->id,
             'name'          => $this->name,
             'email'         => $this->email,

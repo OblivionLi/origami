@@ -23,7 +23,7 @@ class LoginUserResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'message'       => 'User login successful',
+            'message'       => 'User login success',
             'id'            => $this->id,
             'name'          => $this->name,
             'email'         => $this->email,
