@@ -28,4 +28,11 @@ class Role extends Model
     {
         return $this->belongsToMany(Permission::class, 'role_permission');
     }
+
+    // define scope function that return a query with eager loading
+    public function scopeInfo($query)
+    {
+        // return data from relationships
+        return $query->with(['users:name,email', 'permissions:name']);
+    }
 }
