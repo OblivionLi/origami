@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 
 class Product extends Model
 {
-    use HasFactory, Sluggable;
+    use HasFactory, Sluggable, SluggableScopeHelpers;
 
     protected $fillable = [
-        'name', 'description', 'price', 'discount', 'special_offer', 'product_code', 'rating', 'total_reviews', 'total_quantities'
+        'name', 'user_id', 'parent_category_id', 'child_category_id', 'description', 'price', 'discount', 'special_offer', 'product_code', 'rating', 'total_reviews', 'total_quantities'
     ];
 
     /**
@@ -66,5 +67,12 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    // define scope function that return a query with eager loading
+    public function scopeInfo($query)
+    {
+        // return data from relationships
+        return $query->with(['parentCategory', 'childCategory', 'user', 'productImages', 'reviews']);
     }
 }

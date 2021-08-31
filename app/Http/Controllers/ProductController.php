@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\product\ProductStoreRequest;
+use App\Http\Requests\product\ProductUpdateRequest;
+use App\Http\Resources\product\ProductIndexResource;
+use App\Http\Resources\product\ProductShowResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -14,17 +19,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        // return product resource with all relationship data
+        return ProductIndexResource::collection(Product::info()->get());
     }
 
     /**
@@ -33,9 +29,28 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductStoreRequest $request)
     {
-        //
+        // Create the product
+        $product = Product::create([
+            // 'user_id'           => Auth::id(),
+            'user_id'               => $request->user_id,
+            'parent_category_id'    => $request->parent_category_id,
+            'child_category_id'     => $request->child_category_id,
+            'name'                  => $request->name,
+            'description'           => $request->description,
+            'price'                 => $request->price,
+            'discount'              => $request->discount,
+            'special_offer'         => $request->special_offer,
+            'product_code'          => $request->product_code,
+            'rating'                => 0,
+            'total_reviews'         => 0,
+            'total_quantities'      => 0
+        ]);
+
+        // return success message
+        $response = ['message' => 'Product create success'];
+        return response()->json($response, 200);
     }
 
     /**
@@ -44,20 +59,17 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product)
+    public function show($slug)
     {
-        //
-    }
+        // get product by slug with relationships
+        $product = Product::findBySlug($slug);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        //
+        // if product doesnt exist return error message
+        $response = ['message' => 'Product does not exist..'];
+        if (!$product) return response()->json($response, 422);
+
+        // return product resource
+        return new ProductShowResource($product);
     }
 
     /**
@@ -67,9 +79,34 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductUpdateRequest $request, $slug)
     {
-        //
+        // get product by slug
+        $product = Product::findBySlug($slug);
+
+        // if product doesnt exist return error message
+        if (!$product) return response()->json(['message' => 'Product does not exist..']);
+
+        // update product data
+        $product->slug              = null;
+        $product->name              = $request->name;
+        $product->description       = $request->description;
+        $product->price             = $request->price;
+        $product->discount          = $request->has('discount') ? ($request->discout > 0 ? $request->discount : null) : null;
+        $product->special_offer     = $request->special_offer;
+        $product->product_code      = $request->product_code;
+        $product->total_quantities  = 0;
+
+        // save the new product data
+        $product->save();
+
+        // associate relationship ids
+        $product->parentCategory()->associate($request->parent_category_id);
+        $product->childCategory()->associate($request->parent_category_id);
+
+        // return success message
+        $response = ['message', 'Product update success'];
+        return response()->json($response, 200);
     }
 
     /**
@@ -78,8 +115,19 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($slug)
     {
-        //
+        // get product by slug
+        $product = Product::findBySlug($slug);
+
+        // if product doesnt exist return error message
+        if (!$product) return response()->json(['message' => 'Product does not exist..']);
+
+        // delete the product
+        $product->delete();
+
+        // return success message
+        $response = ['message', 'Product delete success'];
+        return response()->json($response, 200);
     }
 }
