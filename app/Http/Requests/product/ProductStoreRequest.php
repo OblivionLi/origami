@@ -30,7 +30,7 @@ class ProductStoreRequest extends FormRequest
             'discount'      => 'required|numeric|between:0,100',
             'special_offer' => 'required|boolean',
             'product_code'  => 'required|string|max:20',
-            // 'image' => 'image|mimes:jpg,png,jpeg|max:5000',
+            'image'         => 'image|mimes:jpg,png,jpeg|max:10000'
         ];
     }
 }

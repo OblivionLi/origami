@@ -7,8 +7,10 @@ use App\Http\Requests\product\ProductUpdateRequest;
 use App\Http\Resources\product\ProductIndexResource;
 use App\Http\Resources\product\ProductShowResource;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class ProductController extends Controller
 {
@@ -33,8 +35,7 @@ class ProductController extends Controller
     {
         // Create the product
         $product = Product::create([
-            // 'user_id'           => Auth::id(),
-            'user_id'               => $request->user_id,
+            'user_id'           => Auth::id(),
             'parent_category_id'    => $request->parent_category_id,
             'child_category_id'     => $request->child_category_id,
             'name'                  => $request->name,
@@ -47,6 +48,21 @@ class ProductController extends Controller
             'total_reviews'         => 0,
             'total_quantities'      => 0
         ]);
+
+        // check if request has images
+        if ($request->hasFile('images')) {
+            // loop through request files
+            foreach ($request->file('images') as $file) {
+                // get original file name and add time in front for a unique overall name
+                $imgFileName = time() . '_' . $file->getClientOriginalName();
+                // create the image
+                ProductImage::create([
+                    'product_id'    => $product->id,
+                    'name'          => $imgFileName,
+                    'path'          => $file->storeAs('productImages', $imgFileName, 'public')
+                ]);
+            }
+        }
 
         // return success message
         $response = ['message' => 'Product create success'];
@@ -122,6 +138,18 @@ class ProductController extends Controller
 
         // if product doesnt exist return error message
         if (!$product) return response()->json(['message' => 'Product does not exist..']);
+
+        // get product images
+        $images = ProductImage::where('product_id', $product->id)->get();
+
+        // loop through the images collection
+        foreach ($images as $image) {
+            // delete image from storage
+            File::delete(public_path('/storage/' . $image->path));
+
+            // delete image from database
+            $image->delete();
+        }
 
         // delete the product
         $product->delete();
