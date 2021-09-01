@@ -4,30 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    use HasFactory, Sluggable;
+    use HasFactory;
 
     protected $fillable = [
-       'id', 'status', 'product_price', 'product_discount_price', 'shipping_price', 'tax_price', 'total_price', 'is_paid', 'is_delivered', 'paid_at', 'delivered_at'
+       'id', 
+       'status', 
+       'products_price', 
+       'products_discount_price', 
+       'shipping_price', 
+       'tax_price', 
+       'total_price', 
+       'is_paid', 
+       'is_delivered', 
+       'paid_at', 
+       'delivered_at'
     ];
-
-    /**
-     * Return the sluggable configuration array for this model.
-     *
-     * @return array
-     */
-    public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => 'id' + Str::random(30)
-            ]
-        ];
-    }
 
     /**
      * Get the user that owns the order
@@ -43,5 +37,12 @@ class Order extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'order_product')->withPivot('qty');
+    }
+
+    // define scope function that return a query with eager loading
+    public function scopeInfo($query)
+    {
+        // return data from relationships
+        return $query->with(['user', 'products']);
     }
 }
