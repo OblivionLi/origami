@@ -2,8 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\review\ReviewStoreRequest;
+use App\Http\Requests\review\ReviewUpdateRequest;
+use App\Http\Resources\review\ReviewIndexResource;
+use App\Http\Resources\review\ReviewIndexWithPaginationResource;
+use App\Http\Resources\review\ReviewShowResource;
+use App\Models\Product;
 use App\Models\Review;
+use App\Models\User;
+use Error;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
@@ -14,17 +23,18 @@ class ReviewController extends Controller
      */
     public function index()
     {
-        //
+        // return review resource with all relationship data
+        return ReviewIndexResource::collection(Review::with('products', 'user')->get());
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Display a listing of the resource with pagination.
+     * 
      */
-    public function create()
+    public function indexWithPagination($id)
     {
-        //
+        // return review resource with all relationship data
+        return ReviewIndexWithPaginationResource::collection(Review::with('products')->where('product_id', $id)->paginate(8));
     }
 
     /**
@@ -33,9 +43,47 @@ class ReviewController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ReviewStoreRequest $request)
     {
-        //
+        // find product by product_id
+        $product = Product::find($request->product_id);
+
+        // if product doesnt exist return error message
+        if (!$product) return response()->json(['message' => 'Product does not exist..']);
+
+        // get review where product_id is the same as request->product_id
+        // and user_id is the same as the logged in user id
+        $existingReview = Review::where([
+            ['product_id',  '=', $request->product_id],
+            ['user_id',     '=', Auth::id()]
+        ])->get();
+
+        // check if existingReview already exist
+        // then send an error message
+        if ($existingReview->count() > 1) return throw new Error('You reviewed this product already. Only one review per customer is allowed..', 1);
+
+        // create review
+        Review::create([
+            'product_id'        => $request->product_id,
+            'user_id'           => Auth::id(),
+            'name'              => $request->username,
+            'rating'            => $request->rating,
+            'comment'           => $request->comment 
+        ]);
+
+        // get collection of reviews where product_id is the same as request->product_id
+        $reviews = Review::where('product_id', $request->product_id)->get();
+
+        // update product overall total_reviews and rating columns data
+        $product->total_reviews = $reviews->count();
+        $product->rating        = $reviews->avg('rating');
+
+        // save product data into database
+        $product->save();
+
+        // return success message
+        $response = ['message', 'Review create success'];
+        return response()->json($response, 200);
     }
 
     /**
@@ -44,20 +92,17 @@ class ReviewController extends Controller
      * @param  \App\Models\Review  $review
      * @return \Illuminate\Http\Response
      */
-    public function show(Review $review)
+    public function show($id)
     {
-        //
-    }
+        // get review by id
+        $review = Review::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Review  $review
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Review $review)
-    {
-        //
+        // if review doesnt exist return error message
+        $response = ['message' => 'Review does not exist..'];
+        if (!$review) return response()->json($response, 422);
+
+        // return review resource
+        return new ReviewShowResource($review);
     }
 
     /**
@@ -67,9 +112,37 @@ class ReviewController extends Controller
      * @param  \App\Models\Review  $review
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Review $review)
+    public function update(ReviewUpdateRequest $request)
     {
-        //
+        // find review by id
+        $review = Review::find($request->review_id);
+
+        // if review doesnt exist return error message
+        if (!$review) return response()->json(['message' => 'Review does not exist..']);
+
+        // get logged in user id
+        $user_id = Auth::id();
+
+        // if no user is logged in return error message
+        if (!$user_id) return response()->json(['message' => 'Unable to find logged in user..']);
+
+        // find user by logged in id
+        $user = User::find($user_id);
+
+        // if user doesnt exist return error message
+        if (!$user) return response()->json(['message' => 'User does not exist..']);
+
+        // update review data
+        $review->admin_name     = $user->name;
+        $review->comment        = $request->comment;
+        $review->admin_comment  = $request->admin_comment;
+
+        // save the new review data
+        $review->save();
+
+        // return success message
+        $response = ['message', 'Review update success'];
+        return response()->json($response, 200);
     }
 
     /**
@@ -78,8 +151,19 @@ class ReviewController extends Controller
      * @param  \App\Models\Review  $review
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Review $review)
+    public function destroy($id)
     {
-        //
+        // find review by id
+        $review = Review::find($id);
+
+        // if review doesnt exist return error message
+        if (!$review) return response()->json(['message' => 'Review does not exist..']);
+
+        // delete review
+        $review->delete();
+
+        // return success message
+        $response = ['message', 'Review delete success'];
+        return response()->json($response, 200);
     }
 }
