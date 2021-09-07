@@ -4,5 +4,12 @@
 // Variables
 @import 'variables';
 
+// Components
+@import 'base';
+@import 'navigation/navbar';
+@import 'homescreen/latest';
+@import 'footer/footer';
+@import 'auth/auth';
+
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';

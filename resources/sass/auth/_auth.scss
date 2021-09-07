@@ -1,0 +1,31 @@
+.auth {
+    margin-top: 3rem;
+    background-color: $background-color;
+    box-shadow: $primary-shadow;
+
+    &-title {
+        width: 80%;
+        color: $primary-color;
+        font-family: $Quicksand;
+    }
+
+    &-form {
+
+        &--action {
+            margin-top: 1rem;
+            letter-spacing: 1px;
+        
+            &__link {
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 18px;
+                color: $primary-color;
+                font-family: $Quicksand;
+
+                &:hover {
+                    color: $secondary-color;
+                }
+            }
+        }
+    }
+}

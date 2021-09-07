@@ -1,0 +1,85 @@
+.content {
+    width: 70%;
+    margin: 0 auto;
+    padding: 1.5rem 3rem;
+
+    position: relative;
+
+    font-family: $Playfair;
+
+    &__products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, auto));
+        align-items: center;
+        justify-items: center;
+        gap: 30px;
+
+        div {
+            position: relative;
+
+            img {
+                height: 300px;
+                max-width: 100%;
+                display: block;
+                object-fit: cover;
+            }
+        }
+    }
+
+    &-title {
+        width: 80%;
+        margin: 0 auto;
+        padding: 1.5rem 3rem;
+        background-color: $background-color !important;
+
+        color: $primary-color !important;
+        font-family: $Quicksand;
+
+        box-shadow: $primary-shadow !important;
+    }
+}
+
+.card-content {
+    border-top: 1px solid $border;
+    background-color: $background-color;
+    color: wheat;
+
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    p, h2{
+        font-family: $Quicksand;
+        letter-spacing: 1px;
+        color: $primary-color;
+    }
+
+    button {
+        color: wheat;
+        background-color: $primary-color;
+        font-family: $Quicksand;
+        letter-spacing: 1px;
+    }
+
+    button:hover {
+        background-color: $secondary-color;
+        color: wheat;
+    }
+
+    &--span {
+        background-color: $primary-color;
+        color: wheat;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+}
+
+@media (max-width: 600px) {
+    .content {
+        width: 100%;
+        padding-left: 0;
+        margin-left: 0;
+    }
+}

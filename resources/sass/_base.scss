@@ -1,0 +1,24 @@
+body {
+    font-family: $Playfair;
+    background: url('http://127.0.0.1:8000/storage/back.jpg') no-repeat center center fixed;
+    background-size: cover;
+    padding-right: 0;
+}
+
+
+.divider2 {
+    width: 80%;
+    margin: 2rem auto 0 auto;
+    border: 1px solid $border;
+}
+
+.divider3 {
+    width: 40%;
+    margin: 2rem auto 0 auto;
+    border: 1px solid $border;
+}
+
+.icon {
+    font-size: 25px;
+    color: $secondary-color;
+}
