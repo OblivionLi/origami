@@ -24,10 +24,16 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes        ################################################## no need for admin perms or login
 Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::patch('reset-password/{email}', [AuthController::class, 'resetPassword']);
+Route::get('reset-password/{token}', [AuthController::class, 'getToken']);
 
 // Public routes        ################################################## no need for admin perms; login needed !
 Route::group(['middleware' => 'auth:api'], function () {
+    # User routes
+    Route::get('logout', [AuthController::class, 'logout']);
+    Route::patch('update-credentials/{id}', [AuthController::class, 'update']);
     Route::delete('delete/{id}', [AuthController::class, 'delete_user']);
 
     # Order routes
