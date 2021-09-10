@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\auth;
 
+use App\Http\Resources\role\RoleShowResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LoginUserResource extends JsonResource
@@ -28,6 +29,8 @@ class LoginUserResource extends JsonResource
             'name'          => $this->name,
             'email'         => $this->email,
             'role'          => $this->roles->pluck('name'),
+            'is_admin'      => $this->roles->pluck('is_admin'),
+            'details'       => RoleShowResource::collection($this->roles),
             'access_token'  => $this->token,
         ];
     }
