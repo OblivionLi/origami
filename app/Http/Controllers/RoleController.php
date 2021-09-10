@@ -32,7 +32,8 @@ class RoleController extends Controller
     {
         // Create the role
         Role::create([
-            'name'  => $request->name,
+            'name'      => $request->name,
+            'is_admin'  => 0
         ]);
         
         // return success message
@@ -103,8 +104,9 @@ class RoleController extends Controller
         // if role doesnt exist return error message
         if (!$role) return response()->json(['message' => 'Role does not exist..']);
 
-        // detach role_permission pivot
+        // detach role_permission & role_user pivot
         $role->permissions()->detach();
+        $role->users()->detach();
 
         // delete the role
         $role->delete();
