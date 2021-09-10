@@ -49,6 +49,6 @@ class ChildCategory extends Model
     public function scopeInfo($query)
     {
         // return data from relationships
-        return $query->with(['parentCategory:name', 'products']);
+        return $query->with(['parentCategory', 'products']);
     }
 }
