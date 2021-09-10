@@ -12,6 +12,29 @@
         list-style-type: none;
         padding-left: 0;
 
+        &--item {
+            height: 40px;
+            width: 40px;
+
+            text-decoration: none;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: $primary-color;
+
+            svg {
+                height: 100%;
+                width: 100%;
+
+                transition: all 0.2s ease-in-out;
+            }
+
+            &:hover {
+                color: $secondary-color;
+                transform: scale(1.1);
+            }
+        }
+
         li {
             display: flex;
             justify-content: center;

@@ -22,3 +22,11 @@ body {
     font-size: 25px;
     color: $secondary-color;
 }
+
+.center-loader {
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
