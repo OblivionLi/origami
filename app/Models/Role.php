@@ -33,6 +33,6 @@ class Role extends Model
     public function scopeInfo($query)
     {
         // return data from relationships
-        return $query->with(['users:name,email', 'permissions:name']);
+        return $query->with(['users:name,email', 'permissions:id,name']);
     }
 }
