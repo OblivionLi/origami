@@ -20,6 +20,18 @@ import {
     USER_UPDATE_CREDENTIALS_FAIL,
     USER_UPDATE_CREDENTIALS_SUCCESS,
     USER_UPDATE_CREDENTIALS_REQUEST,
+    USER_LIST_REQUEST,
+    USER_LIST_SUCCESS,
+    USER_LIST_FAIL,
+    USER_SHOW_FAIL,
+    USER_SHOW_SUCCESS,
+    USER_SHOW_REQUEST,
+    USER_UPDATE_FAIL,
+    USER_UPDATE_SUCCESS,
+    USER_UPDATE_REQUEST,
+    USER_DELETE_FAIL,
+    USER_DELETE_SUCCESS,
+    USER_DELETE_REQUEST,
 } from "../constants/userConstants";
 
 export const register =
@@ -97,7 +109,7 @@ export const login = (email, password, remember_me) => async (dispatch) => {
     }
 };
 
-export const logout = (dispatch) => {
+export const logout = () => async (dispatch) => {
     localStorage.removeItem("userInfo");
     dispatch({ type: USER_LOGOUT });
     dispatch({ type: USER_REGISTER_RESET });
@@ -193,6 +205,7 @@ export const updateCredentials =
             const { data } = await Axios.patch(
                 `/api/update-credentials/${id}`,
                 {
+                    id,
                     name,
                     email,
                     password,
@@ -211,6 +224,7 @@ export const updateCredentials =
                     name: data.name,
                     email: data.email,
                     role: data.role,
+                    is_admin: data.is_admin,
                     access_token: profile.data.access_token,
                 },
             };
@@ -222,6 +236,136 @@ export const updateCredentials =
                 payload:
                     error.response && error.response.data.message
                         ? error.response.data.errors
+                        : error.message,
+            });
+        }
+    };
+
+export const getUsersList = () => async (dispatch, getState) => {
+    try {
+        dispatch({ type: USER_LIST_REQUEST });
+
+        const {
+            userLogin: { userInfo },
+        } = getState();
+
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userInfo.data.access_token}`,
+            },
+        };
+
+        const { data } = await Axios.get("/api/users", config);
+
+        dispatch({ type: USER_LIST_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: USER_LIST_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.message
+                    : error.message,
+        });
+    }
+};
+
+export const getUser = (id) => async (dispatch, getState) => {
+    try {
+        dispatch({ type: USER_SHOW_REQUEST });
+
+        const {
+            userLogin: { userInfo },
+        } = getState();
+
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userInfo.data.access_token}`,
+            },
+        };
+
+        const { data } = await Axios.get(`/api/users/${id}`, config);
+
+        dispatch({ type: USER_SHOW_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: USER_SHOW_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.message
+                    : error.message,
+        });
+    }
+};
+
+export const editUser =
+    (id, name, email, role) => async (dispatch, getState) => {
+        try {
+            dispatch({ type: USER_UPDATE_REQUEST });
+
+            const {
+                userLogin: { userInfo },
+            } = getState();
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+            };
+
+            const { data } = await Axios.patch(
+                `/api/users/${id}`,
+                {
+                    id,
+                    name,
+                    email,
+                    role,
+                },
+                config
+            );
+
+            dispatch({ type: USER_UPDATE_SUCCESS, payload: data });
+        } catch (error) {
+            dispatch({
+                type: USER_UPDATE_FAIL,
+                payload:
+                    error.response && error.response.data.message
+                        ? error.response.message
+                        : error.message,
+            });
+        }
+    };
+
+export const deleteUser =
+    (id) => async (dispatch, getState) => {
+        try {
+            dispatch({ type: USER_DELETE_REQUEST });
+
+            const {
+                userLogin: { userInfo },
+            } = getState();
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+            };
+
+            const { data } = await Axios.delete(
+                `/api/users/${id}`,
+                config
+            );
+
+            dispatch({ type: USER_DELETE_SUCCESS, payload: data });
+        } catch (error) {
+            dispatch({
+                type: USER_DELETE_FAIL,
+                payload:
+                    error.response && error.response.data.message
+                        ? error.response.message
                         : error.message,
             });
         }
