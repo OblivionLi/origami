@@ -9,6 +9,7 @@ use App\Http\Requests\auth\RegisterUserRequest;
 use App\Http\Requests\auth\ResetPasswordRequest;
 use App\Http\Requests\auth\UpdateUserRequest;
 use App\Http\Resources\auth\RegisterUserResource;
+use App\Http\Resources\auth\UserUpdateResource;
 use App\Mail\ForgotPassword;
 use App\Models\Role;
 use App\Models\User;
@@ -231,7 +232,8 @@ class AuthController extends Controller
             'id'        => $user->id,
             'name'      => $user->name,
             'email'     => $user->email,
-            'role'      => $user->roles->pluck('name')
+            'role'      => $user->roles->pluck('name'),
+            'is_admin'  => $user->roles->pluck('is_admin')
         ];
         // return resource
         return response()->json($response, 200);
