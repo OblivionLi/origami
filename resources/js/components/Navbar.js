@@ -67,9 +67,12 @@ const Navbar = () => {
                     <li>
                         {userInfo ? (
                             <>
-                                <Link onClick={handleClick}>
+                                <a
+                                    className="navigation-list--item"
+                                    onClick={handleClick}
+                                >
                                     <AccountBoxIcon />
-                                </Link>
+                                </a>
                                 <Menu
                                     id="simple-menu"
                                     anchorEl={anchorEl}
@@ -79,11 +82,20 @@ const Navbar = () => {
                                     disableScrollLock={true}
                                 >
                                     <MenuItem onClick={handleClose}>
-                                        <Link to={'/settings'}>Settings</Link>
+                                        <Link to={"/settings"}>Settings</Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleClose}>
                                         My account
                                     </MenuItem>
+                                    {userInfo.data.is_admin == 1 && (
+                                        <MenuItem onClick={handleClose}>
+                                            <a
+                                                href="/admin"
+                                            >
+                                                Admin Panel
+                                            </a>
+                                        </MenuItem>
+                                    )}
                                     <MenuItem onClick={handleClose}>
                                         <a href="/" onClick={logoutHandler}>
                                             Logout
