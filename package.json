@@ -25,11 +25,14 @@
         "sass-loader": "^11.0.1"
     },
     "dependencies": {
-        "@material-ui/core": "^4.12.3",
+        "@material-ui/core": "^4.11.4",
         "@material-ui/icons": "^4.11.2",
         "@material-ui/lab": "^4.0.0-alpha.60",
         "@material-ui/utils": "^4.11.2",
+        "material-table": "^1.69.3",
+        "moment": "^2.29.1",
         "react-icons": "^4.2.0",
+        "react-moment": "^1.1.1",
         "react-redux": "^7.2.4",
         "react-router-dom": "^5.2.0",
         "redux": "^4.1.1",
