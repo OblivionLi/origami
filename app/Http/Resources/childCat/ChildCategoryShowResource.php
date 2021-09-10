@@ -17,12 +17,13 @@ class ChildCategoryShowResource extends JsonResource
         return [
             'id'            => $this->id,
             'name'          => $this->name,
+            'slug'          => $this->slug,
             'quantity'      => $this->quantity,
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
 
             'products'      => $this->products,
-            'parentCat'      => $this->parentCategory
+            'parentCat'     => $this->parentCategory
         ];
     }
 }

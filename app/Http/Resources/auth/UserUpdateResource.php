@@ -19,7 +19,8 @@ class UserUpdateResource extends JsonResource
             'id'        => $this->id,
             'name'      => $this->name,
             'email'     => $this->email,
-            'role'      => $this->roles->pluck('name')
+            'role'      => $this->roles->pluck('name'),
+            'is_admin'  => $this->roles->pluck('is_admin')
         ];
     }
 }
