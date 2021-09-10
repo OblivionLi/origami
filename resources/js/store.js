@@ -9,31 +9,84 @@ import {
     userResetPasswordReducer,
     userTokenResetPasswordReducer,
     userUpdateCredentialsReducer,
-    // userListReducer,
-    // userResetPassReducer,
-    // getUserResetReducer,
-    // userDeleteReducer,
-    // userGetEditDetailsReducer,
-    // userEditReducer,
-    // userDetailsReducer,
-    // userUpdateProfileReducer,
+    userListReducer,
+    userUpdateReducer,
+    userShowReducer,
+    userDeleteReducer
 } from "./reducers/userReducers";
 
+import {
+    roleListReducer,
+    roleUpdateReducer,
+    roleShowReducer,
+    roleDeleteReducer,
+    roleStoreReducer
+} from "./reducers/roleReducers";
+
+import {
+    permissionListReducer,
+    permissionUpdateReducer,
+    permissionShowReducer,
+    permissionDeleteReducer,
+    permissionStoreReducer
+} from "./reducers/permissionReducers";
+
+import {
+    parentCatListReducer,
+    parentCatUpdateReducer,
+    parentCatShowReducer,
+    parentCatDeleteReducer,
+    parentCatStoreReducer
+} from "./reducers/parentCategoryReducers";
+
+import {
+    childCatListReducer,
+    childCatUpdateReducer,
+    childCatShowReducer,
+    childCatDeleteReducer,
+    childCatStoreReducer
+} from "./reducers/childCategoryReducers";
+
 const reducer = combineReducers({
-    userRegister: userRegisterReducer,
-    userLogin: userLoginReducer,
-    userForgotPassword: userForgotPasswordReducer,
-    userResetPassword: userResetPasswordReducer,
-    userTokenResetPassword: userTokenResetPasswordReducer,
-    userUpdateCredentials: userUpdateCredentialsReducer,
-    // userList: userListReducer,
-    // userResetPass: userResetPassReducer,
-    // getUserReset: getUserResetReducer,
-    // userDelete: userDeleteReducer,
-    // userGetEditDetails: userGetEditDetailsReducer,
-    // userEdit: userEditReducer,
-    // userDetails: userDetailsReducer,
-    // userUpdateProfile: userUpdateProfileReducer,
+    // user reducers
+    userRegister:               userRegisterReducer,
+    userLogin:                  userLoginReducer,
+    userForgotPassword:         userForgotPasswordReducer,
+    userResetPassword:          userResetPasswordReducer,
+    userTokenResetPassword:     userTokenResetPasswordReducer,
+    userUpdateCredentials:      userUpdateCredentialsReducer,
+    userList:                   userListReducer,
+    userUpdate:                 userUpdateReducer,
+    userShow:                   userShowReducer,
+    userDelete:                 userDeleteReducer,
+
+    // role reducers
+    roleList:                   roleListReducer,
+    roleStore:                  roleStoreReducer,
+    roleUpdate:                 roleUpdateReducer,
+    roleShow:                   roleShowReducer,
+    roleDelete:                 roleDeleteReducer,
+
+    // permission reducers
+    permissionList:             permissionListReducer,
+    permissionStore:            permissionStoreReducer,
+    permissionUpdate:           permissionUpdateReducer,
+    permissionShow:             permissionShowReducer,
+    permissionDelete:           permissionDeleteReducer,
+
+    // parent category reducers
+    parentCatList:             parentCatListReducer,
+    parentCatStore:            parentCatStoreReducer,
+    parentCatUpdate:           parentCatUpdateReducer,
+    parentCatShow:             parentCatShowReducer,
+    parentCatDelete:           parentCatDeleteReducer,
+
+    // child category reducers
+    childCatList:             childCatListReducer,
+    childCatStore:            childCatStoreReducer,
+    childCatUpdate:           childCatUpdateReducer,
+    childCatShow:             childCatShowReducer,
+    childCatDelete:           childCatDeleteReducer,
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")
