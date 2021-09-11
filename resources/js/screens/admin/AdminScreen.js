@@ -39,6 +39,8 @@ import CategoryIcon from '@material-ui/icons/Category';
 import FileCopySharpIcon from '@material-ui/icons/FileCopySharp';
 import InsertDriveFileSharpIcon from '@material-ui/icons/InsertDriveFileSharp';
 import ChildCategoriesScreen from './categories/child/ChildCategoriesScreen';
+import ProductsScreen from './products/ProductsScreen';
+import NoteIcon from '@material-ui/icons/Note';
 
 const drawerWidth = 280;
 
@@ -318,6 +320,15 @@ const AdminScreen = ({ history }) => {
 
                                 <Divider />
 
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <NoteIcon className={classes.icons} />
+                                    </ListItemIcon>
+                                    <Link to="/admin/products" className="admin--links">
+                                        Products
+                                    </Link>
+                                </ListItem>
+
                                 <ListItem button onClick={handleCategoryMenu}>
                                     <ListItemIcon>
                                         <CategoryIcon className={classes.icons} />
@@ -347,7 +358,7 @@ const AdminScreen = ({ history }) => {
                                                 />
                                             </ListItemIcon>
                                             <Link
-                                                to="/admin/parent-category"
+                                                to="/admin/parent-categories"
                                                 className="admin--links"
                                             >
                                                 Parent
@@ -360,7 +371,7 @@ const AdminScreen = ({ history }) => {
                                                 />
                                             </ListItemIcon>
                                             <Link
-                                                to="/admin/child-category"
+                                                to="/admin/child-categories"
                                                 className="admin--links"
                                             >
                                                 Child
@@ -461,13 +472,18 @@ const AdminScreen = ({ history }) => {
                                 />
 
                                 <Route
-                                    path="/admin/parent-category"
+                                    path="/admin/parent-categories"
                                     component={ParentCategoriesScreen}
                                 />
 
                                 <Route
-                                    path="/admin/child-category"
+                                    path="/admin/child-categories"
                                     component={ChildCategoriesScreen}
+                                />
+
+                                <Route
+                                    path="/admin/products"
+                                    component={ProductsScreen}
                                 />
                             </Switch>
                         </main>
