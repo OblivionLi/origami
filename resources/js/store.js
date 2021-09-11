@@ -47,6 +47,17 @@ import {
     childCatStoreReducer
 } from "./reducers/childCategoryReducers";
 
+import {
+    productListReducer,
+    productUpdateReducer,
+    productShowReducer,
+    productDeleteReducer,
+    productStoreReducer,
+    productImageCreateReducer,
+    productImageDeleteReducer,
+    productImageReplaceReducer
+} from "./reducers/productReducers";
+
 const reducer = combineReducers({
     // user reducers
     userRegister:               userRegisterReducer,
@@ -75,18 +86,30 @@ const reducer = combineReducers({
     permissionDelete:           permissionDeleteReducer,
 
     // parent category reducers
-    parentCatList:             parentCatListReducer,
-    parentCatStore:            parentCatStoreReducer,
-    parentCatUpdate:           parentCatUpdateReducer,
-    parentCatShow:             parentCatShowReducer,
-    parentCatDelete:           parentCatDeleteReducer,
+    parentCatList:              parentCatListReducer,
+    parentCatStore:             parentCatStoreReducer,
+    parentCatUpdate:            parentCatUpdateReducer,
+    parentCatShow:              parentCatShowReducer,
+    parentCatDelete:            parentCatDeleteReducer,
 
     // child category reducers
-    childCatList:             childCatListReducer,
-    childCatStore:            childCatStoreReducer,
-    childCatUpdate:           childCatUpdateReducer,
-    childCatShow:             childCatShowReducer,
-    childCatDelete:           childCatDeleteReducer,
+    childCatList:               childCatListReducer,
+    childCatStore:              childCatStoreReducer,
+    childCatUpdate:             childCatUpdateReducer,
+    childCatShow:               childCatShowReducer,
+    childCatDelete:             childCatDeleteReducer,
+
+    // product reducers
+    productList:                productListReducer,
+    productStore:               productStoreReducer,
+    productUpdate:              productUpdateReducer,
+    productShow:                productShowReducer,
+    productDelete:              productDeleteReducer,
+
+    // product image reducers
+    productImageCreate:         productImageCreateReducer,
+    productImageDelete:         productImageDeleteReducer,
+    productImageReplace:        productImageReplaceReducer,
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")
