@@ -25,23 +25,23 @@ class ProductImageController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
         // find images of the current product
-        $images = ProductImage::where('product_id', $request->product_id)->get();
+        $images = ProductImage::where('product_id', $id)->get();
 
         // limit adding a new image if the product already has 5 images
         if ($images->count() < 5) {
             // check if request has file
-            if ($request->hasFile('images')) {
+            if ($request->hasFile('image')) {
                 // get image original name and add currect time for an overall unique name
-                $imgFileName = time() . '_' . $request->images->getClientOriginalName();
+                $imgFileName = time() . '_' . $request->image->getClientOriginalName();
 
                 // create image
                 ProductImage::create([
-                    'product_id'    => $request->product_id,
+                    'product_id'    => $id,
                     'name'          => $imgFileName,
-                    'path'          => $request->images->storeAs('productImages', $imgFileName, 'public')
+                    'path'          => $request->image->storeAs('productImages', $imgFileName, 'public')
                 ]);
 
             // return warning message
@@ -62,23 +62,23 @@ class ProductImageController extends Controller
      * @param  \App\Models\ProductImage  $productImage
      * @return \Illuminate\Http\Response
      */
-    public function update(ProductImageUpdateRequest $request)
+    public function update(ProductImageUpdateRequest $request, $id)
     {
         // if request has no files return error message
-        if (!$request->hasFile('images')) return response()->json(['message' => 'Request has no file to process..']);
+        if (!$request->hasFile('image')) return response()->json(['message' => 'Request has no file to process..']);
 
         // get image original name and add currect time for an overall unique name
-        $imgFileName = time() . '_' . $request->images->getClientOriginalName();
+        $imgFileName = time() . '_' . $request->image->getClientOriginalName();
 
         // replace image
         ProductImage::create([
             'product_id'    => $request->product_id,
             'name'          => $imgFileName,
-            'path'          => $request->images->storeAs('productImages', $imgFileName, 'public')
+            'path'          => $request->image->storeAs('productImages', $imgFileName, 'public')
         ]);
 
         // find the current image to be replaced
-        $currentImage = ProductImage::find($request->image_id);
+        $currentImage = ProductImage::find($id);
         // get the current image to be replaced path
         $currentImagePath = public_path('/storage/' . $currentImage->path);
 
