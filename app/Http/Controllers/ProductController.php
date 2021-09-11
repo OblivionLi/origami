@@ -6,6 +6,7 @@ use App\Http\Requests\product\ProductStoreRequest;
 use App\Http\Requests\product\ProductUpdateRequest;
 use App\Http\Resources\product\ProductIndexResource;
 use App\Http\Resources\product\ProductShowResource;
+use App\Models\ChildCategory;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
@@ -33,10 +34,15 @@ class ProductController extends Controller
      */
     public function store(ProductStoreRequest $request)
     {
+        // find category by request->child_category_id
+        // query is used to get the child category relation id for parent category
+        // id is used to store the parent_category_id
+        $childCat = ChildCategory::find($request->child_category_id);
+
         // Create the product
         $product = Product::create([
             'user_id'           => Auth::id(),
-            'parent_category_id'    => $request->parent_category_id,
+            'parent_category_id'    => $childCat->parent_category_id,
             'child_category_id'     => $request->child_category_id,
             'name'                  => $request->name,
             'description'           => $request->description,
@@ -97,6 +103,11 @@ class ProductController extends Controller
      */
     public function update(ProductUpdateRequest $request, $slug)
     {
+        // find category by request->child_category_id
+        // query is used to get the child category relation id for parent category
+        // id is used to store the parent_category_id
+        $childCat = ChildCategory::find($request->child_category_id);
+
         // get product by slug
         $product = Product::findBySlug($slug);
 
@@ -117,8 +128,8 @@ class ProductController extends Controller
         $product->save();
 
         // associate relationship ids
-        $product->parentCategory()->associate($request->parent_category_id);
-        $product->childCategory()->associate($request->parent_category_id);
+        $product->parentCategory()->associate($childCat->parent_category_id);
+        $product->childCategory()->associate($request->child_category_id);
 
         // return success message
         $response = ['message', 'Product update success'];
