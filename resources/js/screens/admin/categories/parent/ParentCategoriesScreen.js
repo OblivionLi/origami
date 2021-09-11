@@ -296,6 +296,35 @@ const ParentCategoriesScreen = ({ history }) => {
                                     backgroundColor: "#FDF7E9",
                                 },
                             }}
+                            detailPanel={(rowData) => {
+                                return (
+                                    <div className="table-detail">
+                                        <h2 className="table-detail--title">
+                                            Parent Category's Child Categories
+                                        </h2>
+                                        <div className="table-detail--par">
+                                            {rowData.childCat.length ? (
+                                                rowData.childCat.map(
+                                                    (childCat) => (
+                                                        <h4
+                                                            key={
+                                                                childCat
+                                                            }
+                                                        >
+                                                            {childCat}
+                                                        </h4>
+                                                    )
+                                                )
+                                            ) : (
+                                                <p>
+                                                    This Parent Category "({rowData})"
+                                                    has no child categories.
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            }}
                         />
                     )}
 
