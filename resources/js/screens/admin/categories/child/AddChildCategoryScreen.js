@@ -102,9 +102,7 @@ const AddChildCategoryScreen = ({ setOpenAddDialog, setRequestData }) => {
                                     required
                                 />
                             </div>
-                        </div>
-
-                        <div className="form">
+                            
                             <div className="form__field">
                                 <FormControl fullWidth>
                                     <InputLabel id="role-simple-select-label">

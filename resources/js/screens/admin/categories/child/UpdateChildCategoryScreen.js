@@ -129,9 +129,7 @@ const UpdateChildCategoryScreen = ({
                                     required
                                 />
                             </div>
-                        </div>
-
-                        <div className="form">
+                            
                             <div className="form__field">
                                 <FormControl fullWidth>
                                     <InputLabel id="parentCat-simple-select-label">

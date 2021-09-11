@@ -70,7 +70,6 @@ const UpdateRoleScreen = ({ setOpenEditDialog, setRequestData, roleId }) => {
                 setName(data.name);
                 setIsAdmin(data.is_admin);
 
-                
                 let currentPerms = [];
                 if (perms) {
                     data &&
@@ -162,9 +161,7 @@ const UpdateRoleScreen = ({ setOpenEditDialog, setRequestData, roleId }) => {
                                     required
                                 />
                             </div>
-                        </div>
 
-                        <div className="form">
                             <div className="form__field">
                                 <FormControl component="fieldset">
                                     <FormLabel component="legend">
@@ -179,7 +176,7 @@ const UpdateRoleScreen = ({ setOpenEditDialog, setRequestData, roleId }) => {
                                                 value={isAdmin}
                                                 control={
                                                     <Checkbox
-                                                        style ={{
+                                                        style={{
                                                             color: "#388667",
                                                         }}
                                                         checked={
@@ -199,63 +196,63 @@ const UpdateRoleScreen = ({ setOpenEditDialog, setRequestData, roleId }) => {
                             </div>
 
                             {Object.keys(role).length != 0 && (
-                                <div className="form">
-                                    <div className="form__field">
-                                        <FormControl component="fieldset">
-                                            <FormLabel component="legend">
-                                                Choose Permissions
-                                            </FormLabel>
-                                            <FormGroup
-                                                row
-                                                onChange={handlePermCheckbox}
-                                            >
-                                                <div className="form__field--checkboxes">
-                                                    {permissions && Object.keys(permissions).length != 0 &&
-                                                        permissions.data.map(
-                                                            (permission, i) => {
-                                                                return (
-                                                                    <FormControlLabel
-                                                                        key={
-                                                                            permission.id
-                                                                        }
-                                                                        value={
-                                                                            permission.id
-                                                                        }
-                                                                        control={
-                                                                            <Checkbox
-                                                                                style ={{
-                                                                                    color: "#388667",
-                                                                                }}
-                                                                                defaultChecked={
-                                                                                    data &&
-                                                                                    data.permissions.some(
-                                                                                        (
-                                                                                            p
-                                                                                        ) =>
-                                                                                            p.id ===
-                                                                                            permission.id
-                                                                                    )
-                                                                                        ? true
-                                                                                        : false
-                                                                                }
-                                                                            />
-                                                                        }
-                                                                        label={
-                                                                            permission.name
-                                                                        }
-                                                                        name="permission"
-                                                                    />
-                                                                );
-                                                            }
-                                                        )}
-                                                </div>
-                                            </FormGroup>
-                                            <FormHelperText>
-                                                Be consistent with distributing
-                                                permissions between users.
-                                            </FormHelperText>
-                                        </FormControl>
-                                    </div>
+                                <div className="form__field">
+                                    <FormControl component="fieldset">
+                                        <FormLabel component="legend">
+                                            Choose Permissions
+                                        </FormLabel>
+                                        <FormGroup
+                                            row
+                                            onChange={handlePermCheckbox}
+                                        >
+                                            <div className="form__field--checkboxes">
+                                                {permissions &&
+                                                    Object.keys(permissions)
+                                                        .length != 0 &&
+                                                    permissions.data.map(
+                                                        (permission, i) => {
+                                                            return (
+                                                                <FormControlLabel
+                                                                    key={
+                                                                        permission.id
+                                                                    }
+                                                                    value={
+                                                                        permission.id
+                                                                    }
+                                                                    control={
+                                                                        <Checkbox
+                                                                            style={{
+                                                                                color: "#388667",
+                                                                            }}
+                                                                            defaultChecked={
+                                                                                data &&
+                                                                                data.permissions.some(
+                                                                                    (
+                                                                                        p
+                                                                                    ) =>
+                                                                                        p.id ===
+                                                                                        permission.id
+                                                                                )
+                                                                                    ? true
+                                                                                    : false
+                                                                            }
+                                                                        />
+                                                                    }
+                                                                    label={
+                                                                        permission.name
+                                                                    }
+                                                                    name="permission"
+                                                                />
+                                                            );
+                                                        }
+                                                    )}
+                                            </div>
+                                        </FormGroup>
+                                        <FormHelperText>
+                                            Be consistent with distributing
+                                            permissions between users.
+                                        </FormHelperText>
+                                    </FormControl>
                                 </div>
                             )}
                         </div>

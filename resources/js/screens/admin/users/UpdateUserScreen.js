@@ -125,9 +125,7 @@ const UpdateUserScreen = ({ setOpenEditDialog, setRequestData, userId }) => {
                                     required
                                 />
                             </div>
-                        </div>
 
-                        <div className="form">
                             <div className="form__field">
                                 <TextField
                                     variant="outlined"
@@ -139,9 +137,7 @@ const UpdateUserScreen = ({ setOpenEditDialog, setRequestData, userId }) => {
                                     required
                                 />
                             </div>
-                        </div>
 
-                        <div className="form">
                             <div className="form__field">
                                 <FormControl fullWidth>
                                     <InputLabel id="role-simple-select-label">
