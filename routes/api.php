@@ -89,7 +89,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         # Product Images routes
         Route::post('productImage/{productId}', [ProductImageController::class, 'store']);
-        Route::post('productImage/{imageId}', [ProductImageController::class, 'update']);
+        Route::post('RproductImage/{imageId}', [ProductImageController::class, 'update']);
         Route::delete('productImage/{imageId}', [ProductImageController::class, 'destroy']);
 
         # Review routes
