@@ -240,6 +240,10 @@ const ChildCategoriesScreen = ({ history }) => {
                                     field: "parentCat.name",
                                 },
                                 {
+                                    title: "Total Products",
+                                    field: "products.length",
+                                },
+                                {
                                     title: "Created At",
                                     field: "created_at",
                                     render: (childCats) => {
