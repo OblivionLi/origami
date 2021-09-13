@@ -18,7 +18,7 @@ import {
     Menu,
     MenuItem,
 } from "@material-ui/core";
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -34,13 +34,15 @@ import RolesScreen from "./users/roles/RolesScreen";
 import PermissionsScreen from "./users/permissions/PermissionsScreen";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import DashboardScreen from "./DashboardScreen";
-import ParentCategoriesScreen from './categories/parent/ParentCategoriesScreen';
-import CategoryIcon from '@material-ui/icons/Category';
-import FileCopySharpIcon from '@material-ui/icons/FileCopySharp';
-import InsertDriveFileSharpIcon from '@material-ui/icons/InsertDriveFileSharp';
-import ChildCategoriesScreen from './categories/child/ChildCategoriesScreen';
-import ProductsScreen from './products/ProductsScreen';
-import NoteIcon from '@material-ui/icons/Note';
+import ParentCategoriesScreen from "./categories/parent/ParentCategoriesScreen";
+import CategoryIcon from "@material-ui/icons/Category";
+import FileCopySharpIcon from "@material-ui/icons/FileCopySharp";
+import InsertDriveFileSharpIcon from "@material-ui/icons/InsertDriveFileSharp";
+import ChildCategoriesScreen from "./categories/child/ChildCategoriesScreen";
+import ProductsScreen from "./products/ProductsScreen";
+import NoteIcon from "@material-ui/icons/Note";
+import { BiCommentDetail } from "react-icons/bi";
+import ReviewsScreen from "./reviews/ReviewsScreen";
 
 const drawerWidth = 280;
 
@@ -56,7 +58,8 @@ const useStyles = makeStyles((theme) => ({
         }),
         backgroundColor: "#FDF7E9",
         color: "#855C1B",
-        boxShadow: '0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)',
+        boxShadow:
+            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
     },
     menuPanel: {
         fontFamily: "Quicksand",
@@ -98,7 +101,8 @@ const useStyles = makeStyles((theme) => ({
             duration: theme.transitions.duration.enteringScreen,
         }),
         backgroundColor: "#FDF7E9",
-        boxShadow: '0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)',
+        boxShadow:
+            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
     },
     drawerClose: {
         transition: theme.transitions.create("width", {
@@ -111,7 +115,8 @@ const useStyles = makeStyles((theme) => ({
             width: theme.spacing(9) + 1,
         },
         backgroundColor: "#FDF7E9",
-        boxShadow: '0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)',
+        boxShadow:
+            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
     },
     toolbar: {
         display: "flex",
@@ -178,7 +183,6 @@ const AdminScreen = ({ history }) => {
     // function handleClick() {
     //     setOpen2(!open2);
     // }
-
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -265,13 +269,17 @@ const AdminScreen = ({ history }) => {
                                                 open={Boolean(openNavUserMenu)}
                                                 onClose={handleNavUserMenu}
                                             >
-                                                <MenuItem onClick={handleNavUserMenu}>
+                                                <MenuItem
+                                                    onClick={handleNavUserMenu}
+                                                >
                                                     <a href="/settings">
                                                         Settings
                                                     </a>
                                                 </MenuItem>
 
-                                                <MenuItem onClick={handleNavUserMenu}>
+                                                <MenuItem
+                                                    onClick={handleNavUserMenu}
+                                                >
                                                     <Link
                                                         to="/"
                                                         onClick={logoutHandler}
@@ -311,7 +319,9 @@ const AdminScreen = ({ history }) => {
                             <List>
                                 <ListItem button>
                                     <ListItemIcon>
-                                        <DashboardIcon className={classes.icons} />
+                                        <DashboardIcon
+                                            className={classes.icons}
+                                        />
                                     </ListItemIcon>
                                     <Link to="/admin" className="admin--links">
                                         Dashboard
@@ -324,14 +334,33 @@ const AdminScreen = ({ history }) => {
                                     <ListItemIcon>
                                         <NoteIcon className={classes.icons} />
                                     </ListItemIcon>
-                                    <Link to="/admin/products" className="admin--links">
+                                    <Link
+                                        to="/admin/products"
+                                        className="admin--links"
+                                    >
                                         Products
+                                    </Link>
+                                </ListItem>
+
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <BiCommentDetail
+                                            className={classes.icons}
+                                        />
+                                    </ListItemIcon>
+                                    <Link
+                                        to="/admin/products/reviews"
+                                        className="admin--links"
+                                    >
+                                        Reviews
                                     </Link>
                                 </ListItem>
 
                                 <ListItem button onClick={handleCategoryMenu}>
                                     <ListItemIcon>
-                                        <CategoryIcon className={classes.icons} />
+                                        <CategoryIcon
+                                            className={classes.icons}
+                                        />
                                     </ListItemIcon>
                                     <ListItemText
                                         primary="Product Categories"
@@ -484,6 +513,12 @@ const AdminScreen = ({ history }) => {
                                 <Route
                                     path="/admin/products"
                                     component={ProductsScreen}
+                                    exact
+                                />
+
+                                <Route
+                                    path="/admin/products/reviews"
+                                    component={ReviewsScreen}
                                 />
                             </Switch>
                         </main>
