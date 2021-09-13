@@ -15,6 +15,7 @@ class ReviewIndexResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'id'            => $this->id,
             'user_name'     => $this->user_name,
             'user_comment'  => $this->user_comment,
             'admin_name'    => $this->admin_name,
