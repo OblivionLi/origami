@@ -30,12 +30,20 @@ Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::patch('reset-password/{email}', [AuthController::class, 'resetPassword']);
 Route::get('reset-password/{token}', [AuthController::class, 'getToken']);
 
+# Product routes
+Route::get('showcase-products', [ProductController::class, 'getShowcaseProducts']);
+Route::get('products/{product}', [ProductController::class, 'show']);
+Route::get('reviews/product/{product}', [ReviewController::class, 'indexWithPagination']);
+
 // Public routes        ################################################## no need for admin perms; login needed !
 Route::group(['middleware' => 'auth:api'], function () {
     # User routes
     Route::get('logout', [AuthController::class, 'logout']);
     Route::patch('update-credentials/{id}', [AuthController::class, 'update']);
     Route::delete('delete/{id}', [AuthController::class, 'delete_user']);
+
+    # Review routes
+    Route::post('reviews/{review}', [ReviewController::class, 'store']);
 
     # Order routes
     Route::get('userOrders', [OrderController::class, 'getUserOrders']);
@@ -83,7 +91,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         # Product routes
         Route::get('products', [ProductController::class, 'index']);
         Route::post('products', [ProductController::class, 'store']);
-        Route::get('products/{product}', [ProductController::class, 'show']);
         Route::patch('products/{product}', [ProductController::class, 'update']);
         Route::delete('products/{product}', [ProductController::class, 'destroy']);
 
@@ -94,8 +101,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         # Review routes
         Route::get('reviews', [ReviewController::class, 'index']);
-        Route::get('reviews', [ReviewController::class, 'indexWithPagination']);
-        Route::post('reviews', [ReviewController::class, 'store']);
+        // Route::get('reviews', [ReviewController::class, 'indexWithPagination']);
         Route::get('reviews/{review}', [ReviewController::class, 'show']);
         Route::patch('reviews/{review}', [ReviewController::class, 'update']);
         Route::delete('reviews/{review}', [ReviewController::class, 'destroy']);
