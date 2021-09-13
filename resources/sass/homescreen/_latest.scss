@@ -48,22 +48,33 @@
     justify-content: space-between;
     flex-wrap: wrap;
 
-    p, h2{
-        font-family: $Quicksand;
-        letter-spacing: 1px;
-        color: $primary-color;
+    &-top {
+        border-top: 1px solid $border;
+        background-color: $background-color;
+        color: wheat;
+        
+        p, h2{
+            font-family: $Quicksand;
+            letter-spacing: 1px;
+            color: $primary-color;
+        }
     }
+    
 
-    button {
+    a {
         color: wheat;
         background-color: $primary-color;
         font-family: $Quicksand;
         letter-spacing: 1px;
-    }
+        text-decoration: none;
+        padding: 5px;
+        border-radius: 5px;
 
-    button:hover {
-        background-color: $secondary-color;
-        color: wheat;
+        &:hover {
+            background-color: $secondary-color;
+            color: wheat;
+            text-decoration: none;
+        }
     }
 
     &--span {
@@ -74,7 +85,34 @@
         cursor: pointer;
     }
 
+    &--span2 {
+        background-color: $primary-color;
+        color: wheat;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: $Quicksand;
+        letter-spacing: 1px;
+    }
+
 }
+
+.bc {
+    color: $primary-color;
+    font-weight: 600;
+
+    &:hover {
+        cursor: pointer;
+        color: $secondary-color;
+    }
+
+    &-p {
+        font-weight: 600 !important;
+        font-size: 20px !important;
+        color: $secondary-color !important;
+    }
+}
+
 
 @media (max-width: 600px) {
     .content {

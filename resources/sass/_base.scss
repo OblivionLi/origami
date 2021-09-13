@@ -30,3 +30,28 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+.MuiCircularProgress-circle {
+    color: $secondary-color !important;
+}
+
+.MuiAlert-message {
+    font-family: $Quicksand;
+}
+
+.page-link {
+    background-color: $primary-color !important;
+    color: wheat !important;
+
+    &:hover {
+        background-color: $secondary-color !important;
+    }
+}
+
+.page-item.active .page-link {
+    background-color: $secondary-color !important;
+    color: wheat !important;
+    border-color: $border;
+
+    cursor: pointer;
+}
