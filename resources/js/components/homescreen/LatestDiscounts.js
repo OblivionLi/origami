@@ -10,6 +10,8 @@ import {
     CardActions,
     Button,
 } from "@material-ui/core";
+import Loader from "../alert/Loader";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -25,17 +27,19 @@ const useStyles = makeStyles((theme) => ({
     },
 
     card: {
-        maxWidth: 320,
+        maxWidth: 345,
+        minWidth: 345,
         boxShadow:
             "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
     },
 
     media: {
-        height: 340,
+        height: 345,
+        width: "100%",
     },
 }));
 
-const LatestDiscounts = () => {
+const LatestDiscounts = ({ latestDiscounts }) => {
     const classes = useStyles();
 
     return (
@@ -46,160 +50,57 @@ const LatestDiscounts = () => {
 
             <div className="content">
                 <div className="content__products">
-                    <Card className={classes.card}>
-                        <CardActionArea>
-                            <CardMedia
-                                className={classes.media}
-                                image="http://127.0.0.1:8000/storage/img1.jpeg"
-                                title="Contemplative Reptile"
-                            />
-                            <CardContent className="card-content">
-                                <Typography
-                                    gutterBottom
-                                    variant="h5"
-                                    component="h2"
-                                    className="card-content-h2"
-                                >
-                                    Lizard
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    component="p"
-                                    className="card-content-p"
-                                >
-                                    Lizards are a widespread group of squamate
-                                    reptiles, with over 6,000 species, ranging
-                                    across all continents except Antarctica
-                                </Typography>
-                            </CardContent>
-                        </CardActionArea>
-                        <CardActions className="card-content">
-                            <Button size="small" color="primary">
-                                View Product
-                            </Button>
+                    {!latestDiscounts ? (
+                        <Loader />
+                    ) : (
+                        latestDiscounts.map((product) => (
+                            <Card className={classes.card} key={product.id}>
+                                <CardActionArea>
+                                    <CardMedia
+                                        className={classes.media}
+                                        image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
+                                        title={`Image for product: ${product.name}`}
+                                    />
+                                    <CardContent className="card-content-top">
+                                        <Typography
+                                            gutterBottom
+                                            variant="h5"
+                                            component="h2"
+                                            className="card-content-h2"
+                                        >
+                                            {product.name}
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            component="p"
+                                            className="card-content-p"
+                                        >
+                                            {product.description}
+                                        </Typography>
+                                    </CardContent>
+                                </CardActionArea>
+                                <CardActions className="card-content">
+                                    <Link to={`/product/${product.slug}`}>
+                                        View Product
+                                    </Link>
 
-                            <div className="card-content--span">
-                                <span>
-                                    &euro;
-                                    1.55
-                                    {/* {(
-                                        mostDiscountedProduct.price -
-                                        (mostDiscountedProduct.price *
-                                            mostDiscountedProduct.discount) /
-                                            100
-                                    ).toFixed(2)} */}
-                                </span>
-                                {" - "}
-                                <strike>
-                                    &euro;
-                                    2.99
-                                    {/* {mostDiscountedProduct.price} */}
-                                </strike>
-                            </div>
-                        </CardActions>
-                    </Card>
-                    <Card className={classes.card}>
-                        <CardActionArea>
-                            <CardMedia
-                                className={classes.media}
-                                image="http://127.0.0.1:8000/storage/img1.jpeg"
-                                title="Contemplative Reptile"
-                            />
-                            <CardContent className="card-content">
-                                <Typography
-                                    gutterBottom
-                                    variant="h5"
-                                    component="h2"
-                                    className="card-content-h2"
-                                >
-                                    Lizard
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    component="p"
-                                    className="card-content-p"
-                                >
-                                    Lizards are a widespread group of squamate
-                                    reptiles, with over 6,000 species, ranging
-                                    across all continents except Antarctica
-                                </Typography>
-                            </CardContent>
-                        </CardActionArea>
-                        <CardActions className="card-content">
-                            <Button size="small" color="primary">
-                                View Product
-                            </Button>
-                            <div className="card-content--span">
-                                <span>
-                                    &euro;
-                                    1.55
-                                    {/* {(
-                                        mostDiscountedProduct.price -
-                                        (mostDiscountedProduct.price *
-                                            mostDiscountedProduct.discount) /
-                                            100
-                                    ).toFixed(2)} */}
-                                </span>
-                                {" - "}
-                                <strike>
-                                    &euro;
-                                    2.99
-                                    {/* {mostDiscountedProduct.price} */}
-                                </strike>
-                            </div>
-                        </CardActions>
-                    </Card>
-                    <Card className={classes.card}>
-                        <CardActionArea>
-                            <CardMedia
-                                className={classes.media}
-                                image="http://127.0.0.1:8000/storage/img1.jpeg"
-                                title="Contemplative Reptile"
-                            />
-                            <CardContent className="card-content">
-                                <Typography
-                                    gutterBottom
-                                    variant="h5"
-                                    component="h2"
-                                    className="card-content-h2"
-                                >
-                                    Lizard
-                                </Typography>
-                                <Typography
-                                    variant="body2"
-                                    component="p"
-                                    className="card-content-p"
-                                >
-                                    Lizards are a widespread group of squamate
-                                    reptiles, with over 6,000 species, ranging
-                                    across all continents except Antarctica
-                                </Typography>
-                            </CardContent>
-                        </CardActionArea>
-                        <CardActions className="card-content">
-                            <Button size="small" color="primary">
-                                View Product
-                            </Button>
-                            <div className="card-content--span">
-                                <span>
-                                    &euro;
-                                    1.55
-                                    {/* {(
-                                        mostDiscountedProduct.price -
-                                        (mostDiscountedProduct.price *
-                                            mostDiscountedProduct.discount) /
-                                            100
-                                    ).toFixed(2)} */}
-                                </span>
-                                {" - "}
-                                <strike>
-                                    &euro;
-                                    2.99
-                                    {/* {mostDiscountedProduct.price} */}
-                                </strike>
-                            </div>
-                        </CardActions>
-                    </Card>
+                                    <div className="card-content--span">
+                                        <span>
+                                            &euro;
+                                            {(
+                                                product.price -
+                                                (product.price *
+                                                    product.discount) /
+                                                    100
+                                            ).toFixed(2)}
+                                        </span>
+                                        {" - "}
+                                        <strike>&euro; {product.price}</strike>
+                                    </div>
+                                </CardActions>
+                            </Card>
+                        ))
+                    )}
                 </div>
             </div>
         </section>
