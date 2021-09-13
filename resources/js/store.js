@@ -55,8 +55,18 @@ import {
     productStoreReducer,
     productImageCreateReducer,
     productImageDeleteReducer,
-    productImageReplaceReducer
+    productImageReplaceReducer,
+    productShowcaseReducer
 } from "./reducers/productReducers";
+
+import {
+    reviewListReducer,
+    reviewUpdateReducer,
+    reviewShowReducer,
+    reviewDeleteReducer,
+    reviewStoreReducer,
+    reviewListPagReducer
+} from "./reducers/reviewReducers";
 
 const reducer = combineReducers({
     // user reducers
@@ -105,21 +115,38 @@ const reducer = combineReducers({
     productUpdate:              productUpdateReducer,
     productShow:                productShowReducer,
     productDelete:              productDeleteReducer,
+    productShowcase:            productShowcaseReducer,
 
     // product image reducers
     productImageCreate:         productImageCreateReducer,
     productImageDelete:         productImageDeleteReducer,
     productImageReplace:        productImageReplaceReducer,
+
+    // review reducers
+    reviewList:                 reviewListReducer,
+    reviewStore:                reviewStoreReducer,
+    reviewUpdate:               reviewUpdateReducer,
+    reviewShow:                 reviewShowReducer,
+    reviewDelete:               reviewDeleteReducer,
+    reviewListPag:              reviewListPagReducer,
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")
     ? JSON.parse(localStorage.getItem("userInfo"))
     : null;
 
+const cartItemsFromStorage = localStorage.getItem("cartItems")
+    ? JSON.parse(localStorage.getItem("cartItems"))
+    : [];
+
 const initialState = {
     userLogin: {
         userInfo: userInfoFromStorage,
     },
+
+    cart: {
+        cartItems: cartItemsFromStorage
+    }
 };
 
 const middleware = [thunk];
