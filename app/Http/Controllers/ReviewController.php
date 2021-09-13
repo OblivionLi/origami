@@ -24,7 +24,7 @@ class ReviewController extends Controller
     public function index()
     {
         // return review resource with all relationship data
-        return ReviewIndexResource::collection(Review::with('products', 'user')->get());
+        return ReviewIndexResource::collection(Review::info()->get());
     }
 
     /**
@@ -34,7 +34,7 @@ class ReviewController extends Controller
     public function indexWithPagination($id)
     {
         // return review resource with all relationship data
-        return ReviewIndexWithPaginationResource::collection(Review::with('products')->where('product_id', $id)->paginate(8));
+        return ReviewIndexWithPaginationResource::collection(Review::with('product')->where('product_id', $id)->paginate(1));
     }
 
     /**
@@ -43,43 +43,46 @@ class ReviewController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ReviewStoreRequest $request)
+    public function store(ReviewStoreRequest $request, $slug)
     {
         // find product by product_id
-        $product = Product::find($request->product_id);
+        $product = Product::findBySlug($slug);
 
         // if product doesnt exist return error message
-        if (!$product) return response()->json(['message' => 'Product does not exist..']);
+        if ($product) {
+            // get review where product_id is the same as request->product_id
+            // and user_id is the same as the logged in user id
+            $existingReview = Review::where([
+                ['product_id',  '=', $product->id],
+                ['user_id',     '=', $request->user_id]
+            ])->get();
 
-        // get review where product_id is the same as request->product_id
-        // and user_id is the same as the logged in user id
-        $existingReview = Review::where([
-            ['product_id',  '=', $request->product_id],
-            ['user_id',     '=', Auth::id()]
-        ])->get();
+            // check if existingReview already exist
+            // if not then send an error message
+            if ($existingReview->count() < 1) {
+                // create review
+                Review::create([
+                    'product_id'        => $product->id,
+                    'user_id'           => $request->user_id,
+                    'user_name'         => $request->username,
+                    'rating'            => $request->rating,
+                    'user_comment'      => $request->comment 
+                ]);
 
-        // check if existingReview already exist
-        // then send an error message
-        if ($existingReview->count() > 1) return throw new Error('You reviewed this product already. Only one review per customer is allowed..', 1);
-
-        // create review
-        Review::create([
-            'product_id'        => $request->product_id,
-            'user_id'           => Auth::id(),
-            'name'              => $request->username,
-            'rating'            => $request->rating,
-            'comment'           => $request->comment 
-        ]);
-
-        // get collection of reviews where product_id is the same as request->product_id
-        $reviews = Review::where('product_id', $request->product_id)->get();
-
-        // update product overall total_reviews and rating columns data
-        $product->total_reviews = $reviews->count();
-        $product->rating        = $reviews->avg('rating');
-
-        // save product data into database
-        $product->save();
+                // get collection of reviews where product_id is the same as request->product_id
+                $reviews = Review::where('product_id', $product->id)->get();
+        
+                // update product overall total_reviews and rating columns data
+                $product->total_reviews = $reviews->count();
+                $product->rating        = $reviews->avg('rating');
+        
+                // save product data into database
+                $product->save();
+            } else { 
+                // return error message
+                throw new Error('You reviewed this product already. Only one review per customer is allowed!', 1);
+            }
+        }
 
         // return success message
         $response = ['message', 'Review create success'];
@@ -112,10 +115,10 @@ class ReviewController extends Controller
      * @param  \App\Models\Review  $review
      * @return \Illuminate\Http\Response
      */
-    public function update(ReviewUpdateRequest $request)
+    public function update(ReviewUpdateRequest $request, $id)
     {
         // find review by id
-        $review = Review::find($request->review_id);
+        $review = Review::find($id);
 
         // if review doesnt exist return error message
         if (!$review) return response()->json(['message' => 'Review does not exist..']);
@@ -134,7 +137,7 @@ class ReviewController extends Controller
 
         // update review data
         $review->admin_name     = $user->name;
-        $review->comment        = $request->comment;
+        $review->user_comment   = $request->user_comment;
         $review->admin_comment  = $request->admin_comment;
 
         // save the new review data
