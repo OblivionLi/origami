@@ -25,6 +25,9 @@ import {
     PRODUCT_IMAGE_REPLACE_FAIL,
     PRODUCT_IMAGE_REPLACE_REQUEST,
     PRODUCT_IMAGE_REPLACE_SUCCESS,
+    PRODUCT_SHOWCASE_FAIL,
+    PRODUCT_SHOWCASE_SUCCESS,
+    PRODUCT_SHOWCASE_REQUEST,
 } from "./../constants/productConstants";
 
 export const getProductsList = () => async (dispatch, getState) => {
@@ -89,18 +92,7 @@ export const getProduct = (id) => async (dispatch, getState) => {
     try {
         dispatch({ type: PRODUCT_SHOW_REQUEST });
 
-        const {
-            userLogin: { userInfo },
-        } = getState();
-
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userInfo.data.access_token}`,
-            },
-        };
-
-        const { data } = await Axios.get(`/api/products/${id}`, config);
+        const { data } = await Axios.get(`/api/products/${id}`);
 
         dispatch({ type: PRODUCT_SHOW_SUCCESS, payload: data });
     } catch (error) {
@@ -288,6 +280,24 @@ export const deleteProductImage = (id) => async (dispatch, getState) => {
             payload:
                 error.response && error.response.data.message
                     ? error.response.data.message
+                    : error.message,
+        });
+    }
+};
+
+export const getShowcaseList = () => async (dispatch) => {
+    try {
+        dispatch({ type: PRODUCT_SHOWCASE_REQUEST });
+
+        const { data } = await Axios.get("/api/showcase-products");
+
+        dispatch({ type: PRODUCT_SHOWCASE_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: PRODUCT_SHOWCASE_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.message
                     : error.message,
         });
     }

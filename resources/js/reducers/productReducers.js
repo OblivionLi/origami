@@ -29,6 +29,10 @@ import {
     PRODUCT_IMAGE_REPLACE_REQUEST,
     PRODUCT_IMAGE_REPLACE_RESET,
     PRODUCT_IMAGE_REPLACE_SUCCESS,
+    PRODUCT_SHOWCASE_RESET,
+    PRODUCT_SHOWCASE_FAIL,
+    PRODUCT_SHOWCASE_SUCCESS,
+    PRODUCT_SHOWCASE_REQUEST,
 } from "./../constants/productConstants";
 
 export const productListReducer = (state = { products: {} }, action) => {
@@ -173,6 +177,25 @@ export const productImageDeleteReducer = (state = {}, action) => {
 
         case PRODUCT_IMAGE_DELETE_FAIL:
             return { loading: false, error: action.payload };
+
+        default:
+            return state;
+    }
+};
+
+export const productShowcaseReducer = (state = { showcase: {} }, action) => {
+    switch (action.type) {
+        case PRODUCT_SHOWCASE_REQUEST:
+            return { loading: true, showcase: [] };
+
+        case PRODUCT_SHOWCASE_SUCCESS:
+            return { loading: false, showcase: action.payload };
+
+        case PRODUCT_SHOWCASE_FAIL:
+            return { loading: false, error: action.payload };
+
+        case PRODUCT_SHOWCASE_RESET:
+            return {};
 
         default:
             return state;
