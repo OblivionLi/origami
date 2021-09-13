@@ -10,6 +10,9 @@ import ResetPasswordScreen from './screens/public/users/ResetPasswordScreen';
 import ForgotPasswordScreen from './screens/public/users/ForgotPasswordScreen';
 import SettingsScreen from './screens/public/users/SettingsScreen';
 import AdminScreen from './screens/admin/AdminScreen';
+import ShowProductScreen from './screens/public/products/ShowProductScreen';
+import ReviewsScreen from './screens/public/reviews/ReviewsScreen';
+import CartScreen from './screens/public/cart/CartScreen';
 
 function Index() {
     return (
@@ -23,6 +26,15 @@ function Index() {
                 <Route path="/forgot-password" component={ForgotPasswordScreen} />
                 <Route path="/settings" component={SettingsScreen} />
 
+                {/* Product */}
+                <Route path="/product/:slug" component={ShowProductScreen} />
+
+                {/* Reviews */}
+                <Route path="/reviews/product/:id" component={ReviewsScreen} exact />
+                <Route path="/reviews/product/:id/:page?" component={ReviewsScreen} />
+
+                {/* Cart */}
+                <Route path="/cart/:id?" component={CartScreen} />
 
                 {/* Admin Section */}
                 <Route path="/admin" component={AdminScreen} />
