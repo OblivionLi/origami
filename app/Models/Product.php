@@ -75,4 +75,25 @@ class Product extends Model
         // return data from relationships
         return $query->with(['parentCategory', 'childCategory', 'user', 'productImages', 'reviews']);
     }
+
+    // define scope function that return a query with eager loading for latest 3 products
+    public function scopeGetLatestProducts($query)
+    {
+        // return data from relationships
+        return $query->with(['parentCategory', 'childCategory', 'productImages'])->orderBy('created_at', 'desc')->limit(3);
+    }
+
+    // define scope function that return a query with eager loading for latest 3 products
+    public function scopeGetLatestDiscountedProducts($query)
+    {
+        // return data from relationships
+        return $query->with(['parentCategory', 'childCategory', 'productImages'])->orderBy('discount', 'desc')->limit(3);
+    }
+
+    // define scope function that return a query with eager loading for most commented last 3 products
+    public function scopeGetMostCommentedProducts($query)
+    {
+        // return data from relationships
+        return $query->with(['parentCategory', 'childCategory', 'productImages'])->orderBy('total_reviews', 'desc')->limit(3);
+    }
 }
