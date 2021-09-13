@@ -169,4 +169,21 @@ class ProductController extends Controller
         $response = ['message', 'Product delete success'];
         return response()->json($response, 200);
     }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getShowcaseProducts()
+    {
+        $showcase = [
+            'latestProducts'    => Product::getLatestProducts()->get(),
+            'latestDiscounts'   => Product::getLatestDiscountedProducts()->get(),
+            'mostCommented'     => Product::getMostCommentedProducts()->get(),
+        ];
+
+        // return product resource with all relationship data
+        return response()->json($showcase, 200);
+    }
 }
