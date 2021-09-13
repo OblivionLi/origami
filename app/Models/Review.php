@@ -10,7 +10,7 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = [
-        'rating', 'user_name', 'user_comment', 'admin_name', 'admin_comment'
+        'user_id', 'product_id', 'rating', 'user_name', 'user_comment', 'admin_name', 'admin_comment'
     ];
 
     /**
@@ -27,5 +27,12 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // define scope function that return a query with eager loading
+    public function scopeInfo($query)
+    {
+        // return data from relationships
+        return $query->with(['product', 'user']);
     }
 }
