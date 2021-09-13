@@ -32,6 +32,29 @@ body {
   align-items: center;
 }
 
+.MuiCircularProgress-circle {
+  color: #388667 !important;
+}
+
+.MuiAlert-message {
+  font-family: "Quicksand", sans-serif;
+}
+
+.page-link {
+  background-color: #855C1B !important;
+  color: wheat !important;
+}
+.page-link:hover {
+  background-color: #388667 !important;
+}
+
+.page-item.active .page-link {
+  background-color: #388667 !important;
+  color: wheat !important;
+  border-color: #BE8E4C;
+  cursor: pointer;
+}
+
 .navigation {
   display: flex;
   justify-content: center;
@@ -162,20 +185,29 @@ body {
   justify-content: space-between;
   flex-wrap: wrap;
 }
-.card-content p, .card-content h2 {
+.card-content-top {
+  border-top: 1px solid #BE8E4C;
+  background-color: #FDF7E9;
+  color: wheat;
+}
+.card-content-top p, .card-content-top h2 {
   font-family: "Quicksand", sans-serif;
   letter-spacing: 1px;
   color: #855C1B;
 }
-.card-content button {
+.card-content a {
   color: wheat;
   background-color: #855C1B;
   font-family: "Quicksand", sans-serif;
   letter-spacing: 1px;
+  text-decoration: none;
+  padding: 5px;
+  border-radius: 5px;
 }
-.card-content button:hover {
+.card-content a:hover {
   background-color: #388667;
   color: wheat;
+  text-decoration: none;
 }
 .card-content--span {
   background-color: #855C1B;
@@ -183,6 +215,29 @@ body {
   padding: 5px;
   border-radius: 5px;
   cursor: pointer;
+}
+.card-content--span2 {
+  background-color: #855C1B;
+  color: wheat;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  letter-spacing: 1px;
+}
+
+.bc {
+  color: #855C1B;
+  font-weight: 600;
+}
+.bc:hover {
+  cursor: pointer;
+  color: #388667;
+}
+.bc-p {
+  font-weight: 600 !important;
+  font-size: 20px !important;
+  color: #388667 !important;
 }
 
 @media (max-width: 600px) {
@@ -382,6 +437,135 @@ body {
   background-color: #FDF7E9 !important;
   padding: 2rem 2rem;
   box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
+}
+
+.product {
+  margin-top: 2rem;
+  display: flex;
+  gap: 5rem;
+  justify-content: center;
+}
+.product__carousel {
+  width: 30rem;
+}
+.product__carousel-img {
+  width: 100%;
+}
+.product__paper {
+  padding: 1.5rem 3rem;
+  background-color: #FDF7E9 !important;
+  width: 20rem;
+  height: 100%;
+  color: #855C1B !important;
+  font-family: "Quicksand", sans-serif;
+  box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
+}
+.product__paper--rating {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.product__paper--rating p {
+  font-size: 1.5rem;
+}
+.product__paper--details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.product__paper--p {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #388667;
+}
+.product__paper--div {
+  margin-bottom: 1.2rem;
+}
+.product__container {
+  width: 70%;
+  margin: 2rem auto;
+  padding: 1.5rem 3rem;
+  background-color: #FDF7E9 !important;
+  color: #855C1B !important;
+  font-family: "Quicksand", sans-serif;
+  box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
+}
+.product__container2 {
+  width: 70%;
+  margin: 2rem auto;
+  padding: 1.5rem 3rem;
+  background-color: #FFE7C2 !important;
+  color: #855C1B !important;
+  font-family: "Quicksand", sans-serif;
+  box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
+}
+.product__container3 {
+  width: 100%;
+  margin: 2rem auto;
+  padding: 1.5rem 3rem;
+  background-color: #FFE7C2 !important;
+  color: #855C1B !important;
+  font-family: "Quicksand", sans-serif;
+  box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
+}
+
+.inStock {
+  color: #388667;
+}
+
+.notInStock {
+  color: darkred;
+}
+
+.divider {
+  border-bottom: 1px solid #BE8E4C;
+}
+
+.reviews-form {
+  padding: 15px;
+  width: 60%;
+  margin-top: 15px;
+}
+
+.review {
+  width: 60%;
+  margin-top: 15px;
+}
+.review:not(:last-child) {
+  border-bottom: 1px solid #BE8E4C;
+  margin: 20px 0;
+}
+.review-top {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.review-bottom {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+.review-bottom--comment {
+  text-indent: 20px;
+}
+.review-bottom--date {
+  align-self: flex-end;
+}
+.review-card {
+  border: 1px solid #BE8E4C;
+  padding: 10px;
+}
+.review-card:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.rating-from {
+  display: flex;
+  gap: 15px;
+}
+
+.MuiRating-iconFilled {
+  color: #388667 !important;
 }
 
 /*!
