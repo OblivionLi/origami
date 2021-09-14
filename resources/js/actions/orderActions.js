@@ -34,7 +34,7 @@ export const listOrders = () => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await Axios.get("/api/order", config);
+        const { data } = await Axios.get("/api/orders", config);
 
         dispatch({ type: ORDER_LIST_SUCCESS, payload: data });
     } catch (error) {
