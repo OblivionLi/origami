@@ -44,6 +44,6 @@ class Order extends Model
     public function scopeInfo($query)
     {
         // return data from relationships
-        return $query->with(['user', 'products']);
+        return $query->with(['user', 'products', 'user.addresses']);
     }
 }
