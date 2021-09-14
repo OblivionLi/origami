@@ -74,10 +74,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'user_role');
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(Address::class, 'user_id');
+    }
+
     // define scope function that return a query with eager loading
     public function scopeInfo($query)
     {
         // return data from relationships
-        return $query->with(['products', 'reviews', 'orders', 'roles']);
+        return $query->with(['products', 'reviews', 'orders', 'roles', 'addresses']);
     }
 }
