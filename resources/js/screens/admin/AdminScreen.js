@@ -26,7 +26,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
-import { FaUsers, FaUsersCog, FaUserTag } from "react-icons/fa";
+import { FaUsers, FaUsersCog, FaUserTag, FaReceipt } from "react-icons/fa";
 import { logout } from "../../actions/userActions";
 import Loader from "../../components/alert/Loader";
 import UsersScreen from "./users/UsersScreen";
@@ -43,6 +43,7 @@ import ProductsScreen from "./products/ProductsScreen";
 import NoteIcon from "@material-ui/icons/Note";
 import { BiCommentDetail } from "react-icons/bi";
 import ReviewsScreen from "./reviews/ReviewsScreen";
+import OrderScreen from "./orders/OrderScreen";
 
 const drawerWidth = 280;
 
@@ -473,6 +474,20 @@ const AdminScreen = ({ history }) => {
                                         </ListItem>
                                     </List>
                                 </Collapse>
+
+                                <Divider />
+
+                                <ListItem button>
+                                    <ListItemIcon>
+                                        <FaReceipt className={classes.icons} />
+                                    </ListItemIcon>
+                                    <Link
+                                        to="/admin/orders"
+                                        className="admin--links"
+                                    >
+                                        Orders
+                                    </Link>
+                                </ListItem>
                             </List>
                         </Drawer>
                         <main className={classes.content}>
@@ -519,6 +534,11 @@ const AdminScreen = ({ history }) => {
                                 <Route
                                     path="/admin/products/reviews"
                                     component={ReviewsScreen}
+                                />
+
+                                <Route
+                                    path="/admin/orders"
+                                    component={OrderScreen}
                                 />
                             </Switch>
                         </main>
