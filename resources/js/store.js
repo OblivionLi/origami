@@ -68,6 +68,27 @@ import {
     reviewListPagReducer
 } from "./reducers/reviewReducers";
 
+import {
+    cartReducer
+} from "./reducers/cartReducers";
+
+import {
+    addressListReducer,
+    addressCreateReducer,
+    addressShowReducer,
+    addressUpdateReducer,
+    addressDeleteReducer,
+} from "./reducers/addressReducers";
+
+import {
+    orderListReducer,
+    orderCreateReducer,
+    orderShowReducer,
+    orderPayReducer,
+    orderDeliverReducer,
+    orderUserListReducer,
+} from "./reducers/orderReducers";
+
 const reducer = combineReducers({
     // user reducers
     userRegister:               userRegisterReducer,
@@ -129,6 +150,24 @@ const reducer = combineReducers({
     reviewShow:                 reviewShowReducer,
     reviewDelete:               reviewDeleteReducer,
     reviewListPag:              reviewListPagReducer,
+
+    // cart reducers
+    cart:                       cartReducer,
+
+    // address reducers
+    addressList:                addressListReducer,
+    addressCreate:              addressCreateReducer,
+    addressShow:                addressShowReducer,
+    addressUpdate:              addressUpdateReducer,
+    addressDelete:              addressDeleteReducer,
+
+    // order reducers
+    orderList:                  orderListReducer,
+    orderCreate:                orderCreateReducer,
+    orderShow:                  orderShowReducer,
+    orderPay:                   orderPayReducer,
+    orderDeliver:               orderDeliverReducer,
+    orderUserList:              orderUserListReducer,
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")
