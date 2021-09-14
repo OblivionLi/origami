@@ -116,7 +116,7 @@ const ShowProductScreen = ({ history, match }) => {
     }, [dispatch, successProductReview]);
 
     const addToCartHandler = (e) => {
-        // history.push(`/cart/${}`)
+        history.push(`/cart/${productSlug}?qty=${qty}`)
     };
 
     const submitHandler = (e) => {
