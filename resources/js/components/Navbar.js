@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import ShopIcon from "@material-ui/icons/Shop";
-import { Divider, makeStyles, Menu, MenuItem, Button } from "@material-ui/core";
+import { Divider, makeStyles, Menu, MenuItem, Badge, IconButton} from "@material-ui/core";
 import { logout } from "./../actions/userActions";
+import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -28,6 +29,8 @@ const Navbar = () => {
 
     const userLogin = useSelector((state) => state.userLogin);
     const { userInfo } = userLogin;
+
+    const cart = useSelector((state) => state.cart);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -60,9 +63,13 @@ const Navbar = () => {
                         </Link>
                     </li>
                     <li>
-                        <a href="#">
-                            <ShopIcon />
-                        </a>
+                        <Link to="/cart">
+                            <Badge
+                                badgeContent={cart.cartItems.length}
+                            >
+                                <ShoppingCartIcon />
+                            </Badge>
+                        </Link>
                     </li>
                     <li>
                         {userInfo ? (
@@ -85,15 +92,11 @@ const Navbar = () => {
                                         <Link to={"/settings"}>Settings</Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleClose}>
-                                        My account
+                                        <Link to={"/order-history"}>Order History</Link>
                                     </MenuItem>
                                     {userInfo.data.is_admin == 1 && (
                                         <MenuItem onClick={handleClose}>
-                                            <a
-                                                href="/admin"
-                                            >
-                                                Admin Panel
-                                            </a>
+                                            <a href="/admin">Admin Panel</a>
                                         </MenuItem>
                                     )}
                                     <MenuItem onClick={handleClose}>
