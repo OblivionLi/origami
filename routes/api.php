@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChildCategoryController;
 use App\Http\Controllers\OrderController;
@@ -46,10 +47,17 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('reviews/{review}', [ReviewController::class, 'store']);
 
     # Order routes
-    Route::get('userOrders', [OrderController::class, 'getUserOrders']);
-    Route::post('orders', [OrderController::class, 'store']);
-    Route::get('orders/{order}', [OrderController::class, 'show']);
-    Route::patch('orders/{order}/pay', [OrderController::class, 'updateOrderToPaid']);
+    Route::post('order', [OrderController::class, 'store']);
+    Route::get('order/{order}', [OrderController::class, 'show']);
+    Route::patch('order/{order}/pay', [OrderController::class, 'updateOrderToPaid']);
+    Route::get('user-order', [OrderController::class, 'getUserOrders']);
+
+    # Address routes
+    Route::get('address', [AddressController::class, 'index']);
+    Route::post('address', [AddressController::class, 'store']);
+    Route::get('address/{address}', [AddressController::class, 'show']);
+    Route::patch('address/{address}', [AddressController::class, 'update']);
+    Route::delete('address/{address}', [AddressController::class, 'destroy']);
 
     // Private routes   ################################################## admin perms & login needed !
     Route::group(['middleware' => 'isAdmin'], function () {
