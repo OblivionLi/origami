@@ -1,0 +1,11 @@
+.cart {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.MuiBadge-badge {
+    background-color: $secondary-color !important;
+    color: wheat !important;
+}

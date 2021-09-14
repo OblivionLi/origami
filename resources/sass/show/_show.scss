@@ -47,6 +47,16 @@
         }
     }
 
+    &__paper2 {
+        padding: 1.5rem 3rem;
+        background-color: $background-color !important;
+        width: 20rem;
+        color: $primary-color !important;
+        font-family: $Quicksand;
+        box-shadow: $primary-shadow !important;
+    }
+
+
     &__container {
         width: 70%;
         margin: 2rem auto;
@@ -145,4 +155,20 @@
 
 .MuiRating-iconFilled {
     color: $secondary-color !important;
+}
+
+.isPaid {
+    color: $secondary-color;
+}
+
+.notPaid {
+    color: $indianred;
+}
+
+.delivered {
+    color: $secondary-color;
+}
+
+.failed {
+    color: darkred;
 }
