@@ -66,7 +66,7 @@ class OrderController extends Controller
         }
 
         // return success message
-        $response = ['message', 'Order create success'];
+        $response = ['message' => 'Order create success', 'id'  => $order->id];
         return response()->json($response, 200);
     }
 

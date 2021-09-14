@@ -24,11 +24,11 @@ class OrderStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_price'            => 'required|numeric|between:0.01,9999.99',
-            'product_discount_price'   => 'required|numeric|between:0.01,9999.99',
-            'shipping_price'            => 'required|numeric|between:0.01,9999.99',
-            'tax_price'                 => 'required|numeric|between:0.01,9999.99',
-            'total_price'               => 'required|numeric|between:0.01,9999.99',
+            'products_price'            => 'required|numeric',
+            'products_discount_price'   => 'required|numeric',
+            'shipping_price'            => 'required|numeric',
+            'tax_price'                 => 'required|numeric',
+            'total_price'               => 'required|numeric',
             'cart_items'                => 'required'
         ];
     }
