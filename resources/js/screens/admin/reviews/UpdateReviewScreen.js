@@ -9,9 +9,13 @@ import {
 } from "@material-ui/core";
 import Swal from "sweetalert2";
 import { makeStyles } from "@material-ui/core/styles";
-import { getReviewsList, getReview, editReview } from './../../../actions/reviewActions';
-import Loader from './../../../components/alert/Loader';
-import Message from './../../../components/alert/Message';
+import {
+    getReviewsList,
+    getReview,
+    editReview,
+} from "./../../../actions/reviewActions";
+import Loader from "./../../../components/alert/Loader";
+import Message from "./../../../components/alert/Message";
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -74,21 +78,13 @@ const UpdateReviewScreen = ({
         setSuccessModal(true);
         setOpenEditDialog(false);
 
-        const Toast = Swal.mixin({
-            toast: true,
+        Swal.fire({
             position: "center",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-        });
-
-        Toast.fire({
             icon: "success",
-            title: "Review Update with Success",
+            title: `Review updated successfully`,
+            showConfirmButton: false,
+            timer: 2500,
+            width: "65rem",
         });
     };
 
@@ -130,8 +126,10 @@ const UpdateReviewScreen = ({
                                     multiline
                                     rows={4}
                                     fullWidth
-                                    value={adminComment ? adminComment : ''}
-                                    onChange={(e) => setAdminComment(e.target.value)}
+                                    value={adminComment ? adminComment : ""}
+                                    onChange={(e) =>
+                                        setAdminComment(e.target.value)
+                                    }
                                     required
                                 />
                             </div>

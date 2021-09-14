@@ -51,21 +51,13 @@ const AddPermissionScreen = ({ setOpenAddDialog, setRequestData }) => {
         setSuccessModal(true);
         setOpenAddDialog(false);
 
-        const Toast = Swal.mixin({
-            toast: true,
+        Swal.fire({
             position: "center",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-        });
-
-        Toast.fire({
             icon: "success",
-            title: "Permission Create with Success",
+            title: `Permission created successfully`,
+            showConfirmButton: false,
+            timer: 2500,
+            width: "65rem",
         });
     };
 

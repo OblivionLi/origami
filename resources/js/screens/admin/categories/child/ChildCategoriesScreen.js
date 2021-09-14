@@ -5,11 +5,14 @@ import { makeStyles } from "@material-ui/core/styles";
 import MaterialTable from "material-table";
 import Moment from "react-moment";
 import Swal from "sweetalert2";
-import { getChildCatsList, deleteChildCat } from './../../../../actions/childCategoryActions';
-import UpdateChildCategoryScreen from './UpdateChildCategoryScreen';
-import AddChildCategoryScreen from './AddChildCategoryScreen';
-import Loader from './../../../../components/alert/Loader';
-import Message from './../../../../components/alert/Message';
+import {
+    getChildCatsList,
+    deleteChildCat,
+} from "./../../../../actions/childCategoryActions";
+import UpdateChildCategoryScreen from "./UpdateChildCategoryScreen";
+import AddChildCategoryScreen from "./AddChildCategoryScreen";
+import Loader from "./../../../../components/alert/Loader";
+import Message from "./../../../../components/alert/Message";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -69,7 +72,6 @@ const ChildCategoriesScreen = ({ history }) => {
             history.push("/login");
         } else {
             if (!user_perms.includes("admin_view_childCats")) {
-
                 history.push("/admin");
 
                 const Toast = Swal.mixin({
@@ -105,22 +107,11 @@ const ChildCategoriesScreen = ({ history }) => {
         if (user_perms.includes("admin_add_childCats")) {
             setOpenAddDialog(true);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -133,22 +124,11 @@ const ChildCategoriesScreen = ({ history }) => {
             setOpenEditDialog(true);
             setChildId(id);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -187,22 +167,11 @@ const ChildCategoriesScreen = ({ history }) => {
                 }
             });
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -291,7 +260,9 @@ const ChildCategoriesScreen = ({ history }) => {
                                     icon: "delete",
                                     tooltip: "Delete Child Category",
                                     onClick: (event, rowData) => {
-                                        deleteChildCategoryHandler(rowData.slug);
+                                        deleteChildCategoryHandler(
+                                            rowData.slug
+                                        );
                                     },
                                 }),
                             ]}

@@ -78,22 +78,11 @@ const ReviewsScreen = ({ history }) => {
             if (!user_perms.includes("admin_view_reviews")) {
                 history.push("/admin");
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "center",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener("mouseenter", Swal.stopTimer);
-                        toast.addEventListener("mouseleave", Swal.resumeTimer);
-                    },
-                });
-
-                Toast.fire({
-                    icon: "error",
-                    title: "You don't have access to this page",
-                });
+                Swal.fire(
+                    "Sorry!",
+                    `You don't have access to this action.`,
+                    "warning"
+                );
             } else {
                 setIsAdmin(true);
                 dispatch(getReviewsList());
@@ -108,27 +97,16 @@ const ReviewsScreen = ({ history }) => {
     }
 
     const handleEditDialogOpen = (id) => {
-        console.log(id)
+        console.log(id);
         if (user_perms.includes("admin_edit_reviews")) {
             setOpenEditDialog(true);
             setReviewId(id);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -165,22 +143,11 @@ const ReviewsScreen = ({ history }) => {
                 }
             });
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 

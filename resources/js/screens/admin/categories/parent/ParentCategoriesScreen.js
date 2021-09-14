@@ -7,9 +7,12 @@ import Moment from "react-moment";
 import Swal from "sweetalert2";
 import Loader from "./../../../../components/alert/Loader";
 import Message from "./../../../../components/alert/Message";
-import { getParentCatsList, deleteParentCat } from './../../../../actions/parentCategoryActions';
-import UpdateParentCategoryScreen from './UpdateParentCategoryScreen';
-import AddParentCategoryScreen from './AddParentCategoryScreen';
+import {
+    getParentCatsList,
+    deleteParentCat,
+} from "./../../../../actions/parentCategoryActions";
+import UpdateParentCategoryScreen from "./UpdateParentCategoryScreen";
+import AddParentCategoryScreen from "./AddParentCategoryScreen";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -69,25 +72,13 @@ const ParentCategoriesScreen = ({ history }) => {
             history.push("/login");
         } else {
             if (!user_perms.includes("admin_view_parentCats")) {
-
                 history.push("/admin");
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "center",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener("mouseenter", Swal.stopTimer);
-                        toast.addEventListener("mouseleave", Swal.resumeTimer);
-                    },
-                });
-
-                Toast.fire({
-                    icon: "error",
-                    title: "You don't have access to this page",
-                });
+                Swal.fire(
+                    "Sorry!",
+                    `You don't have access to this action.`,
+                    "warning"
+                );
             } else {
                 setIsAdmin(true);
                 dispatch(getParentCatsList());
@@ -105,22 +96,11 @@ const ParentCategoriesScreen = ({ history }) => {
         if (user_perms.includes("admin_add_parentCats")) {
             setOpenAddDialog(true);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -133,22 +113,11 @@ const ParentCategoriesScreen = ({ history }) => {
             setOpenEditDialog(true);
             setParentId(id);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -187,22 +156,11 @@ const ParentCategoriesScreen = ({ history }) => {
                 }
             });
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -283,7 +241,9 @@ const ParentCategoriesScreen = ({ history }) => {
                                     icon: "delete",
                                     tooltip: "Delete Parent Category",
                                     onClick: (event, rowData) => {
-                                        deleteParentCategoryHandler(rowData.slug);
+                                        deleteParentCategoryHandler(
+                                            rowData.slug
+                                        );
                                     },
                                 }),
                             ]}
@@ -306,19 +266,16 @@ const ParentCategoriesScreen = ({ history }) => {
                                             {rowData.childCat.length ? (
                                                 rowData.childCat.map(
                                                     (childCat) => (
-                                                        <h4
-                                                            key={
-                                                                childCat
-                                                            }
-                                                        >
+                                                        <h4 key={childCat}>
                                                             {childCat}
                                                         </h4>
                                                     )
                                                 )
                                             ) : (
                                                 <p>
-                                                    This Parent Category "({rowData})"
-                                                    has no child categories.
+                                                    This Parent Category "(
+                                                    {rowData})" has no child
+                                                    categories.
                                                 </p>
                                             )}
                                         </div>

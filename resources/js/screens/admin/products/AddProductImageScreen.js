@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    Button,
-    Divider,
-    DialogContent,
-    DialogTitle,
-} from "@material-ui/core";
+import { Button, Divider, DialogContent, DialogTitle } from "@material-ui/core";
 import Swal from "sweetalert2";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -33,7 +28,7 @@ const AddProductImageScreen = ({
     setOpenAddProductImageDialog,
     setRequestData,
     productId,
-    productIdImage
+    productIdImage,
 }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -73,38 +68,22 @@ const AddProductImageScreen = ({
         if (data.images.length < 5) {
             dispatch(createProductImage(productIdImage, formData));
 
-            const Toast = Swal.mixin({
-                toast: true,
+            Swal.fire({
                 position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
                 icon: "success",
-                title: "Product Create with Success",
+                title: `Product Image created successfully`,
+                showConfirmButton: false,
+                timer: 2500,
+                width: "65rem",
             });
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
+            Swal.fire({
                 position: "center",
+                icon: "success",
+                title: `Sorry there are already 5 product images, please replace or delete one to add another :)`,
                 showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "Sorry there are already 5 product images, please replace or delete one to add another :)",
+                timer: 2500,
+                width: "65rem",
             });
         }
 

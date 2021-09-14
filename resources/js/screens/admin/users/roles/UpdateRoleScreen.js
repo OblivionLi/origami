@@ -116,21 +116,13 @@ const UpdateRoleScreen = ({ setOpenEditDialog, setRequestData, roleId }) => {
         setSuccessModal(true);
         setOpenEditDialog(false);
 
-        const Toast = Swal.mixin({
-            toast: true,
+        Swal.fire({
             position: "center",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-        });
-
-        Toast.fire({
             icon: "success",
-            title: "Role Update with Success",
+            title: `Role updated successfully`,
+            showConfirmButton: false,
+            timer: 2500,
+            width: "65rem",
         });
     };
 

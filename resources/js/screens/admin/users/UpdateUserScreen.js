@@ -92,9 +92,14 @@ const UpdateUserScreen = ({ setOpenEditDialog, setRequestData, userId }) => {
             },
         });
 
-        Toast.fire({
+        
+        Swal.fire({
+            position: "center",
             icon: "success",
-            title: "User Update with Success",
+            title: `User updated successfully`,
+            showConfirmButton: false,
+            timer: 2500,
+            width: "65rem",
         });
     };
 

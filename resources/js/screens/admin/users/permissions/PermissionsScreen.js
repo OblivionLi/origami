@@ -75,22 +75,11 @@ const PermissionsScreen = ({ history }) => {
 
                 history.push("/admin/users");
 
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "center",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener("mouseenter", Swal.stopTimer);
-                        toast.addEventListener("mouseleave", Swal.resumeTimer);
-                    },
-                });
-
-                Toast.fire({
-                    icon: "error",
-                    title: "You don't have access to this page",
-                });
+                Swal.fire(
+                  "Sorry!",
+                  `You don't have access to this action.`,
+                  "warning"
+              );
             } else {
                 setIsAdmin(true);
                 dispatch(getPermissionsList());
@@ -108,22 +97,11 @@ const PermissionsScreen = ({ history }) => {
         if (user_perms.includes("admin_add_perms")) {
             setOpenAddDialog(true);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                  "Sorry!",
+                  `You don't have access to this action.`,
+                  "warning"
+              );
         }
     };
 
@@ -136,22 +114,11 @@ const PermissionsScreen = ({ history }) => {
             setOpenEditDialog(true);
             setPermissionId(id);
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                  "Sorry!",
+                  `You don't have access to this action.`,
+                  "warning"
+              );
         }
     };
 
@@ -190,22 +157,11 @@ const PermissionsScreen = ({ history }) => {
                 }
             });
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener("mouseenter", Swal.stopTimer);
-                    toast.addEventListener("mouseleave", Swal.resumeTimer);
-                },
-            });
-
-            Toast.fire({
-                icon: "error",
-                title: "You don't have access to this action",
-            });
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
