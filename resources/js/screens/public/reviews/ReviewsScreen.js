@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { getReviewsPagList } from "../../../actions/reviewActions";
 import Rating from "@material-ui/lab/Rating";
 import ReviewPaginate from "../../../components/ReviewPaginate";
+import Footer from './../../../components/Footer';
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -178,8 +179,6 @@ const ReviewsScreen = ({ match }) => {
                                     ))}
                             </div>
 
-                            {console.log(reviews)}
-
                             {reviews.data &&
                                 reviews.data.length > 0 &&
                                 !loading && (
@@ -195,6 +194,9 @@ const ReviewsScreen = ({ match }) => {
                     </>
                 )}
             </section>
+
+            <hr className="divider2" />
+            <Footer />
         </>
     );
 };
