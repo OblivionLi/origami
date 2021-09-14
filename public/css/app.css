@@ -480,6 +480,14 @@ body {
 .product__paper--div {
   margin-bottom: 1.2rem;
 }
+.product__paper2 {
+  padding: 1.5rem 3rem;
+  background-color: #FDF7E9 !important;
+  width: 20rem;
+  color: #855C1B !important;
+  font-family: "Quicksand", sans-serif;
+  box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
+}
 .product__container {
   width: 70%;
   margin: 2rem auto;
@@ -566,6 +574,34 @@ body {
 
 .MuiRating-iconFilled {
   color: #388667 !important;
+}
+
+.isPaid {
+  color: #388667;
+}
+
+.notPaid {
+  color: #d15641;
+}
+
+.delivered {
+  color: #388667;
+}
+
+.failed {
+  color: darkred;
+}
+
+.cart {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.MuiBadge-badge {
+  background-color: #388667 !important;
+  color: wheat !important;
 }
 
 /*!
