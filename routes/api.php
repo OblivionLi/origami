@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ChildCategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ParentCategoryController;
@@ -35,6 +36,10 @@ Route::get('reset-password/{token}', [AuthController::class, 'getToken']);
 Route::get('showcase-products', [ProductController::class, 'getShowcaseProducts']);
 Route::get('products/{product}', [ProductController::class, 'show']);
 Route::get('reviews/product/{product}', [ReviewController::class, 'indexWithPagination']);
+
+Route::get('config/stripe', [CheckoutController::class, 'secretKey']);
+Route::get('config/PKstripe', [CheckoutController::class, 'publicKey']);
+Route::post('payment_intents', [CheckoutController::class, 'createPayIntent']);
 
 // Public routes        ################################################## no need for admin perms; login needed !
 Route::group(['middleware' => 'auth:api'], function () {
