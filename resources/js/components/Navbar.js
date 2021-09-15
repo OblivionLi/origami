@@ -4,7 +4,14 @@ import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import AccountBoxIcon from "@material-ui/icons/AccountBox";
 import ShopIcon from "@material-ui/icons/Shop";
-import { Divider, makeStyles, Menu, MenuItem, Badge, IconButton} from "@material-ui/core";
+import {
+    Divider,
+    makeStyles,
+    Menu,
+    MenuItem,
+    Badge,
+    IconButton,
+} from "@material-ui/core";
 import { logout } from "./../actions/userActions";
 import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
 
@@ -64,9 +71,7 @@ const Navbar = () => {
                     </li>
                     <li>
                         <Link to="/cart">
-                            <Badge
-                                badgeContent={cart.cartItems.length}
-                            >
+                            <Badge badgeContent={cart.cartItems.length}>
                                 <ShoppingCartIcon />
                             </Badge>
                         </Link>
@@ -89,18 +94,37 @@ const Navbar = () => {
                                     disableScrollLock={true}
                                 >
                                     <MenuItem onClick={handleClose}>
-                                        <Link to={"/settings"}>Settings</Link>
+                                        <Link
+                                            to={"/settings"}
+                                            className="nav-links"
+                                        >
+                                            Settings
+                                        </Link>
                                     </MenuItem>
                                     <MenuItem onClick={handleClose}>
-                                        <Link to={"/order-history"}>Order History</Link>
+                                        <Link
+                                            to={"/order-history"}
+                                            className="nav-links"
+                                        >
+                                            Order History
+                                        </Link>
                                     </MenuItem>
                                     {userInfo.data.is_admin == 1 && (
                                         <MenuItem onClick={handleClose}>
-                                            <a href="/admin">Admin Panel</a>
+                                            <a
+                                                href="/admin"
+                                                className="nav-links"
+                                            >
+                                                Admin Panel
+                                            </a>
                                         </MenuItem>
                                     )}
                                     <MenuItem onClick={handleClose}>
-                                        <a href="/" onClick={logoutHandler}>
+                                        <a
+                                            href="/"
+                                            onClick={logoutHandler}
+                                            className="nav-links"
+                                        >
                                             Logout
                                         </a>
                                     </MenuItem>
