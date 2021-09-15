@@ -17,11 +17,14 @@ import NavbarCategories from "./../../../components/NavbarCategories";
 import Moment from "react-moment";
 import Footer from "./../../../components/Footer";
 import { getUser } from "./../../../actions/userActions";
-import { getOrder } from "./../../../actions/orderActions";
+import { getOrder, deliverOrder } from "./../../../actions/orderActions";
 import {
     ORDER_DELIVER_RESET,
     ORDER_PAY_RESET,
 } from "../../../constants/orderConstants";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import CheckoutFormScreen from './../stripe/CheckoutFormScreen';
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -96,6 +99,10 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const PUBLIC_KEY = "pk_test_51J7JDFH7KVlnwo43991XXPrSOWpQYenCEMAY6S1dT5eP6WLOWP7W4z6O9nEhtr1rbmpASbvA8r4lKMr3da5sN0nd00VuikAH3F";
+
+const stripePromise = loadStripe(PUBLIC_KEY);
+
 const ShowOrderScreen = ({ match, history }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -168,10 +175,11 @@ const ShowOrderScreen = ({ match, history }) => {
         ) {
             setPerms(true);
         }
-    }, [dispatch, userInfo, isOrderEmpty]);
+    }, [dispatch, userInfo, isOrderEmpty, successDeliver, successPay]);
 
     const deliverHandler = () => {
         dispatch(deliverOrder(order.data.id));
+        history.push(`/order-history/${orderId}`)
     };
 
     return loading ? (
@@ -418,6 +426,7 @@ const ShowOrderScreen = ({ match, history }) => {
                                                 variant="contained"
                                                 color="secondary"
                                                 onClick={deliverHandler}
+                                                className={classes.button}
                                             >
                                                 Mark as Delivered
                                             </Button>
@@ -428,14 +437,14 @@ const ShowOrderScreen = ({ match, history }) => {
                                     {order.data.is_paid == 0 && (
                                         <div className={classes.checkout}>
                                             {loadingPay && <Loader />}
-                                            {/* <Elements stripe={stripePromise}>
+                                            <Elements stripe={stripePromise}>
                                                 <CheckoutFormScreen
                                                     orderId={orderId}
                                                     totalPrice={
-                                                        order.total_price
+                                                        order.data.total_price
                                                     }
                                                 />
-                                            </Elements> */}
+                                            </Elements>
                                         </div>
                                     )}
                                 </div>
