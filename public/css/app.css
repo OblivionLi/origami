@@ -135,6 +135,15 @@ body {
   color: #388667;
 }
 
+.nav-links {
+  font-family: "Quicksand", sans-serif;
+  color: #855C1B;
+  font-weight: 600;
+}
+.nav-links:hover {
+  color: #388667;
+}
+
 @media (max-width: 600px) {
   .categories__nav-list {
     flex-direction: column;

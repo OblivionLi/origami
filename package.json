@@ -29,6 +29,8 @@
         "@material-ui/icons": "^4.11.2",
         "@material-ui/lab": "^4.0.0-alpha.60",
         "@material-ui/utils": "^4.11.2",
+        "@stripe/react-stripe-js": "^1.4.1",
+        "@stripe/stripe-js": "^1.17.1",
         "material-table": "^1.69.3",
         "moment": "^2.29.1",
         "react-bootstrap": "^1.6.3",
