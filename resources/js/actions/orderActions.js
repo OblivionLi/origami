@@ -197,7 +197,7 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await Axios.patch(`/api/order/${id}/delivered`, {}, config);
+        const { data } = await Axios.patch(`/api/orders/${id}/delivered`, {}, config);
 
         dispatch({ type: ORDER_DELIVER_SUCCESS, payload: data });
     } catch (error) {
