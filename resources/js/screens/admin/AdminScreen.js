@@ -273,7 +273,10 @@ const AdminScreen = ({ history }) => {
                                                 <MenuItem
                                                     onClick={handleNavUserMenu}
                                                 >
-                                                    <a href="/settings">
+                                                    <a
+                                                        href="/settings"
+                                                        className="nav-links"
+                                                    >
                                                         Settings
                                                     </a>
                                                 </MenuItem>
@@ -284,6 +287,7 @@ const AdminScreen = ({ history }) => {
                                                     <Link
                                                         to="/"
                                                         onClick={logoutHandler}
+                                                        className="nav-links"
                                                     >
                                                         Logout
                                                     </Link>
