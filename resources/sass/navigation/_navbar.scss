@@ -101,15 +101,21 @@
     }
 }
 
+.nav-links {
+    font-family: $Quicksand;
+    color: $primary-color;
+    font-weight: 600;
+
+    &:hover {
+        color: $secondary-color;
+    }
+}
+
 @media (max-width: 600px) {
     .categories__nav-list {
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 30px;
-        &--item {
-            &-menu {
-            }
-        }
     }
 }
