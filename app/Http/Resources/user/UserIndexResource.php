@@ -24,7 +24,8 @@ class UserIndexResource extends JsonResource
             'products'      => $this->products,
             'reviews'       => $this->reviews,
             'orders'        => $this->orders,
-            'roles'         => $this->roles
+            'roles'         => $this->roles,
+            'address'       => $this->addresses,
         ];
     }
 }
