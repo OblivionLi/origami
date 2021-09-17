@@ -17,6 +17,9 @@ import ShippingScreen from './screens/public/shop/ShippingScreen';
 import PlaceOrderScreen from './screens/public/shop/PlaceOrderScreen';
 import ShowOrderScreen from './screens/public/shop/ShowOrderScreen';
 import OrderHistoryScreen from './screens/public/users/OrderHistoryScreen';
+import AccessoriesScreen from './screens/public/categories/AccessoriesScreen';
+import OrigamiScreen from './screens/public/categories/OrigamiScreen';
+import SpecialOffers from './screens/public/categories/SpecialOffersScreen';
 
 function Index() {
     return (
@@ -33,6 +36,16 @@ function Index() {
                 {/* Product */}
                 <Route path="/product/:slug" component={ShowProductScreen} />
 
+                {/* Categories */}
+                <Route path="/accessories" component={AccessoriesScreen} exact />
+                <Route path="/accessories/:page?" component={AccessoriesScreen} />
+                
+                <Route path="/origami" component={OrigamiScreen} exact />
+                <Route path="/origami/:page?" component={OrigamiScreen} />
+
+                <Route path="/special-offers" component={SpecialOffers} exact />
+                <Route path="/special-offers/:page?" component={SpecialOffers} />
+
                 {/* Reviews */}
                 <Route path="/reviews/product/:id" component={ReviewsScreen} exact />
                 <Route path="/reviews/product/:id/:page?" component={ReviewsScreen} />
@@ -44,7 +57,7 @@ function Index() {
 
                 {/* Order */}
                 <Route path="/order-history" component={OrderHistoryScreen} exact />
-                <Route path="/order-history/:id?" component={ShowOrderScreen} />
+                <Route path="/order-history/:id/:userId?" component={ShowOrderScreen} />
                 
                 {/* Admin Section */}
                 <Route path="/admin" component={AdminScreen} />
