@@ -1,0 +1,145 @@
+.category {
+    display: flex;
+    justify-content: space-between;
+
+    width: 80%;
+    margin: 2rem auto;
+
+    &--sidebar {
+        flex-grow: 2;
+        background-color: $background-color;
+        padding: 1.5rem 3rem;
+        color: $primary-color;
+        font-family: $Quicksand;
+        box-shadow: $primary-shadow;
+        height: 100%;
+        min-width: 20rem;
+        max-width: 20rem;
+
+        &-title {
+            h4 {
+                border-bottom: 1px solid $primary-color;
+                padding-bottom: 10px;
+            }
+
+            &-item {
+                a {
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    color: $primary-color;
+
+                    &:hover {
+                        color: $secondary-color;
+                    }
+                }
+
+                .filterLink {
+                    cursor: pointer;
+                    font-weight: 600;
+                    text-transform: capitalize;
+                    margin-bottom: 16px;
+                    color: $secondary-color;
+
+                    &:hover {
+                        color: $primary-color;
+                        text-decoration: none;
+                    }
+                }
+            }
+
+            &-item:not(:last-child) {
+                border-bottom: 1px solid $primary-color;
+                padding-bottom: 10px;
+            }
+        }
+    }
+
+    &--products {
+        flex-grow: 4;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+
+        &-items {
+            display: flex;
+            gap: 4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        &-pag {
+            display: flex;
+            justify-content: center;
+
+            &--buttons,
+            .pagination {
+                list-style-type: none;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 1rem;
+                font-family: $Quicksand;
+                font-size: 1.5rem;
+                color: $primary-color;
+
+                a {
+                    cursor: pointer;
+
+                    &:hover {
+                        color: $secondary-color;
+                    }
+                }
+            }
+
+            &--previous,
+            &--next,
+            .page-link {
+                color: $primary-color;
+                background-color: transparent;
+                border: 0;
+                padding: 0;
+                border-radius: 0;
+
+                &:hover {
+                    color: $secondary-color;
+                }
+            }
+
+            &--disabled {
+                color: $dark;
+            }
+
+            &--active,
+            .page-item.active .page-link {
+                color: $indianred;
+                background-color: transparent;
+                border: 0;
+                padding: 0;
+                border-radius: 0;
+            }
+        }
+    }
+}
+
+.active {
+    font-weight: 600;
+    text-transform: uppercase;
+    color: $secondary-color;
+    cursor: pointer;
+}
+
+.info {
+    color: $indianred;
+    font-weight: 600;
+}
+
+.filterButtons {
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: capitalize;
+
+    &:hover {
+        color: $secondary-color;
+        text-decoration: none;
+    }
+}
