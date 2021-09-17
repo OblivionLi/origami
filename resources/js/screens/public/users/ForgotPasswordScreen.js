@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import {
-    makeStyles,
-    Button,
-    Grid,
-    TextField,
-} from "@material-ui/core";
+import { useDispatch, useSelector } from "react-redux";
+import { makeStyles, Button, Grid, TextField } from "@material-ui/core";
 import Navbar from "./../../../components/Navbar";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "./../../../actions/userActions";
