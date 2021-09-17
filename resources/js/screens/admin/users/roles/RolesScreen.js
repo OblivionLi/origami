@@ -192,46 +192,38 @@ const RolesScreen = ({ history }) => {
                                     title: "Is Admin?",
                                     field: "is_admin",
                                     render: (roles) => {
-                                        {
-                                            return roles.is_admin == 1
-                                                ? "Yes"
-                                                : "No";
-                                        }
+                                        return roles.is_admin == 1
+                                            ? "Yes"
+                                            : "No";
                                     },
                                 },
                                 {
                                     title: "Role's users count",
                                     field: "roles",
                                     render: (roles) => {
-                                        {
-                                            return roles.users.length;
-                                        }
+                                        return roles.users.length;
                                     },
                                 },
                                 {
                                     title: "Created At",
                                     field: "created_at",
                                     render: (roles) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {roles.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {roles.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (roles) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {roles.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {roles.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                             ]}

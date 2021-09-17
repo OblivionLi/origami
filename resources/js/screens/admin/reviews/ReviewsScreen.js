@@ -184,54 +184,46 @@ const ReviewsScreen = ({ history }) => {
                                     title: "Product Reviewed",
                                     field: "product.name",
                                     render: (reviews) => {
-                                        {
-                                            return (
-                                                <Link
-                                                    to={`/product/${reviews.product.slug}`}
-                                                    className={classes.link}
-                                                    target="_blank"
-                                                >
-                                                    {reviews.product.name}
-                                                </Link>
-                                            );
-                                        }
+                                        return (
+                                            <Link
+                                                to={`/product/${reviews.product.slug}`}
+                                                className={classes.link}
+                                                target="_blank"
+                                            >
+                                                {reviews.product.name}
+                                            </Link>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Review Edit By (admin)",
                                     field: "product.name",
                                     render: (reviews) => {
-                                        {
-                                            return reviews.admin_name == null
-                                                ? " - "
-                                                : reviews.admin_name;
-                                        }
+                                        return reviews.admin_name == null
+                                            ? " - "
+                                            : reviews.admin_name;
                                     },
                                 },
                                 {
                                     title: "Created At",
                                     field: "created_at",
                                     render: (reviews) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {reviews.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {reviews.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (reviews) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {reviews.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {reviews.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                             ]}

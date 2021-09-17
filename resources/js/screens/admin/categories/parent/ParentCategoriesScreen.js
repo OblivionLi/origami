@@ -197,26 +197,22 @@ const ParentCategoriesScreen = ({ history }) => {
                                     title: "Created At",
                                     field: "created_at",
                                     render: (parentCats) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {parentCats.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {parentCats.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (parentCats) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {parentCats.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {parentCats.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                             ]}

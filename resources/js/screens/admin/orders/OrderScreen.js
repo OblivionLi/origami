@@ -119,19 +119,15 @@ const OrderScreen = ({ history }) => {
                                     title: "Go to Order",
                                     field: "id",
                                     render: (orders) => {
-                                        {
-                                            return (
-                                                <Link
-                                                    to={`/order-history/${orders.id}`}
-                                                    className={
-                                                        classes.link
-                                                    }
-                                                    target="_blank"
-                                                >
-                                                    Order Details
-                                                </Link>
-                                            );
-                                        }
+                                        return (
+                                            <Link
+                                                to={`/order-history/${orders.id}`}
+                                                className={classes.link}
+                                                target="_blank"
+                                            >
+                                                Order Details
+                                            </Link>
+                                        );
                                     },
                                 },
                                 {

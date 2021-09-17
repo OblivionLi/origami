@@ -18,7 +18,8 @@ import StarRateIcon from "@material-ui/icons/StarRate";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import AddProductImageScreen from "./AddProductImageScreen";
-import ReplaceProductImageScreen from './ReplaceProductImageScreen';
+import ReplaceProductImageScreen from "./ReplaceProductImageScreen";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -50,6 +51,14 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: "#855C1B",
         },
     },
+
+    link: {
+        color: "#855C1B",
+
+        "&:hover": {
+            color: "#388667",
+        },
+    },
 }));
 
 const ProductsScreen = ({ history }) => {
@@ -63,11 +72,13 @@ const ProductsScreen = ({ history }) => {
     const [productId, setProductId] = useState(null);
 
     const [productReplaceImageId, setProductReplaceImageId] = useState(null);
-    const [productReplaceProductId, setProductReplaceProductId] = useState(null);
+    const [productReplaceProductId, setProductReplaceProductId] =
+        useState(null);
 
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [openAddProductImageDialog, setOpenAddProductImageDialog] = useState(false);
+    const [openAddProductImageDialog, setOpenAddProductImageDialog] =
+        useState(false);
     const [openReplaceDialog, setOpenReplaceDialog] = useState(false);
 
     const [requestData, setRequestData] = useState(new Date());
@@ -299,6 +310,17 @@ const ProductsScreen = ({ history }) => {
                                 {
                                     title: "Name",
                                     field: "name",
+                                    render: (products) => {
+                                        return (
+                                            <Link
+                                                to={`/product/${products.slug}`}
+                                                className={classes.link}
+                                                target="_blank"
+                                            >
+                                                {products.name}
+                                            </Link>
+                                        );
+                                    },
                                 },
                                 {
                                     title: "Added by",
@@ -312,18 +334,14 @@ const ProductsScreen = ({ history }) => {
                                     title: "Discount",
                                     field: "discount",
                                     render: (products) => {
-                                        {
-                                            return `${products.discount} %`;
-                                        }
+                                        return `${products.discount} %`;
                                     },
                                 },
                                 {
                                     title: "Price",
                                     field: "price",
                                     render: (products) => {
-                                        {
-                                            return `${products.discount} €`;
-                                        }
+                                        return `${products.discount} €`;
                                     },
                                 },
                                 {
@@ -338,27 +356,23 @@ const ProductsScreen = ({ history }) => {
                                     title: "Rating",
                                     field: "rating",
                                     render: (products) => {
-                                        {
-                                            return (
-                                                <>
-                                                    {products.rating}{" "}
-                                                    <StarRateIcon />
-                                                </>
-                                            );
-                                        }
+                                        return (
+                                            <>
+                                                {products.rating}{" "}
+                                                <StarRateIcon />
+                                            </>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (products) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {products.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {products.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                             ]}
@@ -606,8 +620,12 @@ const ProductsScreen = ({ history }) => {
                         <ReplaceProductImageScreen
                             setOpenReplaceDialog={setOpenReplaceDialog}
                             setRequestData={setRequestData}
-                            productReplaceImageId={productReplaceImageId && productReplaceImageId}
-                            productReplaceProductId={productReplaceImageId && productReplaceProductId}
+                            productReplaceImageId={
+                                productReplaceImageId && productReplaceImageId
+                            }
+                            productReplaceProductId={
+                                productReplaceImageId && productReplaceProductId
+                            }
                         />
 
                         <DialogActions>

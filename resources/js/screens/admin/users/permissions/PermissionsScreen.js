@@ -72,14 +72,13 @@ const PermissionsScreen = ({ history }) => {
             history.push("/login");
         } else {
             if (!user_perms.includes("admin_view_perms")) {
-
                 history.push("/admin/users");
 
                 Swal.fire(
-                  "Sorry!",
-                  `You don't have access to this action.`,
-                  "warning"
-              );
+                    "Sorry!",
+                    `You don't have access to this action.`,
+                    "warning"
+                );
             } else {
                 setIsAdmin(true);
                 dispatch(getPermissionsList());
@@ -98,10 +97,10 @@ const PermissionsScreen = ({ history }) => {
             setOpenAddDialog(true);
         } else {
             Swal.fire(
-                  "Sorry!",
-                  `You don't have access to this action.`,
-                  "warning"
-              );
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -115,10 +114,10 @@ const PermissionsScreen = ({ history }) => {
             setPermissionId(id);
         } else {
             Swal.fire(
-                  "Sorry!",
-                  `You don't have access to this action.`,
-                  "warning"
-              );
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
         }
     };
 
@@ -198,26 +197,22 @@ const PermissionsScreen = ({ history }) => {
                                     title: "Created At",
                                     field: "created_at",
                                     render: (permissions) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {permissions.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {permissions.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (permissions) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {permissions.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {permissions.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                             ]}

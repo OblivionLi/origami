@@ -216,26 +216,22 @@ const ChildCategoriesScreen = ({ history }) => {
                                     title: "Created At",
                                     field: "created_at",
                                     render: (childCats) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {childCats.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {childCats.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (childCats) => {
-                                        {
-                                            return (
-                                                <Moment format="DD/MM/YYYY HH:mm">
-                                                    {childCats.created_at}
-                                                </Moment>
-                                            );
-                                        }
+                                        return (
+                                            <Moment format="DD/MM/YYYY HH:mm">
+                                                {childCats.created_at}
+                                            </Moment>
+                                        );
                                     },
                                 },
                             ]}
