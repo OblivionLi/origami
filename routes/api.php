@@ -41,12 +41,17 @@ Route::get('config/stripe', [CheckoutController::class, 'secretKey']);
 Route::get('config/PKstripe', [CheckoutController::class, 'publicKey']);
 Route::post('payment_intents', [CheckoutController::class, 'createPayIntent']);
 
+Route::get('accessories', [ProductController::class, 'getProductByAccessories']);
+Route::get('origami', [ProductController::class, 'getProductByOrigami']);
+Route::get('special-offers', [ProductController::class, 'getProductBySpecialOffers']);
+
 // Public routes        ################################################## no need for admin perms; login needed !
 Route::group(['middleware' => 'auth:api'], function () {
     # User routes
     Route::get('logout', [AuthController::class, 'logout']);
     Route::patch('update-credentials/{id}', [AuthController::class, 'update']);
     Route::delete('delete/{id}', [AuthController::class, 'delete_user']);
+    Route::get('users/{user}', [UserController::class, 'show']);
 
     # Review routes
     Route::post('reviews/{review}', [ReviewController::class, 'store']);
@@ -69,7 +74,6 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         # User routes
         Route::get('users', [UserController::class, 'index']);
-        Route::get('users/{user}', [UserController::class, 'show']);
         Route::patch('users/{user}', [UserController::class, 'update']);
         Route::delete('users/{user}', [UserController::class, 'destroy']);
 
