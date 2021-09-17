@@ -34,7 +34,7 @@ class ReviewController extends Controller
     public function indexWithPagination($id)
     {
         // return review resource with all relationship data
-        return ReviewIndexWithPaginationResource::collection(Review::with('product')->where('product_id', $id)->paginate(1));
+        return ReviewIndexWithPaginationResource::collection(Review::with('product')->where('product_id', $id)->paginate(6));
     }
 
     /**
