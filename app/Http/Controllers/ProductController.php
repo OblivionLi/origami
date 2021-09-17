@@ -7,6 +7,7 @@ use App\Http\Requests\product\ProductUpdateRequest;
 use App\Http\Resources\product\ProductIndexResource;
 use App\Http\Resources\product\ProductShowResource;
 use App\Models\ChildCategory;
+use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
@@ -185,5 +186,66 @@ class ProductController extends Controller
 
         // return product resource with all relationship data
         return response()->json($showcase, 200);
+    }
+
+    public function getProductByAccessories()
+    {
+        // find parent category by name
+        $category = ParentCategory::where('name', 'Accessories')->firstOrFail();
+
+        // if category doesnt exist return error message
+        if (!$category) return response()->json(['message' => 'Category does not exist..']);
+
+        // get all products that has parent_category_id same as $category->id
+        $productsWithPag = Product::info()->where('parent_category_id', $category->id)->paginate(6);
+        $products = Product::info()->where('parent_category_id', $category->id)->get();
+
+        // get all child categories that has parent_category_id same as $category->id
+        $childCat = ChildCategory::info()->where('parent_category_id', $category->id)->get();
+
+        $data = [
+            'productsWithPag'  => $productsWithPag,
+            'products'  => $products,
+            'childCat'  => $childCat
+        ];
+
+        // return collection
+        return response()->json($data, 200);
+    }
+
+    public function getProductByOrigami()
+    {
+        // find parent category by name
+        $category = ParentCategory::where('name', 'Origami')->firstOrFail();
+
+        // if category doesnt exist return error message
+        if (!$category) return response()->json(['message' => 'Category does not exist..']);
+
+        // get all products that has parent_category_id same as $category->id
+        $productsWithPag = Product::info()->where('parent_category_id', $category->id)->paginate(6);
+        $products = Product::info()->where('parent_category_id', $category->id)->get();
+
+        // get all child categories that has parent_category_id same as $category->id
+        $childCat = ChildCategory::info()->where('parent_category_id', $category->id)->get();
+
+        $data = [
+            'productsWithPag'  => $productsWithPag,
+            'products'  => $products,
+            'childCat'  => $childCat
+        ];
+
+        // return collection
+        return response()->json($data, 200);
+    }
+
+    public function getProductBySpecialOffers()
+    {
+        // get all products that has special_offer == 1
+        $products = Product::info()->where('special_offer', 1)->paginate(6);
+        // if products doesnt exist return error message
+        if (!$products) return response()->json(['message' => 'Product does not exist..']);
+
+        // return collection
+        return response()->json($products, 200);
     }
 }
