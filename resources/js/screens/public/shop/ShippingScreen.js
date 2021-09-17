@@ -16,6 +16,7 @@ import { getUser } from "./../../../actions/userActions";
 import { createAddress } from "../../../actions/addressActions";
 import Message from "./../../../components/alert/Message";
 import Loader from "./../../../components/alert/Loader";
+import Swal from "sweetalert2";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -90,8 +91,13 @@ const ShippingScreen = ({ match, history }) => {
     const addressCreate = useSelector((state) => state.addressCreate);
     const { success } = addressCreate;
 
+    const cart = useSelector((state) => state.cart);
+    const { cartItems } = cart;
+
     useEffect(() => {
-        !userInfo && history.push("/");
+        if (!userInfo || userInfo.data.id != userId || !cartItems) {
+            history.push("/")
+        }
 
         if (isUserEmpty) {
             dispatch(getUser(userId));
@@ -136,6 +142,23 @@ const ShippingScreen = ({ match, history }) => {
                 phoneNumber
             )
         );
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+        });
+
+        Toast.fire({
+            icon: "success",
+            title: `Now you can place the order`,
+        });
     };
 
     return (
