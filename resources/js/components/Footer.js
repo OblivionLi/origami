@@ -12,14 +12,14 @@ const Footer = () => {
                     <h2 className="footer-container--title">Categories</h2>
                     <ul>
                         <li>
-                            <GiGemNecklace className="icon" /> <Link className="footer-container-link" to="/">Accessories</Link>
+                            <GiGemNecklace className="icon" /> <Link className="footer-container-link" to="/accessories">Accessories</Link>
                         </li>
                         <li>
                             <GiFoldedPaper className="icon" />{" "}
-                            <Link className="footer-container-link" to="/">Origami Collection</Link>
+                            <Link className="footer-container-link" to="/origami">Origami Collection</Link>
                         </li>
                         <li>
-                            <MdLocalOffer className="icon" /> <Link className="footer-container-link" to="/">Special Offers</Link>
+                            <MdLocalOffer className="icon" /> <Link className="footer-container-link" to="/special-offers">Special Offers</Link>
                         </li>
                     </ul>
                 </div>
