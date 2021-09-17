@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Paper, makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
@@ -13,30 +12,30 @@ const NavbarCategories = () => {
             <nav className="categories__nav">
                 <ul className="categories__nav-list">
                     <li className="categories__nav-list--item acc">
-                        <Link
-                            to="/"
+                        <a
+                            href="/accessories"
                             className="categories__nav-list--item-menu"
                         >
                             Accessories
-                        </Link>
+                        </a>
                     </li>
 
                     <li className="categories__nav-list--item ori">
-                        <Link
-                            to="/"
+                        <a
+                            href="/origami"
                             className="categories__nav-list--item-menu"
                         >
                             Origami Collection
-                        </Link>
+                        </a>
                     </li>
 
                     <li className="categories__nav-list--item spec">
-                        <Link
-                            to="/"
+                        <a
+                            href="/special-offers"
                             className="categories__nav-list--item-menu"
                         >
                             Special Offers
-                        </Link>
+                        </a>
                     </li>
                 </ul>
             </nav>
