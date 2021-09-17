@@ -182,26 +182,26 @@ const UsersScreen = ({ history }) => {
                                     title: "Date Joined",
                                     field: "created_at",
                                     render: (users) => {
-                                        {
+                                        
                                             return (
                                                 <Moment format="DD/MM/YYYY HH:mm">
                                                     {users.created_at}
                                                 </Moment>
                                             );
-                                        }
+                                        
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (users) => {
-                                        {
+                                        
                                             return (
                                                 <Moment format="DD/MM/YYYY HH:mm">
                                                     {users.created_at}
                                                 </Moment>
-                                            );
-                                        }
+                                         );
+                                        
                                     },
                                 },
                             ]}
@@ -231,6 +231,63 @@ const UsersScreen = ({ history }) => {
                                     fontSize: "1.2rem",
                                     backgroundColor: "#FDF7E9",
                                 },
+                            }}
+                            detailPanel={(rowData) => {
+                                return (
+                                    <div className="table-detail">
+                                        {!rowData.address ? (
+                                            <h2 className="table-detail--title">
+                                                User didn't set their details
+                                                yet.
+                                            </h2>
+                                        ) : (
+                                            <>
+                                                <h2 className="table-detail--title">
+                                                    Full Name
+                                                </h2>
+                                                <div className="table-detail--par">
+                                                    <p>
+                                                        {
+                                                            rowData.address[0]
+                                                                .name
+                                                        }{" "}
+                                                        {
+                                                            rowData.address[0]
+                                                                .surname
+                                                        }
+                                                    </p>
+                                                </div>
+
+                                                <h2 className="table-detail--title">
+                                                    Full Address
+                                                </h2>
+                                                <div className="table-detail--par">
+                                                    <p>
+                                                        {`Country: ${rowData.address[0].country}`}
+                                                        {", "}
+                                                        {`City: ${rowData.address[0].city}`}
+                                                        {", "}
+                                                        {`Street: ${rowData.address[0].address}`}
+                                                        {", "}
+                                                        {`Postal Code: ${rowData.address[0].postal_code}`}
+                                                    </p>
+                                                </div>
+
+                                                <h2 className="table-detail--title">
+                                                    Phone Number
+                                                </h2>
+                                                <div className="table-detail--par">
+                                                    <p>
+                                                        {
+                                                            rowData.address[0]
+                                                                .phone_number
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                );
                             }}
                         />
                     )}
