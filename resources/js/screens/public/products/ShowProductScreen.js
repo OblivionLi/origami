@@ -27,8 +27,6 @@ import { REVIEW_STORE_RESET } from "../../../constants/reviewConstants";
 import { createReview } from "../../../actions/reviewActions";
 import Swal from "sweetalert2";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-import { set } from "lodash";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -117,6 +115,23 @@ const ShowProductScreen = ({ history, match }) => {
 
     const addToCartHandler = (e) => {
         history.push(`/cart/${productSlug}?qty=${qty}`)
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+        });
+
+        Toast.fire({
+            icon: "success",
+            title: `Added Product ${data.name} to cart`,
+        });
     };
 
     const submitHandler = (e) => {

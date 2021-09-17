@@ -17,6 +17,7 @@ import { removeFromCart, addToCart } from "../../../actions/cartActions";
 import Message from "./../../../components/alert/Message";
 import MaterialTable from "material-table";
 import Footer from "../../../components/Footer";
+import Swal from "sweetalert2";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -95,6 +96,23 @@ const CartScreen = ({ location, match, history }) => {
 
     const checkoutHandler = () => {
         history.push(`/shipping-to/${userInfo.data.id}`);
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+        });
+
+        Toast.fire({
+            icon: "success",
+            title: `Proceed to checkout with success`,
+        });
     };
 
     return (
@@ -143,7 +161,9 @@ const CartScreen = ({ location, match, history }) => {
                                                     return (
                                                         <Link
                                                             to={`/product/${cartItems.slug}`}
-                                                            className={classes.link}
+                                                            className={
+                                                                classes.link
+                                                            }
                                                             target="_blank"
                                                         >
                                                             {cartItems.name}
