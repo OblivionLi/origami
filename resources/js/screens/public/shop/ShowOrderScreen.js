@@ -24,7 +24,7 @@ import {
 } from "../../../constants/orderConstants";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import CheckoutFormScreen from './../stripe/CheckoutFormScreen';
+import CheckoutFormScreen from "./../stripe/CheckoutFormScreen";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -99,7 +99,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const PUBLIC_KEY = "pk_test_51J7JDFH7KVlnwo43991XXPrSOWpQYenCEMAY6S1dT5eP6WLOWP7W4z6O9nEhtr1rbmpASbvA8r4lKMr3da5sN0nd00VuikAH3F";
+const PUBLIC_KEY =
+    "pk_test_51J7JDFH7KVlnwo43991XXPrSOWpQYenCEMAY6S1dT5eP6WLOWP7W4z6O9nEhtr1rbmpASbvA8r4lKMr3da5sN0nd00VuikAH3F";
 
 const stripePromise = loadStripe(PUBLIC_KEY);
 
@@ -167,6 +168,7 @@ const ShowOrderScreen = ({ match, history }) => {
             dispatch({ type: ORDER_DELIVER_RESET });
             dispatch({ type: ORDER_PAY_RESET });
             dispatch(getOrder(orderId));
+            setIsOrderEmpty(false);
         }
 
         if (
@@ -175,11 +177,11 @@ const ShowOrderScreen = ({ match, history }) => {
         ) {
             setPerms(true);
         }
-    }, [dispatch, userInfo, isOrderEmpty, successDeliver, successPay]);
+    }, [dispatch, userInfo, order, isOrderEmpty, successDeliver, successPay]);
 
     const deliverHandler = () => {
         dispatch(deliverOrder(order.data.id));
-        history.push(`/order-history/${orderId}`)
+        history.push(`/order-history/${orderId}`);
     };
 
     return loading ? (
