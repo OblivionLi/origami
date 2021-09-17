@@ -18,6 +18,7 @@ import { createOrder } from "../../../actions/orderActions";
 import Message from "./../../../components/alert/Message";
 import Loader from "./../../../components/alert/Loader";
 import MaterialTable from "material-table";
+import Swal from "sweetalert2";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -62,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
 
     link: {
         color: "#855C1B",
-        fontWeight: '600',
+        fontWeight: "600",
 
         "&:hover": {
             color: "#388667",
@@ -116,13 +117,13 @@ const PlaceOrderScreen = ({ match, history }) => {
     ).toFixed(2);
 
     useEffect(() => {
-        !userInfo || userInfo.data.id != userId && history.push("/");
+        !userInfo || (userInfo.data.id != userId && history.push("/"));
 
         if (success) {
             cartItems.map((item) => {
                 dispatch(removeFromCart(item.product));
             });
-            history.push(`/order-history/${order.id}`);
+            history.push(`/order-history/${order.id}/${userInfo.data.id}`);
         }
 
         dispatch(getAddress(userInfo.data.id));
@@ -142,6 +143,23 @@ const PlaceOrderScreen = ({ match, history }) => {
                 cart.itemsPriceDiscount
             )
         );
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
+        });
+
+        Toast.fire({
+            icon: "success",
+            title: `Order placed with success`,
+        });
     };
 
     return (
