@@ -89,6 +89,12 @@ import {
     orderUserListReducer,
 } from "./reducers/orderReducers";
 
+import {
+    accessoryListReducer,
+    origamiListReducer,
+    specialOfferListReducer,
+} from "./reducers/categoryReducers";
+
 const reducer = combineReducers({
     // user reducers
     userRegister:               userRegisterReducer,
@@ -168,6 +174,11 @@ const reducer = combineReducers({
     orderPay:                   orderPayReducer,
     orderDeliver:               orderDeliverReducer,
     orderUserList:              orderUserListReducer,
+
+    // category reducers
+    accessoryList:              accessoryListReducer,
+    origamiList:                origamiListReducer,
+    specialOfferList:           specialOfferListReducer,
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")
