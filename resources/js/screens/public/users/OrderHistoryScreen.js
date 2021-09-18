@@ -152,7 +152,7 @@ const OrderHistoryScreen = ({ history }) => {
                                                 {
                                                     return (
                                                         <Link
-                                                            to={`/order-history/${orders.id}/${userInfo.data.id}`}
+                                                            to={`/order-history/${orders.order_id}/${userInfo.data.user_id}`}
                                                             className={
                                                                 classes.link
                                                             }
