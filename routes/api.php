@@ -73,6 +73,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // Private routes   ################################################## admin perms & login needed !
     Route::group(['middleware' => 'isAdmin'], function () {
+        # Dashboard charts
+        Route::get('orderCharts', [OrderController::class, 'orderCharts']);
 
         # User routes
         Route::get('users', [UserController::class, 'index']);
