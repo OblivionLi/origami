@@ -13,10 +13,14 @@ import {
 } from "@material-ui/core";
 import Swal from "sweetalert2";
 import { makeStyles } from "@material-ui/core/styles";
-import { getParentCatsList } from './../../../../actions/parentCategoryActions';
-import { getChildCat, getChildCatsList, editChildCat } from './../../../../actions/childCategoryActions';
-import Message from './../../../../components/alert/Message';
-import Loader from './../../../../components/alert/Loader';
+import { getParentCatsList } from "./../../../../actions/parentCategoryActions";
+import {
+    getChildCat,
+    getChildCatsList,
+    editChildCat,
+} from "./../../../../actions/childCategoryActions";
+import Message from "./../../../../components/alert/Message";
+import Loader from "./../../../../components/alert/Loader";
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -67,6 +71,7 @@ const UpdateChildCategoryScreen = ({
             if (data) {
                 setName(data.name);
                 setSlug(data.slug);
+                setParentCategoryId(data.parentCat.id);
             }
         }
 
@@ -96,7 +101,9 @@ const UpdateChildCategoryScreen = ({
 
     return (
         <>
-            <DialogTitle id="draggable-dialog-title">Update Child Category</DialogTitle>
+            <DialogTitle id="draggable-dialog-title">
+                Update Child Category
+            </DialogTitle>
             <Divider />
             <DialogContent>
                 {loadingUpdate && <Loader />}
@@ -121,7 +128,7 @@ const UpdateChildCategoryScreen = ({
                                     required
                                 />
                             </div>
-                            
+
                             <div className="form__field">
                                 <FormControl fullWidth>
                                     <InputLabel id="parentCat-simple-select-label">
