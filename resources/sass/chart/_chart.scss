@@ -1,0 +1,46 @@
+.chart {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    width: 100%;
+
+    &--widgets {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 2rem;
+        flex-wrap: wrap;
+
+        &-item {
+            background-color: $secondary-color;
+            color: wheat;
+            padding: 2rem;
+            border-radius: 5px;
+            box-shadow: $primary-shadow;
+            border: $border;
+            font-family: $Quicksand;
+            height: 100%;
+
+            h3 {
+                border-bottom: 1px solid $primary-color;
+                padding-bottom: 10px;
+            }
+
+            p {
+                font-size: 1.4rem;
+                font-weight: 600;
+                color: $second;
+            }
+        }
+    }
+
+    &--counts {
+        display: flex;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+
+        &-item {
+            width: 50rem;
+            background-color: $background-color;
+        }
+    }
+}
