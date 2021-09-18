@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -85,5 +86,30 @@ class User extends Authenticatable
     {
         // return data from relationships
         return $query->with(['products', 'reviews', 'orders', 'roles', 'addresses']);
+    }
+
+    // count all users by month
+    public function scopeUserCount()
+    {
+        $users = User::select('id', 'created_at')->get()->groupBy(function ($date) {
+            return Carbon::parse($date->created_at)->format('m');
+        });
+
+        $userCount = [];
+        $userArr = [];
+
+        foreach ($users as $key => $value) {
+            $userCount[(int)$key] = count($value);
+        }
+
+        for ($i = 1; $i <= 12; $i++) {
+            if (!empty($userCount[$i])) {
+                $userArr[] = $userCount[$i];
+            } else {
+                $userArr[] = 0;
+            }
+        }
+
+        return $userArr;
     }
 }
