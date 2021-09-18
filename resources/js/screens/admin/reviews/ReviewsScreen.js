@@ -97,7 +97,6 @@ const ReviewsScreen = ({ history }) => {
     }
 
     const handleEditDialogOpen = (id) => {
-        console.log(id);
         if (user_perms.includes("admin_edit_reviews")) {
             setOpenEditDialog(true);
             setReviewId(id);
