@@ -87,6 +87,7 @@ const ShippingScreen = ({ match, history }) => {
 
     const userShow = useSelector((state) => state.userShow);
     const { loading, error, user } = userShow;
+    const { data } = user;
 
     const addressCreate = useSelector((state) => state.addressCreate);
     const { success } = addressCreate;
@@ -95,7 +96,7 @@ const ShippingScreen = ({ match, history }) => {
     const { cartItems } = cart;
 
     useEffect(() => {
-        if (!userInfo || userInfo.data.id != userId || !cartItems) {
+        if (!userInfo || userInfo.data.user_id != userId || !cartItems) {
             history.push("/")
         }
 
@@ -103,36 +104,36 @@ const ShippingScreen = ({ match, history }) => {
             dispatch(getUser(userId));
             setIsUserEmpty(false);
         } else {
-            if (user) {
-                setName(user.data ? user.data.address[0].name : "");
+            if (data && data.address.length > 0) {
+                setName(data ? data.address[0].name : "");
                 setSurname(
-                    user.data ? user.data.address[0].surname : ""
+                    data ? data.address[0].surname : ""
                 );
                 setCountry(
-                    user.data ? user.data.address[0].country : ""
+                    data ? data.address[0].country : ""
                 );
-                setCity(user.data ? user.data.address[0].city : "");
+                setCity(data ? data.address[0].city : "");
                 setAddress(
-                    user.data ? user.data.address[0].address : ""
+                    data ? data.address[0].address : ""
                 );
                 setPostalCode(
-                    user.data ? user.data.address[0].postal_code : ""
+                    data ? data.address[0].postal_code : ""
                 );
                 setPhoneNumber(
-                    user.data ? user.data.address[0].phone_number : ""
+                    data ? data.address[0].phone_number : ""
                 );
             }
         }
 
-        success && history.push(`/placeorder/${userInfo.data.id}`);
-    }, [dispatch, user, isUserEmpty, success]);
+        success && history.push(`/placeorder/${userInfo.data.user_id}`);
+    }, [dispatch, data, isUserEmpty, success]);
 
     const submitHandler = (e) => {
         e.preventDefault();
 
         dispatch(
             createAddress(
-                userId,
+                userInfo.data.id,
                 name,
                 surname,
                 country,

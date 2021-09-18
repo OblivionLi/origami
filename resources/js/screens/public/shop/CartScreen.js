@@ -95,7 +95,7 @@ const CartScreen = ({ location, match, history }) => {
     };
 
     const checkoutHandler = () => {
-        history.push(`/shipping-to/${userInfo.data.id}`);
+        history.push(`/shipping-to/${userInfo.data.user_id}`);
 
         const Toast = Swal.mixin({
             toast: true,

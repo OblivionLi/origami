@@ -211,7 +211,7 @@ const UsersScreen = ({ history }) => {
                                     icon: "edit",
                                     tooltip: "Edit User",
                                     onClick: (event, rowData) => {
-                                        handleEditDialogOpen(rowData.id);
+                                        handleEditDialogOpen(rowData.user_id);
                                     },
                                 }),
 
