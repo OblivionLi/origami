@@ -97,6 +97,13 @@ const useStyles = makeStyles((theme) => ({
             color: "#388667",
         },
     },
+
+    materialTable: {
+        fontFamily: "Quicksand",
+        fontWeight: "bold",
+        color: "#388667",
+        width: '100%'
+    },
 }));
 
 const PUBLIC_KEY =
@@ -455,6 +462,9 @@ const ShowOrderScreen = ({ match, history }) => {
                     </div>
                 </Paper>
             </section>
+
+            <hr className="divider2" />
+            <Footer />
         </>
     )
 };

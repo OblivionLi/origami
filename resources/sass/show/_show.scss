@@ -3,6 +3,7 @@
     display: flex;
     gap: 5rem;
     justify-content: center;
+    flex-wrap: wrap;
 
     &__carousel {
         width: 30rem;
@@ -54,6 +55,7 @@
         color: $primary-color !important;
         font-family: $Quicksand;
         box-shadow: $primary-shadow !important;
+        width: 100%;
     }
 
 
@@ -65,6 +67,10 @@
         color: $primary-color !important;
         font-family: $Quicksand;
         box-shadow: $primary-shadow !important;
+
+        &--po-right, &--po-left {
+            width: 100%;
+        }
     }
 
     &__container2 {

@@ -6,6 +6,7 @@ import Message from "./../../../components/alert/Message";
 import Loader from "./../../../components/alert/Loader";
 import Swal from "sweetalert2";
 import { updateCredentials } from "./../../../actions/userActions";
+import Footer from "../../../components/Footer";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -223,6 +224,9 @@ const SettingsScreen = ({ history }) => {
                     </form>
                 </div>
             </section>
+
+            <hr className="divider2" />
+            <Footer />
         </>
     );
 };

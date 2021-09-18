@@ -73,13 +73,13 @@ const useStyles = makeStyles((theme) => ({
     },
 
     link2: {
-        color: 'wheat',
+        color: "wheat",
 
-        '&:hover': {
-            color: 'wheat',
-            textDecoration: 'none',
-        }
-    }
+        "&:hover": {
+            color: "wheat",
+            textDecoration: "none",
+        },
+    },
 }));
 
 const ShowProductScreen = ({ history, match }) => {
@@ -114,7 +114,7 @@ const ShowProductScreen = ({ history, match }) => {
     }, [dispatch, successProductReview]);
 
     const addToCartHandler = (e) => {
-        history.push(`/cart/${productSlug}?qty=${qty}`)
+        history.push(`/cart/${productSlug}?qty=${qty}`);
 
         const Toast = Swal.mixin({
             toast: true,
@@ -480,9 +480,13 @@ const ShowProductScreen = ({ history, match }) => {
                                     </Paper>
                                 ))}
 
+                            {userInfo == null && <p>Product has no reviews yet.</p>}
 
                             {data && data.reviews.length > 1 && (
-                                <Button size="small" className={classes.button2}>
+                                <Button
+                                    size="small"
+                                    className={classes.button2}
+                                >
                                     <Link
                                         to={`/reviews/product/${data.id}`}
                                         className={classes.link2}

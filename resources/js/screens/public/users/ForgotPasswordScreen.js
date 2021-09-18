@@ -5,6 +5,7 @@ import Navbar from "./../../../components/Navbar";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "./../../../actions/userActions";
 import Swal from "sweetalert2";
+import Footer from "../../../components/Footer";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -165,6 +166,9 @@ const ForgotPasswordScreen = ({ history }) => {
                     </form>
                 </div>
             </section>
+
+            <hr className="divider2" />
+            <Footer />
         </>
     );
 };

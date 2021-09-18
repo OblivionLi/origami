@@ -14,6 +14,7 @@ import Message from "./../../../components/alert/Message";
 import Loader from "./../../../components/alert/Loader";
 import { login } from "./../../../actions/userActions";
 import Swal from "sweetalert2";
+import Footer from "../../../components/Footer";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -213,6 +214,9 @@ const LoginScreen = ({ location, history }) => {
                     </form>
                 </div>
             </section>
+
+            <hr className="divider2" />
+            <Footer />
         </>
     );
 };

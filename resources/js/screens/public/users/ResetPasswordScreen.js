@@ -7,6 +7,7 @@ import Loader from "./../../../components/alert/Loader";
 import Message from "./../../../components/alert/Message";
 import { resetPassword, getTokenResetPassword } from "./../../../actions/userActions";
 import Swal from "sweetalert2";
+import Footer from "../../../components/Footer";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -196,6 +197,9 @@ const ResetPasswordScreen = ({ history, match }) => {
                     </form>
                 </div>
             </section>
+
+            <hr className="divider2" />
+            <Footer />
         </>
     );
 };

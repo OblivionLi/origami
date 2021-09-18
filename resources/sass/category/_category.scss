@@ -1,20 +1,20 @@
 .category {
     display: flex;
     justify-content: space-between;
-
     width: 80%;
     margin: 2rem auto;
 
     &--sidebar {
-        flex-grow: 2;
+        flex-grow: 1;
+
         background-color: $background-color;
         padding: 1.5rem 3rem;
         color: $primary-color;
         font-family: $Quicksand;
         box-shadow: $primary-shadow;
         height: 100%;
-        min-width: 20rem;
-        max-width: 20rem;
+        min-width: 18rem;
+        max-width: 18rem;
 
         &-title {
             h4 {
@@ -55,7 +55,8 @@
     }
 
     &--products {
-        flex-grow: 4;
+        flex-grow: 3;
+
         display: flex;
         flex-direction: column;
         gap: 2rem;
@@ -141,5 +142,21 @@
     &:hover {
         color: $secondary-color;
         text-decoration: none;
+    }
+}
+
+
+@media (max-width: 1300px) {
+    .category {
+        display: block;
+        width: 100%;
+        padding-left: 0;
+        margin-left: 0;
+
+        &--sidebar {
+            min-width: 80%;
+            max-width: 80%;
+            margin: 2rem auto;
+        }
     }
 }

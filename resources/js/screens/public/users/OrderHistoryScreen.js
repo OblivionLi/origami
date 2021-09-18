@@ -82,6 +82,13 @@ const useStyles = makeStyles((theme) => ({
             color: "#388667",
         },
     },
+
+    materialTable: {
+        fontFamily: "Quicksand",
+        fontWeight: "bold",
+        color: "#388667",
+        width: '100%'
+    },
 }));
 
 const OrderHistoryScreen = ({ history }) => {
