@@ -18,7 +18,13 @@ import {
     ORDER_DELIVER_RESET,
     ORDER_USER_LIST_FAIL, 
     ORDER_USER_LIST_REQUEST,
-    ORDER_USER_LIST_SUCCESS
+    ORDER_USER_LIST_SUCCESS,
+    ORDER_PDF_REQUEST,
+    ORDER_PDF_SUCCESS,
+    ORDER_PDF_FAIL,
+    ORDER_DELETE_FAIL,
+    ORDER_DELETE_SUCCESS,
+    ORDER_DELETE_REQUEST
 } from "../constants/orderConstants";
 
 export const orderListReducer = (state = { orders: [] }, action) => {
@@ -155,3 +161,44 @@ export const orderDeliverReducer = (state = {}, action) => {
             return state;
     }
 };
+
+
+export const orderPDFReducer = (state = {}, action) => {
+    switch (action.type) {
+        case ORDER_PDF_REQUEST:
+            return {
+                loading: true,
+            };
+
+        case ORDER_PDF_SUCCESS:
+            return {
+                loading: false,
+                success: true
+            };
+
+        case ORDER_PDF_FAIL:
+            return {
+                loading: false,
+                error: action.payload,
+            };
+        default:
+            return state;
+    }
+};
+
+
+export const orderDeleteReducer = (state = {}, action) => {
+    switch (action.type) {
+        case ORDER_DELETE_REQUEST:
+            return { loading: true };
+
+        case ORDER_DELETE_SUCCESS:
+            return { loading: false, success: true };
+
+        case ORDER_DELETE_FAIL:
+            return { loading: false, error: action.payload };
+
+        default:
+            return state;
+    }
+}

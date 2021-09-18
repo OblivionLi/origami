@@ -15,9 +15,15 @@ import {
     ORDER_DELIVER_REQUEST,
     ORDER_DELIVER_SUCCESS,
     ORDER_DELIVER_FAIL,
-    ORDER_USER_LIST_FAIL, 
+    ORDER_USER_LIST_FAIL,
     ORDER_USER_LIST_REQUEST,
-    ORDER_USER_LIST_SUCCESS
+    ORDER_USER_LIST_SUCCESS,
+    ORDER_PDF_REQUEST,
+    ORDER_PDF_SUCCESS,
+    ORDER_PDF_FAIL,
+    ORDER_DELETE_FAIL,
+    ORDER_DELETE_SUCCESS,
+    ORDER_DELETE_REQUEST,
 } from "../constants/orderConstants";
 
 export const listOrders = () => async (dispatch, getState) => {
@@ -84,7 +90,7 @@ export const createOrder =
         shipping_price,
         tax_price,
         total_price,
-        products_discount_price,
+        products_discount_price
     ) =>
     async (dispatch, getState) => {
         try {
@@ -169,7 +175,11 @@ export const payOrder = (orderId) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await Axios.patch(`/api/order/${orderId}/pay`, {}, config);
+        const { data } = await Axios.patch(
+            `/api/order/${orderId}/pay`,
+            {},
+            config
+        );
 
         dispatch({ type: ORDER_PAY_SUCCESS, payload: data });
     } catch (error) {
@@ -197,7 +207,11 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await Axios.patch(`/api/orders/${id}/delivered`, {}, config);
+        const { data } = await Axios.patch(
+            `/api/orders/${id}/delivered`,
+            {},
+            config
+        );
 
         dispatch({ type: ORDER_DELIVER_SUCCESS, payload: data });
     } catch (error) {
@@ -206,6 +220,72 @@ export const deliverOrder = (id) => async (dispatch, getState) => {
             payload:
                 error.response && error.response.data.message
                     ? error.response.data.message
+                    : error.message,
+        });
+    }
+};
+
+export const createPDFOrder = (id) => async (dispatch, getState) => {
+    try {
+        dispatch({ type: ORDER_PDF_REQUEST });
+
+        const {
+            userLogin: { userInfo },
+        } = getState();
+
+        Axios({
+            url: `/api/order/pdf/${id}`,
+            method: "GET",
+            responseType: "blob", // important
+            authorization: `Bearer ${userInfo.data.access_token}`,
+        }).then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "Your-Order-Invoice.pdf");
+            document.body.appendChild(link);
+            link.click();
+        });
+
+        dispatch({ type: ORDER_PDF_SUCCESS });
+    } catch (error) {
+        dispatch({
+            type: ORDER_PDF_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
+        });
+    }
+};
+
+export const deleteOrder = (id) => async (dispatch, getState) => {
+    try {
+        dispatch({ type: ORDER_DELETE_REQUEST });
+
+        const {
+            userLogin: { userInfo },
+        } = getState();
+
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userInfo.data.access_token}`,
+            },
+        };
+
+        const { data } = await Axios.delete(
+            `/api/orders/${id}`,
+            config
+        );
+
+        dispatch({ type: ORDER_DELETE_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: ORDER_DELETE_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.message
                     : error.message,
         });
     }
