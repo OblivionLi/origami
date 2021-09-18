@@ -25,6 +25,9 @@ class AuthController extends Controller
     // Register User
     public function register(RegisterUserRequest $request)
     {
+        // create unique user id
+        $unique_user_id = Str::random(25);
+
         // Get row where role name is Guest
         $role = Role::where('name', 'Guest')->first();
 
@@ -39,6 +42,7 @@ class AuthController extends Controller
 
         // Create the user
         $user = User::create([
+            'user_id'   => $unique_user_id,
             'name'      => $request->name,
             'email'     => $request->email,
             'password'  => Hash::make($request->password)
