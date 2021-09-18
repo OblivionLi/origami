@@ -25,10 +25,11 @@ class RegisterUserResource extends JsonResource
         return [
             'message'       => 'User register success',
             'id'            => $this->id,
+            'user_id'       => $this->user_id,
             'name'          => $this->name,
             'email'         => $this->email,
-            'role'      => $this->roles->pluck('name'),
-            'is_admin'  => $this->roles->pluck('is_admin'),
+            'role'          => $this->roles->pluck('name'),
+            'is_admin'      => $this->roles->pluck('is_admin'),
             'access_token'  => $this->token,
             
         ];

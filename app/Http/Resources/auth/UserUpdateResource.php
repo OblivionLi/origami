@@ -17,6 +17,7 @@ class UserUpdateResource extends JsonResource
         return [
             'message'   => 'User update success',
             'id'        => $this->id,
+            'user_id'   => $this->user_id,
             'name'      => $this->name,
             'email'     => $this->email,
             'role'      => $this->roles->pluck('name'),
