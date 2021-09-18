@@ -161,7 +161,7 @@ const ShowOrderScreen = ({ match, history }) => {
         if (!userInfo || userInfo == null) {
             history.push("/login");
         } else {
-            dispatch(getUser(userInfo.data.id));
+            dispatch(getUser(userInfo.data.user_id));
         }
 
         if (isOrderEmpty) {
@@ -172,12 +172,12 @@ const ShowOrderScreen = ({ match, history }) => {
         }
 
         if (
-            (order && order.data && order.data.user_id == user.data.id) ||
+            (order && order.data && user && user.data && order.data.user_id == user.data.id) ||
             userInfo.data.is_admin > 0
         ) {
             setPerms(true);
         }
-    }, [dispatch, userInfo, order, isOrderEmpty, successDeliver, successPay]);
+    }, [dispatch, order, isOrderEmpty, successDeliver, successPay]);
 
     const deliverHandler = () => {
         dispatch(deliverOrder(order.data.id));
@@ -338,7 +338,7 @@ const ShowOrderScreen = ({ match, history }) => {
                                             title: "Discount",
                                             field: "discount",
                                             render: (product) => {
-                                                return product.discount == 0
+                                                return product.discount == null
                                                     ? "0 %"
                                                     : `${product.discount} %`;
                                             },
