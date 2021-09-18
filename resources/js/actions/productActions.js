@@ -115,7 +115,8 @@ export const editProduct =
         price,
         discount,
         description,
-        special_offer
+        special_offer,
+        qty
     ) =>
     async (dispatch, getState) => {
         try {
@@ -142,7 +143,8 @@ export const editProduct =
                     price,
                     discount,
                     description,
-                    special_offer
+                    special_offer,
+                    qty
                 },
                 config
             );
