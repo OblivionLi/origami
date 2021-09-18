@@ -86,7 +86,7 @@ const MostCommented = ({ mostCommented }) => {
 
                                     <span className="card-content--span2">
                                         {product.total_reviews > 0
-                                            ? product.total_reviews
+                                            ? `${product.total_reviews} Review/s`
                                             : "No Reviews Yet"}
                                     </span>
                                 </CardActions>
