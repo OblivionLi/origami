@@ -723,6 +723,47 @@ body {
   text-decoration: none;
 }
 
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+  width: 100%;
+}
+.chart--widgets {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.chart--widgets-item {
+  background-color: #388667;
+  color: wheat;
+  padding: 2rem;
+  border-radius: 5px;
+  box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c;
+  border: #BE8E4C;
+  font-family: "Quicksand", sans-serif;
+  height: 100%;
+}
+.chart--widgets-item h3 {
+  border-bottom: 1px solid #855C1B;
+  padding-bottom: 10px;
+}
+.chart--widgets-item p {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #6ebfc2;
+}
+.chart--counts {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.chart--counts-item {
+  width: 50rem;
+  background-color: #FDF7E9;
+}
+
 /*!
  * Bootstrap v4.6.0 (https://getbootstrap.com/)
  * Copyright 2011-2021 The Bootstrap Authors
