@@ -106,7 +106,7 @@ const PlaceOrderScreen = ({ match, history }) => {
         )
         .toFixed(2);
 
-    cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 100);
+    cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 15);
 
     cart.taxPrice = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)));
 
@@ -117,17 +117,21 @@ const PlaceOrderScreen = ({ match, history }) => {
     ).toFixed(2);
 
     useEffect(() => {
-        !userInfo || (userInfo.data.id != userId && history.push("/"));
+        !userInfo || (userInfo.data.user_id != userId && history.push("/"));
 
         if (success) {
             cartItems.map((item) => {
                 dispatch(removeFromCart(item.product));
             });
-            history.push(`/order-history/${order.id}/${userInfo.data.id}`);
+
+            order &&
+                history.push(
+                    `/order-history/${order.id}/${userInfo.data.user_id}`
+                );
         }
 
         dispatch(getAddress(userInfo.data.id));
-    }, [dispatch, userInfo, success]);
+    }, [dispatch, order, userInfo, success]);
 
     const placeOrderHandler = (e) => {
         e.preventDefault();
