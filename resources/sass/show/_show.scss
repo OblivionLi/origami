@@ -67,10 +67,6 @@
         color: $primary-color !important;
         font-family: $Quicksand;
         box-shadow: $primary-shadow !important;
-
-        &--po-right, &--po-left {
-            width: 100%;
-        }
     }
 
     &__container2 {
@@ -177,4 +173,11 @@
 
 .failed {
     color: darkred;
+}
+
+
+@media (max-width: 1200px) {
+    .product__container--po-right, .product__container--po-left {
+        width: 100%;
+    }
 }

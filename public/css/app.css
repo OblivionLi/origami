@@ -493,9 +493,6 @@ body {
   font-family: "Quicksand", sans-serif;
   box-shadow: 0px 3px 3px -2px #be8e4c, 0px 3px 4px 0px #be8e4c, 0px 1px 8px 0px #be8e4c !important;
 }
-.product__container--po-right, .product__container--po-left {
-  width: 100%;
-}
 .product__container2 {
   width: 70%;
   margin: 2rem auto;
@@ -591,6 +588,11 @@ body {
   color: darkred;
 }
 
+@media (max-width: 1200px) {
+  .product__container--po-right, .product__container--po-left {
+    width: 100%;
+  }
+}
 .cart {
   display: flex;
   justify-content: space-evenly;

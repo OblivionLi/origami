@@ -59,7 +59,10 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: "Quicksand",
         fontWeight: "bold",
         color: "#388667",
-        width: '100%'
+
+        [theme.breakpoints.down("sm")]: {
+            width: "100%",
+        },
     },
 
     link: {
@@ -133,6 +136,7 @@ const PlaceOrderScreen = ({ match, history }) => {
 
         dispatch(getAddress(userInfo.data.id));
     }, [dispatch, order, userInfo, success]);
+
 
     const placeOrderHandler = (e) => {
         e.preventDefault();
