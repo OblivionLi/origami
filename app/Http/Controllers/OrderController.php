@@ -7,6 +7,7 @@ use App\Http\Resources\order\OrderIndexAdminResource;
 use App\Http\Resources\order\OrderIndexResource;
 use App\Http\Resources\order\OrderShowResource;
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -139,7 +140,7 @@ class OrderController extends Controller
     public function updateOrderToPaid($id)
     {
         // get order by id
-        $order = Order::info()->find($id);
+        $order = Order::info()->where('order_id', $id)->firstOrFail();
 
         // if order doesnt exist return error message
         $response = ['message' => 'Order does not exist..'];
@@ -166,7 +167,7 @@ class OrderController extends Controller
     public function updateOrderToDelivered($id)
     {
         // get order by id
-        $order = Order::info()->find($id);
+        $order = Order::info()->where('order_id', $id)->firstOrFail();
 
         // if order doesnt exist return error message
         $response = ['message' => 'Order does not exist..'];
@@ -219,5 +220,25 @@ class OrderController extends Controller
         // download PDF file with download method
         return $pdf->download('Your-Order-Invoice.pdf');
         // return $pdf->stream();
+    }
+
+    public function orderCharts()
+    {
+        $orderCount         = Order::orderCount();
+        $revenueLastMonth   = Order::revenueLastMonth();
+        $revenueAllTime     = Order::revenueAllTime();
+        $averageRevenue     = Order::averageRevenue();
+        $userCount          = User::userCount();
+
+        $data = [
+            'orderCount'        => $orderCount,
+            'userCount'         => $userCount,
+            'revenueLastMonth'  => $revenueLastMonth,
+            'revenueAllTime'    => $revenueAllTime,
+            'averageRevenue'    => $averageRevenue,
+
+        ];
+
+        return response()->json($data);
     }
 }
