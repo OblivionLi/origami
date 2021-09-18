@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import Loader from "./../../../components/alert/Loader";
 import Message from "./../../../components/alert/Message";
 import { Link } from "react-router-dom";
-import { listOrders } from "./../../../actions/orderActions";
+import { listOrders, createPDFOrder, deleteOrder } from "./../../../actions/orderActions";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -90,6 +90,55 @@ const OrderScreen = ({ history }) => {
         );
     }
 
+    const handlePDF = (id) => {
+        if (user_perms.includes("admin_dl_orderPDF")) {
+            dispatch(createPDFOrder(id))
+        } else {
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
+        }
+    }
+
+    const deleteOrderHandler = (id) => {
+        if (user_perms.includes("admin_delete_orders")) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: `You can't recover this order after deletion!`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                cancelButtonColor: "#d33",
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.value) {
+                    dispatch(deleteOrder(id));
+                    setRequestData(new Date());
+                    Swal.fire(
+                        "Deleted!",
+                        "The order with the id " + id + " has been deleted.",
+                        "success"
+                    );
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire(
+                        "Cancelled",
+                        `The selected order is safe, don't worry :)`,
+                        "error"
+                    );
+                }
+            });
+        } else {
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
+        }
+    }
+
     return (
         <Paper className="admin-content">
             {!isAdmin ? (
@@ -121,7 +170,7 @@ const OrderScreen = ({ history }) => {
                                     render: (orders) => {
                                         return (
                                             <Link
-                                                to={`/order-history/${orders.id}`}
+                                                to={`/order-history/${orders.order_id}`}
                                                 className={classes.link}
                                                 target="_blank"
                                             >
@@ -246,6 +295,22 @@ const OrderScreen = ({ history }) => {
                                 },
                             ]}
                             data={orders && orders.data}
+                            actions={[
+                                (rowData) => ({
+                                    icon: "receipt",
+                                    tooltip: "Download Order Invoice (PDF)",
+                                    onClick: (event, rowData) => {
+                                        handlePDF(rowData.order_id);
+                                    },
+                                }),
+                                (rowData) => ({
+                                    icon: "delete",
+                                    tooltip: "Delete Order",
+                                    onClick: (event, rowData) => {
+                                        deleteOrderHandler(rowData.id);
+                                    },
+                                }),
+                            ]}
                             options={{
                                 actionsColumnIndex: -1,
                                 headerStyle: {
