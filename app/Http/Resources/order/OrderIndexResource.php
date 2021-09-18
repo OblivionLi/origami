@@ -16,6 +16,7 @@ class OrderIndexResource extends JsonResource
     {
         return [
             'id'                        => $this->id,
+            'order_id'                  => $this->order_id,
             'status'                    => $this->status,
             'products_price'            => $this->products_price,
             'products_discount_price'   => $this->products_discount_price,
