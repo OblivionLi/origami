@@ -11,6 +11,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PDF;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -33,9 +35,13 @@ class OrderController extends Controller
      */
     public function store(OrderStoreRequest $request)
     {
+        // create unique order id
+        $unique_order_id = Str::random(25);
+
         // create order
         $order = Order::create([
             'user_id'                   => Auth::id(),
+            'order_id'                  => $unique_order_id,
             'status'                    => 'PENDING',
             'products_price'            => $request->products_price,
             'products_discount_price'   => $request->products_discount_price,
@@ -66,7 +72,7 @@ class OrderController extends Controller
         }
 
         // return success message
-        $response = ['message' => 'Order create success', 'id'  => $order->id];
+        $response = ['message' => 'Order create success', 'id'  => $order->order_id];
         return response()->json($response, 200);
     }
 
@@ -79,7 +85,7 @@ class OrderController extends Controller
     public function show($id)
     {
         // get order by id
-        $order = Order::info()->find($id);
+        $order = Order::info()->where('order_id', $id)->firstOrFail();
 
         // if order doesnt exist return error message
         $response = ['message' => 'Order does not exist..'];
@@ -107,9 +113,21 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Order $order)
+    public function destroy($id)
     {
-        //
+        // get order by id
+        $order = Order::find($id);
+
+        // if order doesnt exist return error message
+        if (!$order) return response()->json(['message' => 'Order does not exist..']);
+
+        // delete the order
+        $order->products()->sync([]);
+        $order->delete();
+
+        // return success message
+        $response = ['message', 'Order delete success'];
+        return response()->json($response, 200);
     }
 
     /**
@@ -183,5 +201,23 @@ class OrderController extends Controller
 
         // return order resource
         return OrderIndexResource::collection($order);
+    }
+
+    // Generate PDF
+    public function createPDF($id) {
+        // get order by id
+        $order = Order::info()->where('order_id', $id)->firstOrFail();
+
+        // if order doesnt exist return error message
+        $response = ['message' => 'Order does not exist..'];
+        if (!$order) return response()->json($response, 422);
+  
+        // share data to view
+        view()->share('order', $order);
+        $pdf = PDF::loadView('invoice.orderPDF', $order);
+  
+        // download PDF file with download method
+        return $pdf->download('Your-Order-Invoice.pdf');
+        // return $pdf->stream();
     }
 }
