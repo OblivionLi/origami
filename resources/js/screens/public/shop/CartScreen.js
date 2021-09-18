@@ -66,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
 
     link: {
         color: "#855C1B",
+        fontWeight: "600",
 
         "&:hover": {
             color: "#388667",
@@ -128,7 +129,7 @@ const CartScreen = ({ location, match, history }) => {
                 {cartItems && cartItems.length === 0 ? (
                     <div className="product">
                         <Message variant="warning">
-                            Your cart is empty <Link to={`/`}>Go Back</Link>
+                            Your cart is empty <Link to={`/`} className={classes.link}>Go Back</Link>
                         </Message>
                     </div>
                 ) : (

@@ -102,10 +102,7 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: "Quicksand",
         fontWeight: "bold",
         color: "#388667",
-        
-        [theme.breakpoints.down("sm")]: {
-            width: "100%",
-        },
+        width: '100%',
     },
 }));
 

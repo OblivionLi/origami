@@ -257,7 +257,7 @@ const PlaceOrderScreen = ({ match, history }) => {
                                         number is correct. If it's not then
                                         click{" "}
                                         <a
-                                            href={`/shipping-to/${userInfo.data.id}`}
+                                            href={`/shipping-to/${userInfo.data.user_id}`}
                                             className={classes.link}
                                         >
                                             HERE

@@ -80,6 +80,15 @@ const useStyles = makeStyles((theme) => ({
             textDecoration: "none",
         },
     },
+
+    link: {
+        color: "#855C1B",
+        fontWeight: "600",
+
+        "&:hover": {
+            color: "#388667",
+        },
+    },
 }));
 
 const ShowProductScreen = ({ history, match }) => {
@@ -401,7 +410,7 @@ const ShowProductScreen = ({ history, match }) => {
                                     ) : (
                                         <Message variant="error">
                                             Please{" "}
-                                            <Link to="/login">sign in</Link> to
+                                            <Link to="/login" className={classes.link}>sign in</Link> to
                                             write a review.
                                         </Message>
                                     )}
