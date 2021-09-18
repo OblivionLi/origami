@@ -15,6 +15,7 @@ import {
     CardMedia,
     CardContent,
     CardActions,
+    Box
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
@@ -22,6 +23,7 @@ import OrigamiPaginate from "./../../../components/paginations/OrigamiPaginate";
 import ReactPaginate from "react-paginate";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import Rating from "@material-ui/lab/Rating";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -102,6 +104,21 @@ const OrigamiScreen = ({ match }) => {
                 </CardActionArea>
                 <CardActions className="card-content">
                     <Link to={`/product/${product.slug}`}>View Product</Link>
+                    <Box
+                        component="fieldset"
+                        borderColor="transparent"
+                        className={classes.box}
+                    >
+                        <Rating
+                            size="small"
+                            name="rating"
+                            value={parseFloat(product.rating)}
+                            text={`${product.total_reviews} reviews`}
+                            precision={0.5}
+                            className={classes.rating}
+                            readOnly
+                        />
+                    </Box>
                     <span className="card-content--span">
                         &euro;{product.price}
                     </span>
@@ -245,6 +262,29 @@ const OrigamiScreen = ({ match }) => {
                                                           >
                                                               View Product
                                                           </Link>
+                                                          <Box
+                                                              component="fieldset"
+                                                              borderColor="transparent"
+                                                              className={
+                                                                  classes.box
+                                                              }
+                                                          >
+                                                              <Rating
+                                                                  size="small"
+                                                                  name="rating"
+                                                                  value={parseFloat(
+                                                                      product.rating
+                                                                  )}
+                                                                  text={`${product.total_reviews} reviews`}
+                                                                  precision={
+                                                                      0.5
+                                                                  }
+                                                                  className={
+                                                                      classes.rating
+                                                                  }
+                                                                  readOnly
+                                                              />
+                                                          </Box>
                                                           <span className="card-content--span">
                                                               &euro;
                                                               {product.price}

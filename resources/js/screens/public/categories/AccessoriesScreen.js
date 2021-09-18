@@ -16,6 +16,11 @@ import {
     CardContent,
     CardActions,
     Button,
+    Box,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
@@ -23,6 +28,7 @@ import AccessoriesPaginate from "./../../../components/paginations/AccessoriesPa
 import ReactPaginate from "react-paginate";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import Rating from "@material-ui/lab/Rating";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -104,6 +110,21 @@ const AccessoriesScreen = ({ match }) => {
                 </CardActionArea>
                 <CardActions className="card-content">
                     <Link to={`/product/${product.slug}`}>View Product</Link>
+                    <Box
+                        component="fieldset"
+                        borderColor="transparent"
+                        className={classes.box}
+                    >
+                        <Rating
+                            size="small"
+                            name="rating"
+                            value={parseFloat(product.rating)}
+                            text={`${product.total_reviews} reviews`}
+                            precision={0.5}
+                            className={classes.rating}
+                            readOnly
+                        />
+                    </Box>
                     <span className="card-content--span">
                         &euro;{product.price}
                     </span>
@@ -123,8 +144,7 @@ const AccessoriesScreen = ({ match }) => {
 
     const handleCategory = (id, slug) => {
         setFilteredProducts(
-            products &&
-                products.filter((item) => item.child_category_id == id)
+            products && products.filter((item) => item.child_category_id == id)
         );
 
         setChildCatSlug(slug);
@@ -167,8 +187,12 @@ const AccessoriesScreen = ({ match }) => {
 
                                 <ul>
                                     <li className="category--sidebar-title-item">
-                                        <a href="/accessories" className="filterLink">Show All</a>
-                                        
+                                        <a
+                                            href="/accessories"
+                                            className="filterLink"
+                                        >
+                                            Show All
+                                        </a>
                                     </li>
                                     {childCat &&
                                         childCat.map((child) => (
@@ -204,51 +228,77 @@ const AccessoriesScreen = ({ match }) => {
                                 <div className="category--products-items">
                                     {filteredProducts == ""
                                         ? productsWithPag &&
-                                        productsWithPag.data.map((product) => (
-                                              <Card
-                                                  className={classes.card}
-                                                  key={product.id}
-                                              >
-                                                  <CardActionArea>
-                                                      <CardMedia
-                                                          className={
-                                                              classes.media
-                                                          }
-                                                          image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
-                                                          title={`Image for product: ${product.name}`}
-                                                      />
-                                                      <CardContent className="card-content-top">
-                                                          <Typography
-                                                              gutterBottom
-                                                              variant="h5"
-                                                              component="h2"
-                                                              className="card-content-h2"
-                                                          >
-                                                              {product.name}
-                                                          </Typography>
-                                                          <Typography
-                                                              variant="body2"
-                                                              component="p"
-                                                              className="card-content-p"
-                                                          >
-                                                              {
-                                                                  product.description
+                                          productsWithPag.data.map(
+                                              (product) => (
+                                                  <Card
+                                                      className={classes.card}
+                                                      key={product.id}
+                                                  >
+                                                      <CardActionArea>
+                                                          <CardMedia
+                                                              className={
+                                                                  classes.media
                                                               }
-                                                          </Typography>
-                                                      </CardContent>
-                                                  </CardActionArea>
-                                                  <CardActions className="card-content">
-                                                      <Link
-                                                          to={`/product/${product.slug}`}
-                                                      >
-                                                          View Product
-                                                      </Link>
-                                                      <span className="card-content--span">
-                                                          &euro;{product.price}
-                                                      </span>
-                                                  </CardActions>
-                                              </Card>
-                                          ))
+                                                              image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
+                                                              title={`Image for product: ${product.name}`}
+                                                          />
+                                                          <CardContent className="card-content-top">
+                                                              <Typography
+                                                                  gutterBottom
+                                                                  variant="h5"
+                                                                  component="h2"
+                                                                  className="card-content-h2"
+                                                              >
+                                                                  {product.name}
+                                                              </Typography>
+                                                              <Typography
+                                                                  variant="body2"
+                                                                  component="p"
+                                                                  className="card-content-p"
+                                                              >
+                                                                  {
+                                                                      product.description
+                                                                  }
+                                                              </Typography>
+                                                          </CardContent>
+                                                      </CardActionArea>
+                                                      <CardActions className="card-content">
+                                                          <Link
+                                                              to={`/product/${product.slug}`}
+                                                          >
+                                                              View Product
+                                                          </Link>
+                                                          <Box
+                                                              component="fieldset"
+                                                              borderColor="transparent"
+                                                              className={
+                                                                  classes.box
+                                                              }
+                                                          >
+                                                              <Rating
+                                                                  size="small"
+                                                                  name="rating"
+                                                                  value={parseFloat(
+                                                                      product.rating
+                                                                  )}
+                                                                  text={`${product.total_reviews} reviews`}
+                                                                  precision={
+                                                                      0.5
+                                                                  }
+                                                                  className={
+                                                                      classes.rating
+                                                                  }
+                                                                  readOnly
+                                                              />
+                                                          </Box>
+                                                          <span className="card-content--span">
+                                                              &euro;
+                                                              {product.price}
+                                                          </span>
+                                                      </CardActions>
+                                                  </Card>
+                                              )
+                                          )
                                         : displayFilteredProducts}
                                 </div>
 

@@ -15,10 +15,12 @@ import {
     CardMedia,
     CardContent,
     CardActions,
+    Box,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import SpecialOffersPaginate from './../../../components/paginations/SpecialOffersPaginate';
+import SpecialOffersPaginate from "./../../../components/paginations/SpecialOffersPaginate";
+import Rating from "@material-ui/lab/Rating";
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -130,6 +132,25 @@ const SpecialOffers = ({ match }) => {
                                                     >
                                                         View Product
                                                     </Link>
+                                                    <Box
+                                                        component="fieldset"
+                                                        borderColor="transparent"
+                                                        className={classes.box}
+                                                    >
+                                                        <Rating
+                                                            size="small"
+                                                            name="rating"
+                                                            value={parseFloat(
+                                                                product.rating
+                                                            )}
+                                                            text={`${product.total_reviews} reviews`}
+                                                            precision={0.5}
+                                                            className={
+                                                                classes.rating
+                                                            }
+                                                            readOnly
+                                                        />
+                                                    </Box>
                                                     <span className="card-content--span">
                                                         &euro;{product.price}
                                                     </span>
