@@ -234,6 +234,7 @@ class AuthController extends Controller
         $response = [
             'message'   => 'User update success',
             'id'        => $user->id,
+            'user_id'   => $user->user_id,
             'name'      => $user->name,
             'email'     => $user->email,
             'role'      => $user->roles->pluck('name'),
