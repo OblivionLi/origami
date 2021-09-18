@@ -123,7 +123,7 @@ class ProductController extends Controller
         $product->discount          = $request->has('discount') ? ($request->discout > 0 ? $request->discount : null) : null;
         $product->special_offer     = $request->special_offer;
         $product->product_code      = $request->product_code;
-        $product->total_quantities  = 0;
+        $product->total_quantities  = $request->qty;
 
         // save the new product data
         $product->save();
