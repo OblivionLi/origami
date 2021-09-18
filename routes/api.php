@@ -45,6 +45,8 @@ Route::get('accessories', [ProductController::class, 'getProductByAccessories'])
 Route::get('origami', [ProductController::class, 'getProductByOrigami']);
 Route::get('special-offers', [ProductController::class, 'getProductBySpecialOffers']);
 
+Route::get('/order/pdf/{order}', [OrderController::class, 'createPDF']);
+
 // Public routes        ################################################## no need for admin perms; login needed !
 Route::group(['middleware' => 'auth:api'], function () {
     # User routes
@@ -126,5 +128,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         # Order routes
         Route::get('orders', [OrderController::class, 'index']);
         Route::patch('orders/{order}/delivered', [OrderController::class, 'updateOrderToDelivered']);
+        Route::delete('orders/{order}', [OrderController::class, 'destroy']);
     });
 });
