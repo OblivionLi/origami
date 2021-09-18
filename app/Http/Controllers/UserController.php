@@ -42,7 +42,7 @@ class UserController extends Controller
     public function show($id)
     {
         // return user object
-        return new UserShowResource(User::info()->find($id));
+        return new UserShowResource(User::info()->where('user_id', $id)->firstOrFail());
     }
 
     /**
