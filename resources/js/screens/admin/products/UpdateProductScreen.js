@@ -57,6 +57,7 @@ const UpdateProductScreen = ({
     const [discount, setDiscount] = useState("");
     const [description, setDescription] = useState("");
     const [isSpecialOffer, setIsSpecialOffer] = useState(0);
+    const [qty, setQty] = useState(0);
 
     const [successModal, setSuccessModal] = useState(false);
     const [isChildCatEmpty, setIsChildCatEmpty] = useState(true);
@@ -72,29 +73,25 @@ const UpdateProductScreen = ({
     const { childCats } = childCatList;
 
     useEffect(() => {
-        if (success) {
-            dispatch({ type: PRODUCT_UPDATE_RESET });
-            dispatch({ type: PRODUCT_SHOW_RESET });
+        if (isChildCatEmpty) {
+            dispatch(getProduct(productId));
+            dispatch(getChildCatsList());
+            setIsChildCatEmpty(false);
         } else {
-            if (isChildCatEmpty) {
-                dispatch(getProduct(productId));
-                dispatch(getChildCatsList());
-                setIsChildCatEmpty(false);
-            } else {
-                if (data) {
-                    setName(data.name);
-                    setProductCode(data.product_code);
-                    setDescription(data.description);
-                    setPrice(data.price);
-                    setDiscount(data.discount);
-                    setIsSpecialOffer(data.special_offer);
-                    setChildCategoryId(data.child_category.id);
-                }
+            if (data) {
+                setName(data.name);
+                setProductCode(data.product_code);
+                setDescription(data.description);
+                setPrice(data.price);
+                setDiscount(data.discount);
+                setIsSpecialOffer(data.special_offer);
+                setChildCategoryId(data.child_category.id);
+                setQty(data.total_quantities);
             }
         }
 
         successModal && dispatch(getProductsList());
-    }, [dispatch, isChildCatEmpty, product, success, successModal]);
+    }, [dispatch, data, isChildCatEmpty, successModal]);
 
     const handleSpecialOfferCheckbox = (e) => {
         let isSpecialOffer;
@@ -114,7 +111,8 @@ const UpdateProductScreen = ({
                 price,
                 discount,
                 description,
-                isSpecialOffer
+                isSpecialOffer,
+                qty
             )
         );
 
@@ -276,6 +274,18 @@ const UpdateProductScreen = ({
                                         setDescription(e.target.value)
                                     }
                                     required
+                                />
+                            </div>
+
+                            <div className="form__field">
+                                <TextField
+                                    variant="outlined"
+                                    name="qty"
+                                    label="Quantity"
+                                    fullWidth
+                                    value={qty}
+                                    type="number"
+                                    onChange={(e) => setQty(e.target.value)}
                                 />
                             </div>
                         </div>
