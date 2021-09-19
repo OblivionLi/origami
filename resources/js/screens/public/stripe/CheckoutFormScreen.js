@@ -57,7 +57,7 @@ const CheckoutFormScreen = ({ history, orderId, totalPrice }) => {
 
     useEffect(() => {
         if (userInfo) {
-            dispatch(getUser(userInfo.data.id));
+            dispatch(getUser(userInfo.data.user_id));
 
             if (user) {
                 setCountryInitials(
