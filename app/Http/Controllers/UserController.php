@@ -8,6 +8,7 @@ use App\Http\Resources\user\UserIndexResource;
 use App\Http\Resources\user\UserShowResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -52,10 +53,18 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UserUpdateRequest $request, $id)
+    public function update(Request $request, $id)
     {
         // get user by id
-        $user = User::find($id);
+        $user = User::where('user_id', $id)->firstOrFail();
+
+        $request->validate([
+            'name' => 'string',
+            'email' => [
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'password' => 'confirmed'
+        ]);
 
         // if user exist
         if ($user) {
