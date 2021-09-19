@@ -259,7 +259,7 @@ const ParentCategoriesScreen = ({ history }) => {
                                             Parent Category's Child Categories
                                         </h2>
                                         <div className="table-detail--par">
-                                            {rowData.childCat.length ? (
+                                            {rowData.childCat.length > 0 ? (
                                                 rowData.childCat.map(
                                                     (childCat) => (
                                                         <h4 key={childCat}>
@@ -269,8 +269,7 @@ const ParentCategoriesScreen = ({ history }) => {
                                                 )
                                             ) : (
                                                 <p>
-                                                    This Parent Category "(
-                                                    {rowData})" has no child
+                                                    This Parent Category has no child
                                                     categories.
                                                 </p>
                                             )}
