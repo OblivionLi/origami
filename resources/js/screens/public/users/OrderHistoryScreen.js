@@ -87,6 +87,7 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: "Quicksand",
         fontWeight: "bold",
         color: "#388667",
+        width: '100%',
         
         [theme.breakpoints.down("sm")]: {
             width: "100%",
@@ -122,7 +123,7 @@ const OrderHistoryScreen = ({ history }) => {
 
             <section className="ctn">
                 {loading ? (
-                    <div className="product">
+                    <div className="loaderCenter">
                         <Loader />
                     </div>
                 ) : error ? (
@@ -140,7 +141,7 @@ const OrderHistoryScreen = ({ history }) => {
                             </Breadcrumbs>
                         </Paper>
 
-                        <Paper className="product__container">
+                        <Paper className="show__container">
                             <div className="cart">
                                 <MaterialTable
                                     title="Orders List"

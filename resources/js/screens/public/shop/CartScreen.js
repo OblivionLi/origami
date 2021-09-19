@@ -127,7 +127,7 @@ const CartScreen = ({ location, match, history }) => {
 
             <section className="ctn">
                 {cartItems && cartItems.length === 0 ? (
-                    <div className="product">
+                    <div className="cart-empty">
                         <Message variant="warning">
                             Your cart is empty <Link to={`/`} className={classes.link}>Go Back</Link>
                         </Message>
@@ -143,7 +143,7 @@ const CartScreen = ({ location, match, history }) => {
                             </Breadcrumbs>
                         </Paper>
 
-                        <Paper className="product__container">
+                        <Paper className="show__container">
                             <div className="cart">
                                 <MaterialTable
                                     title="Cart List"
@@ -322,10 +322,10 @@ const CartScreen = ({ location, match, history }) => {
                                     }}
                                 />
 
-                                <Paper className="product__paper">
-                                    <div className="product__paper--div">
+                                <Paper className="show__paper">
+                                    <div className="show__paper--div">
                                         <h4 className="divider">Subtotal:</h4>
-                                        <p className="product__paper--p">
+                                        <p className="show__paper--p">
                                             {cartItems.reduce(
                                                 (acc, item) =>
                                                     acc + Number(item.qty),
@@ -335,13 +335,13 @@ const CartScreen = ({ location, match, history }) => {
                                         </p>
                                     </div>
 
-                                    <div className="product__paper--div">
+                                    <div className="show__paper--div">
                                         <h4 className="divider">
                                             Total with Discount:
                                         </h4>
                                         <span
                                             color="inherit"
-                                            className="product__paper--p"
+                                            className="show__paper--p"
                                         >
                                             &euro;
                                             {cartItems
@@ -373,7 +373,7 @@ const CartScreen = ({ location, match, history }) => {
 
                                     <hr className="divider" />
 
-                                    <div className="product-tabel-form">
+                                    <div className="show-tabel-form">
                                         <form>
                                             <div className="form__field">
                                                 <Button

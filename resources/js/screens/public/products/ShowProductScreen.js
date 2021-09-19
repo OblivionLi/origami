@@ -164,7 +164,7 @@ const ShowProductScreen = ({ history, match }) => {
 
             <section className="ctn">
                 {loading ? (
-                    <div className="product">
+                    <div className="loaderCenter">
                         <Loader />
                     </div>
                 ) : error ? (
@@ -181,14 +181,14 @@ const ShowProductScreen = ({ history, match }) => {
                                 </Typography>
                             </Breadcrumbs>
                         </Paper>
-                        <div className="product">
-                            <div className="product__carousel">
+                        <div className="show">
+                            <div className="show__carousel">
                                 <Carousel>
                                     {data &&
                                         data.images.map((image) => (
                                             <div key={image.id}>
                                                 <img
-                                                    className="product__carousel-img"
+                                                    className="show__carousel-img"
                                                     src={`http://127.0.0.1:8000/storage/${image.path}`}
                                                     title={`Image id: ${data.name}`}
                                                 />
@@ -197,9 +197,9 @@ const ShowProductScreen = ({ history, match }) => {
                                 </Carousel>
                             </div>
 
-                            <Paper className="product__paper">
-                                <div className="product__paper--rating">
-                                    {data && data.total_quantities > 1 ? (
+                            <Paper className="show__paper">
+                                <div className="show__paper--rating">
+                                    {data && data.total_quantities > 0 ? (
                                         <p className="inStock">
                                             &#8226; Product in stock.
                                         </p>
@@ -223,12 +223,12 @@ const ShowProductScreen = ({ history, match }) => {
                                     <Divider />
                                 </div>
 
-                                <div className="product__paper--details">
+                                <div className="show__paper--details">
                                     <div>
                                         <h4 className="divider">
                                             Product Name:
                                         </h4>
-                                        <p className="product__paper--p">
+                                        <p className="show__paper--p">
                                             {data && data.name}
                                         </p>
                                     </div>
@@ -237,7 +237,7 @@ const ShowProductScreen = ({ history, match }) => {
                                         <h4 className="divider">
                                             Product Code:
                                         </h4>
-                                        <p className="product__paper--p">
+                                        <p className="show__paper--p">
                                             {data && data.product_code}
                                         </p>
                                     </div>
@@ -245,19 +245,19 @@ const ShowProductScreen = ({ history, match }) => {
                             </Paper>
 
                             {data && data.total_quantities > 0 && (
-                                <Paper className="product__paper">
-                                    <div className="product__paper--div">
+                                <Paper className="show__paper">
+                                    <div className="show__paper--div">
                                         <h4 className="divider">Discount:</h4>
-                                        <p className="product__paper--p">
+                                        <p className="show__paper--p">
                                             {data && data.discount} %
                                         </p>
                                     </div>
 
-                                    <div className="product__paper--div">
+                                    <div className="show__paper--div">
                                         <h4 className="divider">Price:</h4>
                                         <span
                                             color="inherit"
-                                            className="product__paper--p"
+                                            className="show__paper--p"
                                         >
                                             &euro;
                                             {(
@@ -275,16 +275,16 @@ const ShowProductScreen = ({ history, match }) => {
                                         </strike>
                                     </div>
 
-                                    <div className="product__paper--div">
+                                    <div className="show__paper--div">
                                         <h4 className="divider">Quantity:</h4>
-                                        <p className="product__paper--p">
+                                        <p className="show__paper--p">
                                             {data && data.total_quantities} left
                                         </p>
                                     </div>
 
                                     <hr className="divider" />
 
-                                    <div className="product-tabel-form">
+                                    <div className="show-tabel-form">
                                         <form>
                                             <div className="form__field">
                                                 <Button
@@ -307,14 +307,14 @@ const ShowProductScreen = ({ history, match }) => {
                             )}
                         </div>
 
-                        <Paper className="product__container">
+                        <Paper className="show__container">
                             <h3 className="divider">Product Description</h3>
-                            <p className="product__paper--p">
+                            <p className="show__paper--p">
                                 {data && data.description} left
                             </p>
                         </Paper>
 
-                        <Paper className="product__container">
+                        <Paper className="show__container">
                             <h3 className="divider">Reviews</h3>
                             {data && data.reviews.length === 0 && (
                                 <Message variant="info">No Reviews</Message>
@@ -410,20 +410,25 @@ const ShowProductScreen = ({ history, match }) => {
                                     ) : (
                                         <Message variant="error">
                                             Please{" "}
-                                            <Link to="/login" className={classes.link}>sign in</Link> to
-                                            write a review.
+                                            <Link
+                                                to="/login"
+                                                className={classes.link}
+                                            >
+                                                sign in
+                                            </Link>{" "}
+                                            to write a review.
                                         </Message>
                                     )}
                                 </AccordionDetails>
                             </Accordion>
                         </Paper>
 
-                        <Paper className="product__container">
-                            {data &&
-                                data.reviews.map((review) => (
+                        {data && data.reviews.length > 0 && (
+                            <Paper className="show__container">
+                                {data.reviews.map((review) => (
                                     <Paper
                                         key={review.id}
-                                        className="product__container2"
+                                        className="show__container--content"
                                     >
                                         <div className="review-top">
                                             <h3>{review.user_name}</h3>
@@ -441,7 +446,7 @@ const ShowProductScreen = ({ history, match }) => {
                                         <Divider />
 
                                         <div className="review-bottom">
-                                            <p className="product__paper--p">
+                                            <p className="show__paper--p">
                                                 {review.user_comment}
                                             </p>
 
@@ -489,22 +494,21 @@ const ShowProductScreen = ({ history, match }) => {
                                     </Paper>
                                 ))}
 
-                            {userInfo == null && <p>Product has no reviews yet.</p>}
-
-                            {data && data.reviews.length > 1 && (
-                                <Button
-                                    size="small"
-                                    className={classes.button2}
-                                >
-                                    <Link
-                                        to={`/reviews/product/${data.id}`}
-                                        className={classes.link2}
+                                {data && data.reviews.length > 1 && (
+                                    <Button
+                                        size="small"
+                                        className={classes.button2}
                                     >
-                                        View all Reviews
-                                    </Link>
-                                </Button>
-                            )}
-                        </Paper>
+                                        <Link
+                                            to={`/reviews/product/${data.id}`}
+                                            className={classes.link2}
+                                        >
+                                            View all Reviews
+                                        </Link>
+                                    </Button>
+                                )}
+                            </Paper>
+                        )}
                     </>
                 )}
             </section>

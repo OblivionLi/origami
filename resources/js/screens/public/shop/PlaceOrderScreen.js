@@ -137,7 +137,6 @@ const PlaceOrderScreen = ({ match, history }) => {
         dispatch(getAddress(userInfo.data.id));
     }, [dispatch, order, userInfo, success]);
 
-
     const placeOrderHandler = (e) => {
         e.preventDefault();
 
@@ -196,61 +195,61 @@ const PlaceOrderScreen = ({ match, history }) => {
                     </Breadcrumbs>
                 </Paper>
 
-                <Paper className="product__container">
-                    <div className="product">
-                        <div className="product__container--po-left">
+                <Paper className="order__container">
+                    <div className="order">
+                        <div className="order__container--po-left">
                             {addressLoading ? (
-                                <div className="product">
+                                <div className="loaderCenter">
                                     <Loader />
                                 </div>
                             ) : error ? (
                                 <Message variant="error">{error}</Message>
                             ) : (
-                                <>
-                                    <div className="table-detail">
-                                        <h2 className="table-detail--title">
-                                            Sending to
-                                        </h2>
-                                        <div className="table-detail--par">
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].name}{" "}
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].surname}
-                                        </div>
-
-                                        <h2 className="table-detail--title">
-                                            Address
-                                        </h2>
-                                        <div className="table-detail--par">
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].country}
-                                            {", "}
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].city}
-                                            {", "}
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].address}
-                                            {", "}
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].postal_code}
-                                            {", "}
-                                        </div>
-
-                                        <h2 className="table-detail--title">
-                                            Phone Number
-                                        </h2>
-                                        <div className="table-detail--par">
-                                            {address &&
-                                                address.data &&
-                                                address.data[0].phone_number}
-                                        </div>
+                                <div className="order__container--po-left-detail">
+                                    <h2 className="order__container--po-left-detail--title">
+                                        Sending to
+                                    </h2>
+                                    <div className="order__container--po-left-detail--par">
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].name}{" "}
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].surname}
                                     </div>
+
+                                    <h2 className="order__container--po-left-detail--title">
+                                        Address
+                                    </h2>
+                                    <div className="order__container--po-left-detail--par">
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].country}
+                                        {", "}
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].city}
+                                        {", "}
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].address}
+                                        {", "}
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].postal_code}
+                                        {", "}
+                                    </div>
+
+                                    <h2 className="order__container--po-left-detail--title">
+                                        Phone Number
+                                    </h2>
+                                    <div className="order__container--po-left-detail--par">
+                                        {address &&
+                                            address.data &&
+                                            address.data[0].phone_number}
+                                    </div>
+
+                                    <br />
 
                                     <Message variant="info">
                                         Make sure your name, address and phone
@@ -264,9 +263,7 @@ const PlaceOrderScreen = ({ match, history }) => {
                                         </a>{" "}
                                         and fix them.
                                     </Message>
-
-                                    <br />
-                                </>
+                                </div>
                             )}
 
                             <div className="cart">
@@ -383,17 +380,17 @@ const PlaceOrderScreen = ({ match, history }) => {
                             </div>
                         </div>
 
-                        <div className="product__container--po-right">
-                            <Paper className="product__paper2">
+                        <div className="order__container--po-right">
+                            <Paper className="show__paper">
                                 <h3 className="divider">Order Summary</h3>
 
                                 <br />
 
-                                <div className="product__paper--div">
+                                <div className="show__paper--div">
                                     <h4 className="divider">
                                         Number of Products:
                                     </h4>
-                                    <p className="product__paper--p">
+                                    <p className="show__paper--p">
                                         {cartItems.reduce(
                                             (acc, item) =>
                                                 acc + Number(item.qty),
@@ -403,11 +400,11 @@ const PlaceOrderScreen = ({ match, history }) => {
                                     </p>
                                 </div>
 
-                                <div className="product__paper--div">
+                                <div className="show__paper--div">
                                     <h4 className="divider">Subtotal:</h4>
                                     <span
                                         color="inherit"
-                                        className="product__paper--p"
+                                        className="show__paper--p"
                                     >
                                         &euro; {cart.itemsPriceDiscount}
                                     </span>
@@ -415,9 +412,9 @@ const PlaceOrderScreen = ({ match, history }) => {
                                     <strike>&euro; {cart.itemsPrice}</strike>
                                 </div>
 
-                                <div className="product__paper--div">
+                                <div className="show__paper--div">
                                     <h4 className="divider">Shipping Tax:</h4>
-                                    <p className="product__paper--p">
+                                    <p className="show__paper--p">
                                         &euro; {cart.shippingPrice}
                                     </p>
                                     <small>
@@ -426,28 +423,28 @@ const PlaceOrderScreen = ({ match, history }) => {
                                     </small>
                                 </div>
 
-                                <div className="product__paper--div">
+                                <div className="show__paper--div">
                                     <h4 className="divider">
                                         Total Product Tax:
                                     </h4>
-                                    <p className="product__paper--p">
+                                    <p className="show__paper--p">
                                         &euro; {cart.taxPrice}
                                     </p>
                                     <small>tax formula: 0.15 * subtotal</small>
                                 </div>
 
-                                <div className="product__paper--div">
+                                <div className="show__paper--div">
                                     <h4 className="divider">
                                         Total with Taxes:
                                     </h4>
-                                    <p className="product__paper--p">
+                                    <p className="show__paper--p">
                                         &euro; {cart.totalPrice}
                                     </p>
                                 </div>
 
                                 <hr className="divider" />
 
-                                <div className="product-tabel-form">
+                                <div className="show-tabel-form">
                                     <Message variant="info">
                                         Place Order and Pay After.
                                     </Message>

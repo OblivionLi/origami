@@ -181,13 +181,13 @@ const ShippingScreen = ({ match, history }) => {
                 </Paper>
 
                 {loading ? (
-                    <div className="product">
+                    <div className="loaderCenter">
                         <Loader />
                     </div>
                 ) : error ? (
                     <Message variant="error">{error}</Message>
                 ) : (
-                    <Paper className="product__container">
+                    <Paper className="show__container">
                         <h2 className={classes.divider}>Your Address</h2>
                         <form onSubmit={submitHandler}>
                             <div className="form">
