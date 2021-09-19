@@ -221,6 +221,7 @@ export const updateCredentials =
                 data: {
                     message: data.message,
                     id: data.id,
+                    user_id: data.user_id,
                     name: data.name,
                     email: data.email,
                     role: data.role,
