@@ -1,0 +1,46 @@
+.order {
+
+    &__container {
+        width: 70%;
+        margin: 2rem auto;
+        padding: 1.5rem 3rem;
+        font-family: $Quicksand;
+        background-color: $background-color !important;
+        color: $primary-color !important;
+        box-shadow: $primary-shadow !important;
+
+        &--po {
+            &-left {
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+
+                margin-bottom: 3rem;
+
+                &-detail {
+                    width: 100%;
+                    &--title {
+                        border-bottom: 1px solid $border;
+                    }
+                    
+                    &--par {
+                        margin-bottom: 2rem;
+
+                    }
+                }
+            }
+
+            &-right {
+                display: flex;
+                justify-content: center;
+            }
+        }
+    }
+}
+
+@media (max-width: 1350px) {
+    .order__container--po-left {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}

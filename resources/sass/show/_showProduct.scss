@@ -1,28 +1,42 @@
-.product {
+.show {
     margin-top: 2rem;
-    display: flex;
-    gap: 2rem;
-    flex-direction: column;
-    flex-wrap: wrap;
     width: 100%;
-    align-items: center;
+
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 2rem;
 
     &__carousel {
-        width: 30rem;
+        margin-bottom: 12rem;
+        width: 20rem;
+        height: 35.5rem;
 
         &-img {
             width: 100%;
+            height: 100%;
         }
     }
 
     &__paper {
         padding: 1.5rem 3rem;
-        background-color: $background-color !important;
         width: 20rem;
         height: 100%;
-        color: $primary-color !important;
         font-family: $Quicksand;
+        color: $primary-color !important;
+        background-color: $background-color !important;
         box-shadow: $primary-shadow !important;
+
+        &--alternate{
+            padding: 1.5rem 3rem;
+            width: 90%;
+            height: 100%;
+            margin: 0 auto;
+            font-family: $Quicksand;
+            color: $primary-color !important;
+            background-color: $background-color !important;
+            box-shadow: $primary-shadow !important;
+        }
 
         &--rating {
             margin-bottom: 1rem;
@@ -50,79 +64,21 @@
         }
     }
 
-    &__paper2 {
-        padding: 1.5rem 3rem;
-        background-color: $background-color !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
-        width: 100%;
-    }
-
-
     &__container {
         width: 70%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
+        font-family: $Quicksand;
         background-color: $background-color !important;
         color: $primary-color !important;
-        font-family: $Quicksand;
         box-shadow: $primary-shadow !important;
 
-        &--po {
-
-            &-left {
-                display: flex;
-                justify-content: center;
-                gap: 2rem;
-
-                &__address {
-                    width: 100%;
-
-                    &--title {
-                        color: $primary-color;
-                        border-bottom: 1px solid $primary-color;
-                    }
-
-                    &--par {
-                        padding: 2rem;
-                        display: flex;
-                        justify-content: space-evenly;
-                        flex-wrap: wrap;
-                        gap: 1rem;
-                
-                        color: $secondary-color;
-                        font-family: $Quicksand;
-                        font-weight: 600;
-                    }
-                }
-            }
-
-            &-right {
-                width: 100%;
-            }
+        &--content {
+            padding: 1.5rem 3rem;
+            background-color: $background-color-2 !important;
         }
     }
 
-    &__container2 {
-        width: 70%;
-        margin: 2rem auto;
-        padding: 1.5rem 3rem;
-        background-color: $background-color-2 !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
-    }
-
-    &__container3 {
-        width: 100%;
-        margin: 2rem auto;
-        padding: 1.5rem 3rem;
-        background-color: $background-color-2 !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
-    }
 }
 
 .inStock {
@@ -139,7 +95,7 @@
 
 .reviews-form {
     padding: 15px;
-    width: 60%;
+    width: 100%;
     margin-top: 15px;
 }
 

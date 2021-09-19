@@ -1,0 +1,124 @@
+.content {
+    width: 70%;
+    margin: 0 auto;
+    padding: 1.5rem 3rem;
+
+    position: relative;
+
+    font-family: $Playfair;
+
+    &__products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, auto));
+        align-items: center;
+        justify-items: center;
+        gap: 30px;
+
+        div {
+            position: relative;
+
+            img {
+                height: 300px;
+                max-width: 100%;
+                display: block;
+                object-fit: cover;
+            }
+        }
+    }
+
+    &-title {
+        width: 80%;
+        margin: 0 auto;
+        padding: 1.5rem 3rem;
+        background-color: $background-color !important;
+
+        color: $primary-color !important;
+        font-family: $Quicksand;
+
+        box-shadow: $primary-shadow !important;
+    }
+}
+
+.card-content {
+    border-top: 1px solid $border;
+    background-color: $background-color;
+    color: wheat;
+
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    &-top {
+        border-top: 1px solid $border;
+        background-color: $background-color;
+        color: wheat;
+        
+        p, h2{
+            font-family: $Quicksand;
+            letter-spacing: 1px;
+            color: $primary-color;
+        }
+    }
+    
+
+    a {
+        color: wheat;
+        background-color: $primary-color;
+        font-family: $Quicksand;
+        letter-spacing: 1px;
+        text-decoration: none;
+        padding: 5px;
+        border-radius: 5px;
+
+        &:hover {
+            background-color: $secondary-color;
+            color: wheat;
+            text-decoration: none;
+        }
+    }
+
+    &--span {
+        background-color: $primary-color;
+        color: wheat;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    &--span2 {
+        background-color: $primary-color;
+        color: wheat;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: $Quicksand;
+        letter-spacing: 1px;
+    }
+
+}
+
+.bc {
+    color: $primary-color;
+    font-weight: 600;
+
+    &:hover {
+        cursor: pointer;
+        color: $secondary-color;
+    }
+
+    &-p {
+        font-weight: 600 !important;
+        font-size: 20px !important;
+        color: $secondary-color !important;
+    }
+}
+
+
+@media (max-width: 600px) {
+    .content {
+        width: 100%;
+        padding-left: 0;
+        margin-left: 0;
+        padding-right: 0;
+    }
+}

@@ -7,12 +7,14 @@
 // Components
 @import 'base';
 @import 'navigation/navbar';
-@import 'homescreen/latest';
+@import 'homescreen/homescreen';
 @import 'footer/footer';
 @import 'auth/auth';
 @import 'admin/admin';
-@import 'show/show';
+// @import 'show/show';
+@import 'show/showProduct';
 @import 'shop/cart';
+@import 'shop/order';
 @import 'category/category';
 @import 'chart/chart';
 
