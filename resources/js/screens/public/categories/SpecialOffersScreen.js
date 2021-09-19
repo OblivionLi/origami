@@ -71,7 +71,7 @@ const SpecialOffers = ({ match }) => {
             <NavbarCategories />
             <section className="ctn">
                 {loading ? (
-                    <div className="product">
+                    <div className="loaderCenter">
                         <Loader />
                     </div>
                 ) : error ? (
