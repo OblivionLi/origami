@@ -14,122 +14,206 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
-// Public routes        ################################################## no need for admin perms or login
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login'])->name('login');
-Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
-Route::patch('reset-password/{email}', [AuthController::class, 'resetPassword']);
-Route::get('reset-password/{token}', [AuthController::class, 'getToken']);
+// Public Routes (No Authentication or Authorization Required)
+Route::controller(AuthController::class)->group(function () {
+    Route::post('register', 'register');
+    Route::post('login', 'login')->name('login');
+    Route::post('forgot-password', 'forgotPassword');
+    Route::patch('reset-password/{email}', 'resetPassword');
+    Route::get('reset-password/{token}', 'getToken');
+});
 
-# Product routes
-Route::get('showcase-products', [ProductController::class, 'getShowcaseProducts']);
-Route::get('products/{product}', [ProductController::class, 'show']);
-Route::get('reviews/product/{product}', [ReviewController::class, 'indexWithPagination']);
+Route::controller(ProductController::class)->group(function () {
+    Route::get('showcase-products', 'getShowcaseProducts');
+    Route::get('products/{product}', 'show');
+    Route::get('products/accessories', 'getProductByAccessories');
+    Route::get('products/origami', 'getProductByOrigami');
+    Route::get('products/special-offers', 'getProductBySpecialOffers');
+});
 
-Route::get('config/stripe', [CheckoutController::class, 'secretKey']);
-Route::get('config/PKstripe', [CheckoutController::class, 'publicKey']);
-Route::post('payment_intents', [CheckoutController::class, 'createPayIntent']);
+Route::controller(ReviewController::class)->group(function () {
+    Route::get('products/{product}/reviews', 'indexWithPagination');
+});
 
-Route::get('accessories', [ProductController::class, 'getProductByAccessories']);
-Route::get('origami', [ProductController::class, 'getProductByOrigami']);
-Route::get('special-offers', [ProductController::class, 'getProductBySpecialOffers']);
+Route::controller(CheckoutController::class)->group(function () {
+    Route::get('config/stripe', 'secretKey');
+    Route::get('config/stripe/public-key', 'publicKey');
+    Route::post('payment-intents', 'createPayIntent');
+});
 
-Route::get('/order/pdf/{order}', [OrderController::class, 'createPDF']);
+Route::get('orders/{order}/pdf', [OrderController::class, 'createPDF']);
 
-// Public routes        ################################################## no need for admin perms; login needed !
-Route::group(['middleware' => 'auth:api'], function () {
-    # User routes
-    Route::get('logout', [AuthController::class, 'logout']);
-    Route::patch('update-credentials/{id}', [AuthController::class, 'update']);
-    Route::delete('delete/{id}', [AuthController::class, 'delete_user']);
-    Route::get('users/{user}', [UserController::class, 'show']);
+// Authenticated Routes (Login Required)
+Route::middleware('auth:api')->group(function () {
+    // User Routes
+    Route::controller(AuthController::class)->group(function () {
+        Route::get('logout', 'logout');
+        Route::patch('users/update-credentials', 'update');
+        Route::delete('users/me', 'delete_user');
+    });
+    Route::get('users/me', [UserController::class, 'show']);
 
-    # Review routes
-    Route::post('reviews/{review}', [ReviewController::class, 'store']);
+    // Review Routes
+    Route::post('products/{product}/reviews', [ReviewController::class, 'store']);
 
-    # Order routes
-    Route::post('order', [OrderController::class, 'store']);
-    Route::get('order/{order}', [OrderController::class, 'show']);
-    Route::patch('order/{order}/pay', [OrderController::class, 'updateOrderToPaid']);
-    Route::get('user-order', [OrderController::class, 'getUserOrders']);
+    // Order Routes
+    Route::controller(OrderController::class)->group(function () {
+        Route::post('orders', 'store');
+        Route::get('orders/me', 'getUserOrders');
+        Route::get('orders/{order}', 'show');
+        Route::patch('orders/{order}/pay', 'updateOrderToPaid');
+    });
 
-    # Address routes
-    Route::get('address', [AddressController::class, 'index']);
-    Route::post('address', [AddressController::class, 'store']);
-    Route::get('address/{address}', [AddressController::class, 'show']);
-    Route::patch('address/{address}', [AddressController::class, 'update']);
-    Route::delete('address/{address}', [AddressController::class, 'destroy']);
+    // Address Routes
+    Route::apiResource('addresses', AddressController::class);
 
-    // Private routes   ################################################## admin perms & login needed !
-    Route::group(['middleware' => 'isAdmin'], function () {
-        # Dashboard charts
-        Route::get('orderCharts', [OrderController::class, 'orderCharts']);
+    // Admin Routes (Admin Role Required)
+    Route::middleware('isAdmin')->group(function () {
+        // Dashboard
+        Route::get('admin/dashboard/order-charts', [OrderController::class, 'orderCharts']);
 
-        # User routes
-        Route::get('users', [UserController::class, 'index']);
-        Route::patch('users/{user}', [UserController::class, 'update']);
-        Route::delete('users/{user}', [UserController::class, 'destroy']);
+        // User Management
+        Route::apiResource('admin/users', UserController::class)->except(['show']);
 
-        # Role routes
-        Route::get('roles', [RoleController::class, 'index']);
-        Route::post('roles', [RoleController::class, 'store']);
-        Route::get('roles/{role}', [RoleController::class, 'show']);
-        Route::patch('roles/{role}', [RoleController::class, 'update']);
-        Route::delete('roles/{role}', [RoleController::class, 'destroy']);
+        // Role Management
+        Route::apiResource('admin/roles', RoleController::class);
 
-        # Permission routes
-        Route::get('permissions', [PermissionController::class, 'index']);
-        Route::post('permissions', [PermissionController::class, 'store']);
-        Route::get('permissions/{permission}', [PermissionController::class, 'show']);
-        Route::patch('permissions/{permission}', [PermissionController::class, 'update']);
-        Route::delete('permissions/{permission}', [PermissionController::class, 'destroy']);
+        // Permission Management
+        Route::apiResource('admin/permissions', PermissionController::class);
 
-        # Parent Category routes
-        Route::get('parent-categories', [ParentCategoryController::class, 'index']);
-        Route::post('parent-categories', [ParentCategoryController::class, 'store']);
-        Route::get('parent-categories/{parentCategory}', [ParentCategoryController::class, 'show']);
-        Route::patch('parent-categories/{parentCategory}', [ParentCategoryController::class, 'update']);
-        Route::delete('parent-categories/{parentCategory}', [ParentCategoryController::class, 'destroy']);
+        // Category Management
+        Route::apiResource('admin/parent-categories', ParentCategoryController::class);
+        Route::apiResource('admin/child-categories', ChildCategoryController::class);
 
-        # Child Category routes
-        Route::get('child-categories', [ChildCategoryController::class, 'index']);
-        Route::post('child-categories', [ChildCategoryController::class, 'store']);
-        Route::get('child-categories/{childCategory}', [ChildCategoryController::class, 'show']);
-        Route::patch('child-categories/{childCategory}', [ChildCategoryController::class, 'update']);
-        Route::delete('child-categories/{childCategory}', [ChildCategoryController::class, 'destroy']);
+        // Product Management
+        Route::apiResource('admin/products', ProductController::class)->except(['show']);
 
-        # Product routes
-        Route::get('products', [ProductController::class, 'index']);
-        Route::post('products', [ProductController::class, 'store']);
-        Route::patch('products/{product}', [ProductController::class, 'update']);
-        Route::delete('products/{product}', [ProductController::class, 'destroy']);
+        // Product Image Management
+        Route::controller(ProductImageController::class)->group(function () {
+            Route::post('admin/products/{productId}/images', 'store');
+            Route::patch('admin/product-images/{imageId}', 'update');
+            Route::delete('admin/product-images/{imageId}', 'destroy');
+        });
 
-        # Product Images routes
-        Route::post('productImage/{productId}', [ProductImageController::class, 'store']);
-        Route::post('RproductImage/{imageId}', [ProductImageController::class, 'update']);
-        Route::delete('productImage/{imageId}', [ProductImageController::class, 'destroy']);
+        // Review Management
+        Route::apiResource('admin/reviews', ReviewController::class)->except(['store']);
 
-        # Review routes
-        Route::get('reviews', [ReviewController::class, 'index']);
-        // Route::get('reviews', [ReviewController::class, 'indexWithPagination']);
-        Route::get('reviews/{review}', [ReviewController::class, 'show']);
-        Route::patch('reviews/{review}', [ReviewController::class, 'update']);
-        Route::delete('reviews/{review}', [ReviewController::class, 'destroy']);
-
-        # Order routes
-        Route::get('orders', [OrderController::class, 'index']);
-        Route::patch('orders/{order}/delivered', [OrderController::class, 'updateOrderToDelivered']);
-        Route::delete('orders/{order}', [OrderController::class, 'destroy']);
+        // Order Management
+        Route::controller(OrderController::class)->group(function () {
+            Route::get('admin/orders', 'index');
+            Route::patch('admin/orders/{order}/deliver', 'updateOrderToDelivered');
+            Route::delete('admin/orders/{order}', 'destroy');
+        });
     });
 });
+
+//// Public routes        ################################################## no need for admin perms or login
+//Route::post('register', [AuthController::class, 'register']);
+//Route::post('login', [AuthController::class, 'login'])->name('login');
+//Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+//Route::patch('reset-password/{email}', [AuthController::class, 'resetPassword']);
+//Route::get('reset-password/{token}', [AuthController::class, 'getToken']);
+
+//
+//# Product routes
+//Route::get('showcase-products', [ProductController::class, 'getShowcaseProducts']);
+//Route::get('products/{product}', [ProductController::class, 'show']);
+//Route::get('reviews/product/{product}', [ReviewController::class, 'indexWithPagination']);
+//
+//Route::get('config/stripe', [CheckoutController::class, 'secretKey']);
+//Route::get('config/PKstripe', [CheckoutController::class, 'publicKey']);
+//Route::post('payment_intents', [CheckoutController::class, 'createPayIntent']);
+//
+//Route::get('accessories', [ProductController::class, 'getProductByAccessories']);
+//Route::get('origami', [ProductController::class, 'getProductByOrigami']);
+//Route::get('special-offers', [ProductController::class, 'getProductBySpecialOffers']);
+//
+//Route::get('/order/pdf/{order}', [OrderController::class, 'createPDF']);
+//
+//// Public routes        ################################################## no need for admin perms; login needed !
+//Route::group(['middleware' => 'auth:api'], function () {
+//    # User routes
+//    Route::get('logout', [AuthController::class, 'logout']);
+//    Route::patch('update-credentials/{id}', [AuthController::class, 'update']);
+//    Route::delete('delete/{id}', [AuthController::class, 'delete_user']);
+//    Route::get('users/{user}', [UserController::class, 'show']);
+//
+//    # Review routes
+//    Route::post('reviews/{review}', [ReviewController::class, 'store']);
+//
+//    # Order routes
+//    Route::post('order', [OrderController::class, 'store']);
+//    Route::get('order/{order}', [OrderController::class, 'show']);
+//    Route::patch('order/{order}/pay', [OrderController::class, 'updateOrderToPaid']);
+//    Route::get('user-order', [OrderController::class, 'getUserOrders']);
+//
+//    # Address routes
+//    Route::get('address', [AddressController::class, 'index']);
+//    Route::post('address', [AddressController::class, 'store']);
+//    Route::get('address/{address}', [AddressController::class, 'show']);
+//    Route::patch('address/{address}', [AddressController::class, 'update']);
+//    Route::delete('address/{address}', [AddressController::class, 'destroy']);
+//
+//    // Private routes   ################################################## admin perms & login needed !
+//    Route::group(['middleware' => 'isAdmin'], function () {
+//        # Dashboard charts
+//        Route::get('orderCharts', [OrderController::class, 'orderCharts']);
+//
+//        # User routes
+//        Route::get('users', [UserController::class, 'index']);
+//        Route::patch('users/{user}', [UserController::class, 'update']);
+//        Route::delete('users/{user}', [UserController::class, 'destroy']);
+//
+//        # Role routes
+//        Route::get('roles', [RoleController::class, 'index']);
+//        Route::post('roles', [RoleController::class, 'store']);
+//        Route::get('roles/{role}', [RoleController::class, 'show']);
+//        Route::patch('roles/{role}', [RoleController::class, 'update']);
+//        Route::delete('roles/{role}', [RoleController::class, 'destroy']);
+//
+//        # Permission routes
+//        Route::get('permissions', [PermissionController::class, 'index']);
+//        Route::post('permissions', [PermissionController::class, 'store']);
+//        Route::get('permissions/{permission}', [PermissionController::class, 'show']);
+//        Route::patch('permissions/{permission}', [PermissionController::class, 'update']);
+//        Route::delete('permissions/{permission}', [PermissionController::class, 'destroy']);
+//
+//        # Parent Category routes
+//        Route::get('parent-categories', [ParentCategoryController::class, 'index']);
+//        Route::post('parent-categories', [ParentCategoryController::class, 'store']);
+//        Route::get('parent-categories/{parentCategory}', [ParentCategoryController::class, 'show']);
+//        Route::patch('parent-categories/{parentCategory}', [ParentCategoryController::class, 'update']);
+//        Route::delete('parent-categories/{parentCategory}', [ParentCategoryController::class, 'destroy']);
+//
+//        # Child Category routes
+//        Route::get('child-categories', [ChildCategoryController::class, 'index']);
+//        Route::post('child-categories', [ChildCategoryController::class, 'store']);
+//        Route::get('child-categories/{childCategory}', [ChildCategoryController::class, 'show']);
+//        Route::patch('child-categories/{childCategory}', [ChildCategoryController::class, 'update']);
+//        Route::delete('child-categories/{childCategory}', [ChildCategoryController::class, 'destroy']);
+//
+//        # Product routes
+//        Route::get('products', [ProductController::class, 'index']);
+//        Route::post('products', [ProductController::class, 'store']);
+//        Route::patch('products/{product}', [ProductController::class, 'update']);
+//        Route::delete('products/{product}', [ProductController::class, 'destroy']);
+//
+//        # Product Images routes
+//        Route::post('productImage/{productId}', [ProductImageController::class, 'store']);
+//        Route::post('RproductImage/{imageId}', [ProductImageController::class, 'update']);
+//        Route::delete('productImage/{imageId}', [ProductImageController::class, 'destroy']);
+//
+//        # Review routes
+//        Route::get('reviews', [ReviewController::class, 'index']);
+//        // Route::get('reviews', [ReviewController::class, 'indexWithPagination']);
+//        Route::get('reviews/{review}', [ReviewController::class, 'show']);
+//        Route::patch('reviews/{review}', [ReviewController::class, 'update']);
+//        Route::delete('reviews/{review}', [ReviewController::class, 'destroy']);
+//
+//        # Order routes
+//        Route::get('orders', [OrderController::class, 'index']);
+//        Route::patch('orders/{order}/delivered', [OrderController::class, 'updateOrderToDelivered']);
+//        Route::delete('orders/{order}', [OrderController::class, 'destroy']);
+//    });
+//});

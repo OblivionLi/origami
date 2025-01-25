@@ -10,7 +10,8 @@ use App\Models\ChildCategory;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Models\ProductImage;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
@@ -19,21 +20,20 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        // return product resource with all relationship data
         return ProductIndexResource::collection(Product::info()->get());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param ProductStoreRequest $request
+     * @return JsonResponse
      */
-    public function store(ProductStoreRequest $request)
+    public function store(ProductStoreRequest $request): JsonResponse
     {
         // find category by request->child_category_id
         // query is used to get the child category relation id for parent category
@@ -79,10 +79,10 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
+     * @param string $slug
+     * @return ProductShowResource | JsonResponse
      */
-    public function show($slug)
+    public function show(string $slug): ProductShowResource | JsonResponse
     {
         // get product by slug with relationships
         $product = Product::findBySlug($slug);
@@ -98,11 +98,11 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
+     * @param ProductUpdateRequest $request
+     * @param string $slug
+     * @return JsonResponse
      */
-    public function update(ProductUpdateRequest $request, $slug)
+    public function update(ProductUpdateRequest $request, string $slug): JsonResponse
     {
         // find category by request->child_category_id
         // query is used to get the child category relation id for parent category
@@ -140,10 +140,10 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
+     * @param string $slug
+     * @return JsonResponse
      */
-    public function destroy($slug)
+    public function destroy(string $slug): JsonResponse
     {
         // get product by slug
         $product = Product::findBySlug($slug);
@@ -174,9 +174,9 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
-    public function getShowcaseProducts()
+    public function getShowcaseProducts(): JsonResponse
     {
         $showcase = [
             'latestProducts'    => Product::getLatestProducts()->get(),
@@ -188,7 +188,10 @@ class ProductController extends Controller
         return response()->json($showcase, 200);
     }
 
-    public function getProductByAccessories()
+    /**
+     * @return JsonResponse
+     */
+    public function getProductByAccessories(): JsonResponse
     {
         // find parent category by name
         $category = ParentCategory::where('name', 'Accessories')->firstOrFail();
@@ -213,7 +216,10 @@ class ProductController extends Controller
         return response()->json($data, 200);
     }
 
-    public function getProductByOrigami()
+    /**
+     * @return JsonResponse
+     */
+    public function getProductByOrigami(): JsonResponse
     {
         // find parent category by name
         $category = ParentCategory::where('name', 'Origami')->firstOrFail();
@@ -238,7 +244,10 @@ class ProductController extends Controller
         return response()->json($data, 200);
     }
 
-    public function getProductBySpecialOffers()
+    /**
+     * @return JsonResponse
+     */
+    public function getProductBySpecialOffers(): JsonResponse
     {
         // get all products that has special_offer == 1
         $products = Product::info()->where('special_offer', 1)->paginate(6);
