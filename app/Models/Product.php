@@ -6,11 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
     use HasFactory, Sluggable, SluggableScopeHelpers;
 
+    /**
+     * @var array[int, string]
+     */
     protected $fillable = [
         'name', 'user_id', 'parent_category_id', 'child_category_id', 'description', 'price', 'discount', 'special_offer', 'product_code', 'rating', 'total_reviews', 'total_quantities'
     ];
@@ -18,7 +23,7 @@ class Product extends Model
     /**
      * Return the sluggable configuration array for this model.
      *
-     * @return array
+     * @return array[string, array]
      */
     public function sluggable(): array
     {
@@ -29,71 +34,28 @@ class Product extends Model
         ];
     }
 
-    /**
-     * Get the parent category that owns the product
-     */
-    public function parentCategory()
+    public function parentCategory(): BelongsTo
     {
         return $this->belongsTo(ParentCategory::class, 'parent_category_id');
     }
 
-    /**
-     * Get the child category that owns the product
-     */
-    public function childCategory()
+    public function childCategory(): BelongsTo
     {
         return $this->belongsTo(ChildCategory::class, 'child_category_id');
     }
 
-    /**
-     * Get the user that owns the product
-     */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Get the product images for the product
-     */
-    public function productImages()
+    public function productImages(): HasMany
     {
         return $this->hasMany(ProductImage::class);
     }
 
-    /**
-     * Get the reviews for the product
-     */
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
-    }
-
-    // define scope function that return a query with eager loading
-    public function scopeInfo($query)
-    {
-        // return data from relationships
-        return $query->with(['parentCategory', 'childCategory', 'user', 'productImages', 'reviews']);
-    }
-
-    // define scope function that return a query with eager loading for latest 3 products
-    public function scopeGetLatestProducts($query)
-    {
-        // return data from relationships
-        return $query->with(['parentCategory', 'childCategory', 'productImages'])->orderBy('created_at', 'desc')->limit(3);
-    }
-
-    // define scope function that return a query with eager loading for latest 3 products
-    public function scopeGetLatestDiscountedProducts($query)
-    {
-        // return data from relationships
-        return $query->with(['parentCategory', 'childCategory', 'productImages'])->orderBy('discount', 'desc')->limit(3);
-    }
-
-    // define scope function that return a query with eager loading for most commented last 3 products
-    public function scopeGetMostCommentedProducts($query)
-    {
-        // return data from relationships
-        return $query->with(['parentCategory', 'childCategory', 'productImages'])->orderBy('total_reviews', 'desc')->limit(3);
     }
 }

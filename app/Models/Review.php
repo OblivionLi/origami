@@ -4,35 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Review extends Model
 {
     use HasFactory;
 
+    /**
+     * @var array[int, string]
+     */
     protected $fillable = [
         'user_id', 'product_id', 'rating', 'user_name', 'user_comment', 'admin_name', 'admin_comment'
     ];
 
-    /**
-     * Get the product that owns the review
-     */
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    /**
-     * Get the user that owns the review
-     */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    // define scope function that return a query with eager loading
-    public function scopeInfo($query)
-    {
-        // return data from relationships
-        return $query->with(['product', 'user']);
     }
 }

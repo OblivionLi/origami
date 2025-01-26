@@ -4,6 +4,11 @@ namespace App\Http\Requests\auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property string $email
+ * @property string $password
+ * @property bool $remember_me
+ */
 class LoginUserRequest extends FormRequest
 {
     /**
@@ -11,7 +16,7 @@ class LoginUserRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,12 +26,12 @@ class LoginUserRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'email'         => 'string|email|required|max:255',
-            'password'      => 'string|required',
-            'remember_me'   => 'boolean'
+            'email' => 'string|email|required|max:255',
+            'password' => 'string|required',
+            'remember_me' => 'boolean'
         ];
     }
 }

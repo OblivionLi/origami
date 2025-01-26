@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ParentCategory extends Model
 {
     use HasFactory, Sluggable, SluggableScopeHelpers;
 
+    /**
+     * @var array[int, string]
+     */
     protected $fillable = [
         'name'
     ];
@@ -18,7 +22,7 @@ class ParentCategory extends Model
     /**
      * Return the sluggable configuration array for this model.
      *
-     * @return array
+     * @return array[string, array]
      */
     public function sluggable(): array
     {
@@ -29,26 +33,13 @@ class ParentCategory extends Model
         ];
     }
 
-    /**
-     * Get the child categories for the parent category
-     */
-    public function childCategories()
+    public function childCategories(): HasMany
     {
         return $this->hasMany(ChildCategory::class);
     }
 
-    /**
-     * Get the products for the parent category
-     */
-    public function products()
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
-    }
-
-    // define scope function that return a query with eager loading
-    public function scopeInfo($query)
-    {
-        // return data from relationships
-        return $query->with(['childCategories', 'products']);
     }
 }

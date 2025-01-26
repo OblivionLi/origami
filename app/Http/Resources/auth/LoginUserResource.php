@@ -3,11 +3,23 @@
 namespace App\Http\Resources\auth;
 
 use App\Http\Resources\role\RoleShowResource;
+use App\Models\Role;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property-read int $id
+ * @property-read string $name
+ * @property-read string $email
+ * @property-read Collection<Role> $roles
+ */
 class LoginUserResource extends JsonResource
 {
-    protected $token;
+    /**
+     * @var string
+     */
+    protected string $token;
 
     public function __construct($resource, $token)
     {
@@ -18,21 +30,24 @@ class LoginUserResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
-            'message'       => 'User login success',
-            'id'            => $this->id,
-            'user_id'       => $this->user_id,
-            'name'          => $this->name,
-            'email'         => $this->email,
-            'role'          => $this->roles->pluck('name'),
-            'is_admin'      => $this->roles->pluck('is_admin'),
-            'details'       => RoleShowResource::collection($this->roles),
-            'access_token'  => $this->token,
+            'message' => 'User login with success.',
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->whenLoaded('roles', function () {
+                return $this->roles->pluck('name');
+            }),
+            'is_admin' => $this->whenLoaded('roles', function () {
+                return $this->roles->pluck('is_admin');
+            }),
+            'details' => RoleShowResource::collection($this->whenLoaded('roles')),
+            'access_token' => $this->token,
         ];
     }
 }

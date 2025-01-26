@@ -4,35 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
     use HasFactory;
 
+    /**
+     * @var string
+     */
+    protected $table = 'roles';
+
+    /**
+     * @var array[string, string]
+     */
     protected $fillable = [
         'name', 'is_admin'
     ];
 
-    /**
-     * The users that belong to the role.
-     */
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_role');
     }
 
-    /**
-     * The permissions that belong to the role.
-     */
-    public function permissions()
+    public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'role_permission');
-    }
-
-    // define scope function that return a query with eager loading
-    public function scopeInfo($query)
-    {
-        // return data from relationships
-        return $query->with(['users:name,email', 'permissions:id,name']);
     }
 }

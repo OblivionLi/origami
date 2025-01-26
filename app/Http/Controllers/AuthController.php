@@ -4,173 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\auth\ForgotPasswordRequest;
 use App\Http\Requests\auth\LoginUserRequest;
-use App\Http\Resources\auth\LoginUserResource;
 use App\Http\Requests\auth\RegisterUserRequest;
 use App\Http\Requests\auth\ResetPasswordRequest;
 use App\Http\Requests\auth\UpdateUserRequest;
+use App\Http\Resources\auth\LoginUserResource;
 use App\Http\Resources\auth\RegisterUserResource;
-use App\Http\Resources\auth\UserUpdateResource;
-use App\Mail\ForgotPassword;
-use App\Models\Role;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\AuthService;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    // Register User
-    public function register(RegisterUserRequest $request)
+    protected AuthService $authService;
+
+    public function __construct(AuthService $authService)
     {
-        // create unique user id
-        $unique_user_id = Str::random(25);
-
-        // Get row where role name is Guest
-        $role = Role::where('name', 'Guest')->first();
-
-        // Check if role 'Guest' eloquent object exist
-        if (!$role) {
-            // If it doesn't create the role 'Guest'
-            $role = Role::create([
-                'name'      => 'Guest',
-                'is_admin'  => false
-            ]);
-        }
-
-        // Create the user
-        $user = User::create([
-            'user_id'   => $unique_user_id,
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'password'  => Hash::make($request->password)
-        ]);
-
-        // Attach user's role id in relationship
-        $user->roles()->attach($role->id);
-
-        // Create user personal token
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-
-        // Check if remember_me option inside the request is true
-        if ($request->remember_me) {
-            // Add 1 more weeks to the token expiration date
-            // when the token expire, the user is logged out
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        }
-
-        // Save the token
-        $token->save();
-
-        // return resource with token
-        return new RegisterUserResource(
-            $user,
-            $tokenResult->accessToken
-        );
+        $this->authService = $authService;
     }
 
-    // Login User
-    public function login(LoginUserRequest $request)
+    /**
+     * @param RegisterUserRequest $request
+     * @return RegisterUserResource|JsonResponse
+     * @throws Exception
+     */
+    public function register(RegisterUserRequest $request): RegisterUserResource|JsonResponse
     {
-        // find user by email
-        $user = User::where('email', $request->email)->first();
-
-        // if user exist
-        if ($user) {
-            // check if passwords match
-            if (Hash::check($request->password, $user->password)) {
-                // create new token 
-                $tokenResult = $user->createToken('Personal Access Token');
-                // get the new token and store it in $token
-                $token = $tokenResult->token;
-
-                // check if remember me option is true
-                if ($request->remember_me) {
-                    // add 1 more week for user to remain logged in
-                    $token->expires_at = Carbon::now()->addWeeks(1);
-                }
-
-                // save the new token
-                $token->save();
-
-                // return resource with token
-                return new LoginUserResource(
-                    $user,
-                    $tokenResult->accessToken
-                );
-            }
-        }
-
-        // return error if user doesn't exist
-        $response = ['message' => 'Invalid user credentials..'];
-        return response()->json($response, 422);
+        return $this->authService->register($request);
     }
 
-    // logout
-    public function logout(Request $request)
+    /**
+     * @param LoginUserRequest $request
+     * @return LoginUserResource|JsonResponse
+     * @throws Exception
+     */
+    public function login(LoginUserRequest $request): LoginUserResource|JsonResponse
     {
-        $request->user()->token()->revoke();
-
-        $response = ['message' => 'You have been logged out'];
-        return response()->json($response, 200);
+        return $this->authService->login($request);
     }
 
-    // delete account 
-    public function delete_user($id)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
     {
-        // find user by id
-        $user = User::find($id);
-
-        // check if user exist
-        if ($user) {
-            // delete user
-            $user->delete();
-
-            // return success message
-            $response = ['message' => 'User delete success'];
-            return response()->json($response, 200);
-        }
-
-        // return error message
-        $response = ['message' => 'User does not exist..'];
-        return response()->json($response, 422);
+        return $this->authService->logout($request);
     }
 
-    // forgot-password
-    public function forgotPassword(ForgotPasswordRequest $request)
+    /**
+     * @param ForgotPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        // create a token with 60 random characters
-        $token = Str::random(60);
-
-        // insert data into password_resets table
-        // the table takes an email, a token and a date when the record was inserted
-        DB::table('password_resets')->insert([
-            [
-                'email'         => $request->email,
-                'token'         => $token,
-                'created_at'    => Carbon::now()
-            ]
-        ]);
-
-        // get user where the email is = with the email from request
-        $user = User::where('email', $request->email)->first();
-
-        // prepare an array with the user found and the randomly generated token
-        // the data will be used in the sent email
-        $data = [
-            'user'  => $user,
-            'token' => $token
-        ];
-
-        // sent the prepared data to the email inside the request
-        Mail::to($request->email)->send(new ForgotPassword($data));
-
-        // return success message
-        $response = ['message' => 'Email sent with success'];
-        return response()->json($response, 200);
+        return $this->authService->forgotPassword($request);
     }
 
     // reset password
@@ -232,15 +123,36 @@ class AuthController extends Controller
 
         // create response
         $response = [
-            'message'   => 'User update success',
-            'id'        => $user->id,
-            'user_id'   => $user->user_id,
-            'name'      => $user->name,
-            'email'     => $user->email,
-            'role'      => $user->roles->pluck('name'),
-            'is_admin'  => $user->roles->pluck('is_admin')
+            'message' => 'User update success',
+            'id' => $user->id,
+            'user_id' => $user->user_id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->roles->pluck('name'),
+            'is_admin' => $user->roles->pluck('is_admin')
         ];
         // return resource
         return response()->json($response, 200);
+    }
+
+    // delete account
+    public function delete_user($id)
+    {
+        // find user by id
+        $user = User::find($id);
+
+        // check if user exist
+        if ($user) {
+            // delete user
+            $user->delete();
+
+            // return success message
+            $response = ['message' => 'User delete success'];
+            return response()->json($response, 200);
+        }
+
+        // return error message
+        $response = ['message' => 'User does not exist..'];
+        return response()->json($response, 422);
     }
 }
