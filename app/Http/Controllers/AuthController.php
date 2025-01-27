@@ -9,13 +9,11 @@ use App\Http\Requests\auth\ResetPasswordRequest;
 use App\Http\Requests\auth\UpdateUserRequest;
 use App\Http\Resources\auth\LoginUserResource;
 use App\Http\Resources\auth\RegisterUserResource;
-use App\Models\User;
+use App\Http\Resources\auth\UserUpdateResource;
 use App\Services\AuthService;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -64,95 +62,41 @@ class AuthController extends Controller
         return $this->authService->forgotPassword($request);
     }
 
-    // reset password
-    public function resetPassword(ResetPasswordRequest $request, $email)
+    /**
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        // get user by email
-        $user = User::where('email', $email)->first();
-
-        // check if user exist
-        if ($user) {
-            // if password exist in request then hash it and add it to $user obj
-            $request->password && $user->password = Hash::make($request->password);
-
-            // save user to db with the newly hashed password
-            $user->save();
-
-            // delete token from password_resets table
-            DB::table('password_resets')->where('email', $email)->delete();
-        } else {
-            // if user doesnt exist then throw error response
-            $response = ['message' => 'User does not exist..'];
-            return response()->json($response, 404);
-        }
-
-        // return success message
-        $response = ['message' => 'User password changed with success'];
-        return response()->json($user, 200);
+        return $this->authService->resetPassword($request);
     }
 
-    // get token from password_resets table
-    public function getToken($token)
+    /**
+     * @param string $token
+     * @return JsonResponse
+     */
+    public function getPasswordResetToken(string $token): JsonResponse
     {
-        // return a json response with the token
-        return response()->json(DB::select('select *  from password_resets where token = :token', ['token' => $token]));
+        return $this->authService->getPasswordResetToken($token);
     }
 
-    // update user credentials
-    public function update(UpdateUserRequest $request, $id)
+    /**
+     * @param UpdateUserRequest $request
+     * @return UserUpdateResource|JsonResponse
+     * @throws Exception
+     */
+    public function updateMe(UpdateUserRequest $request): UserUpdateResource|JsonResponse
     {
-        // get user by id
-        $user = User::find($id);
-
-        // if user exist
-        if ($user) {
-            // insert data into user object
-            $user->name = $request->name;
-            $user->email = $request->email;
-
-            // check if request has password and hash it
-            $request->password && Hash::make($request->password);
-
-            // save user obj with the new data
-            $user->save();
-        } else {
-            // return error message
-            $response = ['message' => 'User not found'];
-            return response()->json($response, 404);
-        }
-
-        // create response
-        $response = [
-            'message' => 'User update success',
-            'id' => $user->id,
-            'user_id' => $user->user_id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->roles->pluck('name'),
-            'is_admin' => $user->roles->pluck('is_admin')
-        ];
-        // return resource
-        return response()->json($response, 200);
+        return $this->authService->updateMe($request);
     }
 
-    // delete account
-    public function delete_user($id)
+    /**
+     * @param $email
+     * @return JsonResponse
+     */
+    public function deleteMe($email): JsonResponse
     {
-        // find user by id
-        $user = User::find($id);
-
-        // check if user exist
-        if ($user) {
-            // delete user
-            $user->delete();
-
-            // return success message
-            $response = ['message' => 'User delete success'];
-            return response()->json($response, 200);
-        }
-
-        // return error message
-        $response = ['message' => 'User does not exist..'];
-        return response()->json($response, 422);
+        return $this->authService->deleteMe($email);
     }
 }

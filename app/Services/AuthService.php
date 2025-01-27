@@ -5,17 +5,18 @@ namespace App\Services;
 use App\Http\Requests\auth\ForgotPasswordRequest;
 use App\Http\Requests\auth\LoginUserRequest;
 use App\Http\Requests\auth\RegisterUserRequest;
+use App\Http\Requests\auth\ResetPasswordRequest;
+use App\Http\Requests\auth\UpdateUserRequest;
 use App\Http\Resources\auth\LoginUserResource;
 use App\Http\Resources\auth\RegisterUserResource;
+use App\Http\Resources\auth\UserUpdateResource;
 use App\Mail\ForgotPassword;
 use App\Models\User;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -103,37 +104,103 @@ class AuthService
         return response()->json($response, 200);
     }
 
-    // TODO:: continue with fixing/cleaning the forgotPassword
+    /**
+     * @param ForgotPasswordRequest $request
+     * @return JsonResponse
+     */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        // create a token with 60 random characters
-        $token = Str::random(60);
+        $email = $request->email;
+        $user = User::where('email', $email)->first();
 
-        // insert data into password_resets table
-        // the table takes an email, a token and a date when the record was inserted
-        DB::table('password_resets')->insert([
-            [
-                'email' => $request->email,
-                'token' => $token,
-                'created_at' => Carbon::now()
-            ]
-        ]);
+        if (!$user) {
+            return response()->json(['message' => 'If a matching account was found, a password reset link has been sent to your email address'], 200);
+        }
 
-        // get user where the email is = with the email from request
+        $token = Str::random(90);
+
+        if ($this->userRepository->tryInsertingToPasswordReset($email, $token)) {
+            return response()->json(['message' => 'Failed to send password reset email'], 500);
+        }
+
+        try {
+            Mail::to($request->email)->send(new ForgotPassword($user->name, $user->email, $token));
+            return response()->json(['message' => 'If a matching account was found, a password reset link has been sent to your email address.'], 200);
+        } catch (Exception $e) {
+            Log::error("Failed to send password reset email: " . $e->getMessage());
+            return response()->json(['message' => 'Failed to send password reset email'], 500);
+        }
+    }
+
+    /**
+     * @param ResetPasswordRequest $request
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
         $user = User::where('email', $request->email)->first();
 
-        // prepare an array with the user found and the randomly generated token
-        // the data will be used in the sent email
-        $data = [
-            'user' => $user,
-            'token' => $token
-        ];
+        if (!$user) {
+            return response()->json(['message' => 'User password changed with success'], 200);
+        }
 
-        // sent the prepared data to the email inside the request
-        Mail::to($request->email)->send(new ForgotPassword($data));
+        $isPasswordReset = $this->userRepository->tryResettingPassword($user, $request->password);
 
-        // return success message
-        $response = ['message' => 'Email sent with success'];
-        return response()->json($response, 200);
+        if ($isPasswordReset) {
+            return response()->json(['message' => 'User password changed with success'], 200);
+        }
+
+        Log::error("Failed to reset password (database error)");
+        return response()->json(['message' => 'User password changed with success'], 200);
+    }
+
+    /**
+     * @param string $token
+     * @return JsonResponse
+     */
+    public function getPasswordResetToken(string $token): JsonResponse
+    {
+        return response()->json($this->userRepository->getPasswordResetToken($token));
+    }
+
+    /**
+     * @param string $email
+     * @return JsonResponse
+     */
+    public function deleteMe(string $email): JsonResponse
+    {
+        if ($this->userRepository->deleteUser($email)) {
+            return response()->json(['message' => 'User delete success'], 200);
+        }
+
+        return response()->json(['message' => 'User does not exist..'], 422);
+    }
+
+    /**
+     * @param UpdateUserRequest $request
+     * @return UserUpdateResource|JsonResponse
+     * @throws Exception
+     */
+    public function updateMe(UpdateUserRequest $request): UserUpdateResource|JsonResponse
+    {
+        $user = $this->userRepository->getUserByEmail($request->email);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->name = $request->name ?? $user->name;
+        $user->email = $request->email ?? $user->email;
+        $user->password = $request->password ? Hash::make($request->password) : $user->password;
+
+        try {
+            $user->save();
+        } catch (Exception $e) {
+            Log::error("Failed to update user (database error)");
+            return response()->json(['message' => 'Failed to update user'], 500);
+        }
+
+        return new UserUpdateResource($user);
     }
 }

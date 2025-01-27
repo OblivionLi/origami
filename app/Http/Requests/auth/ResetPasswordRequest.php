@@ -4,6 +4,10 @@ namespace App\Http\Requests\auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property-read string $email
+ * @property-read string $password
+ */
 class ResetPasswordRequest extends FormRequest
 {
     /**
@@ -11,7 +15,7 @@ class ResetPasswordRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,9 +25,10 @@ class ResetPasswordRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
+            'email' => 'required|email',
             'password' => 'required|string|min:6|confirmed'
         ];
     }

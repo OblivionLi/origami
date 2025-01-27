@@ -11,11 +11,12 @@ class CreateOrdersTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('order_id')->nullable()->unique();
             $table->string('status');
             $table->decimal('products_price', 8, 2);
             $table->decimal('products_discount_price', 8, 2);
@@ -27,6 +28,8 @@ class CreateOrdersTable extends Migration
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
@@ -35,7 +38,7 @@ class CreateOrdersTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('orders');
     }

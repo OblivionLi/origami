@@ -1,16 +1,20 @@
 @component('mail::message')
-# Forgot Password Notification
+# Password Reset Request
 
-Hello, {{ $user->name }}. A request was called to reset the password on this email {{ $user->email }}.
+Hi {{ $username }},
 
-If you didn't request password reset please ignore this email.
+We received a request to reset the password for your account associated with this email: **{{ $email }}**.
 
-To reset your account password, click on the link below.
+If you made this request, you can reset your password by clicking the button below:
 
-@component('mail::button', ['url' => 'http://127.0.0.1:8000/reset-password/' . $token])
-Reset Password
-@endcomponent 
+@component('mail::button', ['url' => route('password.reset', ['token' => $token])])
+    Reset Password
+@endcomponent
 
-Thanks,<br>
-{{ config('app.name') }}
+If you did not request a password reset, please ignore this email. Your account remains secure.
+
+If you have any questions or need further assistance, feel free to contact our support team.
+
+Thank you,
+The **{{ config('app.name') }}** Team
 @endcomponent

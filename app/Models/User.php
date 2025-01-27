@@ -5,16 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
 /**
- * @property-read string $password
+ * @property string $password
+ * @property string $name
+ * @property string $email
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -69,5 +73,25 @@ class User extends Authenticatable
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class, 'user_id');
+    }
+
+    /**
+     * @return void
+     */
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            foreach ($user->orders as $order) {
+                $order->update([
+                    'user_id' => null,
+                    'order_id' => Str::random(10),
+                ]);
+            }
+
+            $user->reviews()->delete();
+            $user->addresses()->delete();
+        });
     }
 }

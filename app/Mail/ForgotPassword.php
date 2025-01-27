@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -11,22 +10,20 @@ class ForgotPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $user;
-    public $token;
+    public string $username;
+    public string $email;
+    public string $token;
 
     /**
      * Create a new message instance.
      *
      * @return void
-     * 
-     * $data comes from the forgotPassword() inside the AuthController
-     * it contains data from the user with the requested email
-     * and a randomly 60 characters generated token
      */
-    public function __construct($data)
+    public function __construct(string $username, string $email, string $token)
     {
-        $this->user     = $data['user'];
-        $this->token    = $data['token'];
+        $this->username = $username;
+        $this->email = $email;
+        $this->token = $token;
     }
 
     /**
@@ -34,7 +31,7 @@ class ForgotPassword extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function build(): self
     {
         return $this->markdown('emails.forgotPassword');
     }

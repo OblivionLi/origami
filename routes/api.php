@@ -20,8 +20,8 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('login', 'login')->name('login');
     Route::post('forgot-password', 'forgotPassword');
-    Route::patch('reset-password/{email}', 'resetPassword');
-    Route::get('reset-password/{token}', 'getToken');
+    Route::get('reset-password/{token}', 'getPasswordResetToken')->name('password.reset');
+    Route::patch('reset-password', 'resetPassword');
 });
 
 Route::controller(ProductController::class)->group(function () {
@@ -49,8 +49,8 @@ Route::middleware('auth:api')->group(function () {
     // User Routes
     Route::controller(AuthController::class)->group(function () {
         Route::get('logout', 'logout');
-        Route::patch('users/update-credentials', 'update');
-        Route::delete('users/me', 'delete_user');
+        Route::patch('users/update-credentials', 'updateMe');
+        Route::delete('users/me/{email}', 'deleteMe');
     });
     Route::get('users/me', [UserController::class, 'show']);
 

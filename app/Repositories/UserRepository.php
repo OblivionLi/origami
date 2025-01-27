@@ -89,7 +89,92 @@ class UserRepository
         }
     }
 
+    /**
+     * @param string $email
+     * @param string $token
+     * @return bool
+     */
+    public function tryInsertingToPasswordReset(string $email, string $token): bool {
+        try {
+            DB::table('password_resets')->insert([
+                'email' => $email,
+                'token' => $token,
+                'created_at' => Carbon::now()
+            ]);
 
+            return true;
+        } catch (Exception $e) {
+            Log::error("Failed to store password reset token: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @param string $token
+     * @return string
+     */
+    public function getPasswordResetToken(string $token): string
+    {
+        try {
+            return DB::table('password_resets')->where('token', $token)->first()->token;
+        } catch (Exception $e) {
+            Log::error("Failed to get password reset token: " . $e->getMessage());
+            return 'Invalid token';
+        }
+    }
+
+    /**
+     * @param User $user
+     * @param string $password
+     * @return bool
+     * @throws Exception
+     */
+    public function tryResettingPassword(User $user, string $password): bool
+    {
+        DB::beginTransaction();
+
+        $hashedPassword = Hash::make($password);
+        try {
+            $user->update([
+                'password' => $hashedPassword
+            ]);
+
+            DB::table('password_resets')->where('email', $user->email)->delete();
+            DB::commit();
+
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Error resetting user password: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * @param string $email
+     * @return bool
+     */
+    public function deleteUser(string $email): bool
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::where('email', $email)->first();
+
+            if (!$user) {
+                return false;
+            }
+
+            $user->roles()->detach();
+            $user->delete();
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            Log::error("Failed to delete user: " . $e->getMessage());
+            DB::rollBack();
+            return false;
+        }
+    }
 
     public function getUserWithRelations(): Builder
     {

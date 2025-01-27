@@ -6,6 +6,11 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property-read string $name
+ * @property-read string $email
+ * @property-read string $password
+ */
 class UpdateUserRequest extends FormRequest
 {
     /**
@@ -13,7 +18,7 @@ class UpdateUserRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,14 +26,14 @@ class UpdateUserRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array[string, string]
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name'          => 'string|max:50',
-            'email'         => ['string', 'email', 'max:255', Rule::unique('users')->ignore(Auth::id())],
-            'password'      => 'confirmed'
+            'name' => 'string|max:50',
+            'email' => ['string', 'email', 'max:255', Rule::unique('users')->ignore(Auth::id())],
+            'password' => 'confirmed'
         ];
     }
 }
