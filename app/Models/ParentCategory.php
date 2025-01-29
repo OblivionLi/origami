@@ -8,6 +8,10 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $slug
+ * @property string $name
+ */
 class ParentCategory extends Model
 {
     use HasFactory, Sluggable, SluggableScopeHelpers;

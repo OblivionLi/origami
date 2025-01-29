@@ -9,6 +9,12 @@ use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $parent_category_id
+ * @property int $quantity
+ * @property string $slug
+ * @property string $name
+ */
 class ChildCategory extends Model
 {
     use HasFactory, Sluggable, SluggableScopeHelpers;

@@ -7,16 +7,20 @@ use App\Http\Requests\role\RoleUpdateRequest;
 use App\Http\Resources\role\RoleIndexResource;
 use App\Http\Resources\role\RoleShowResource;
 use App\Models\Role;
+use App\Services\RoleService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected RoleService $service;
+
+    public function __construct(RoleService $service)
+    {
+        $this->service = $service;
+    }
+
+    public function index(): AnonymousResourceCollection
     {
         // return role resource with all relationship data
         return RoleIndexResource::collection(Role::info()->get());
@@ -35,7 +39,7 @@ class RoleController extends Controller
             'name'      => $request->name,
             'is_admin'  => 0
         ]);
-        
+
         // return success message
         $response = ['message' => 'Role create success'];
         return response()->json($response, 200);

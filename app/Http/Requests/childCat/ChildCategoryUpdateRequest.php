@@ -4,6 +4,10 @@ namespace App\Http\Requests\childCat;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property-read string $name
+ * @property-read int $parent_category_id
+ */
 class ChildCategoryUpdateRequest extends FormRequest
 {
     /**
@@ -11,7 +15,7 @@ class ChildCategoryUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,11 +25,11 @@ class ChildCategoryUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name'                  => 'string|required|max:30',
-            'parent_category_id'    => 'required'
+            'name' => 'string|required|max:30',
+            'parent_category_id' => 'required'
         ];
     }
 }

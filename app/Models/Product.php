@@ -9,6 +9,17 @@ use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $slug
+ * @property string $name
+ * @property string $description
+ * @property double $price
+ * @property int $discount
+ * @property boolean $special_offer
+ * @property string $product_code
+ * @property int $total_quantities
+ */
 class Product extends Model
 {
     use HasFactory, Sluggable, SluggableScopeHelpers;
@@ -17,7 +28,7 @@ class Product extends Model
      * @var array[int, string]
      */
     protected $fillable = [
-        'name', 'user_id', 'parent_category_id', 'child_category_id', 'description', 'price', 'discount', 'special_offer', 'product_code', 'rating', 'total_reviews', 'total_quantities'
+        'id', 'name', 'user_id', 'parent_category_id', 'child_category_id', 'description', 'price', 'discount', 'special_offer', 'product_code', 'rating', 'total_reviews', 'total_quantities'
     ];
 
     /**

@@ -4,110 +4,62 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\childCat\ChildCategoryStoreRequest;
 use App\Http\Requests\childCat\ChildCategoryUpdateRequest;
-use App\Http\Resources\childCat\ChildCategoryIndexResource;
 use App\Http\Resources\childCat\ChildCategoryShowResource;
-use App\Models\ChildCategory;
-use Illuminate\Http\Request;
+use App\Services\ChildCategoryService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ChildCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected ChildCategoryService $childCategoryService;
+
+    public function __construct(ChildCategoryService $childCategoryService)
     {
-        // return child category resource with all relationship data
-        return ChildCategoryIndexResource::collection(ChildCategory::info()->get());
+        $this->childCategoryService = $childCategoryService;
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return AnonymousResourceCollection
      */
-    public function store(ChildCategoryStoreRequest $request)
+    public function index(): AnonymousResourceCollection
     {
-        // Create the child category
-        ChildCategory::create([
-            'name'                  => $request->name,
-            'parent_category_id'    => $request->parent_category_id,
-            'quantity'              => 0
-        ]);
-        
-        // return success message
-        $response = ['message' => 'Child Category create success'];
-        return response()->json($response, 200);
+        return $this->childCategoryService->getChildCategoriesWithRelations();
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\ChildCategory  $childCategory
-     * @return \Illuminate\Http\Response
+     * @param ChildCategoryStoreRequest $request
+     * @return JsonResponse
      */
-    public function show($slug)
+    public function store(ChildCategoryStoreRequest $request): JsonResponse
     {
-        // get child category by id with relationships
-        $childCategory = ChildCategory::findBySlug($slug);
-
-        // if child category doesnt exist return error message
-        $response = ['message' => 'Child Category does not exist..'];
-        if (!$childCategory) return response()->json($response, 422);
-
-        // return child category resource
-        return new ChildCategoryShowResource($childCategory);
+        return $this->childCategoryService->storeChildCategory($request);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ChildCategory  $childCategory
-     * @return \Illuminate\Http\Response
+     * @param string $slug
+     * @return ChildCategoryShowResource|JsonResponse
      */
-    public function update(ChildCategoryUpdateRequest $request, $slug)
+    public function show(string $slug): ChildCategoryShowResource|JsonResponse
     {
-        // get child category by slug
-        $childCategory = ChildCategory::findBySlug($slug);
-
-        // if child category doesnt exist return error message
-        if (!$childCategory) return response()->json(['message' => 'Child Category does not exist..']);
-
-        // update child category data
-        $childCategory->slug                = null;
-        $childCategory->name                = $request->name;
-        $childCategory->parent_category_id  = $request->parent_category_id;
-
-        // save the new child category data
-        $childCategory->save();
-
-        // return success message
-        $response = ['message', 'Child Category update success'];
-        return response()->json($response, 200);
+        return $this->childCategoryService->showChildCategoryWithRelations($slug);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\ChildCategory  $childCategory
-     * @return \Illuminate\Http\Response
+     * @param ChildCategoryUpdateRequest $request
+     * @param string $slug
+     * @return JsonResponse
      */
-    public function destroy($slug)
+    public function update(ChildCategoryUpdateRequest $request, string $slug): JsonResponse
     {
-        // get child category by slug
-        $childCategory = ChildCategory::findBySlug($slug);
+        return $this->childCategoryService->updateChildCategory($request, $slug);
+    }
 
-        // if child category doesnt exist return error message
-        if (!$childCategory) return response()->json(['message' => 'Child Category does not exist..']);
-
-        // delete the child category
-        $childCategory->delete();
-
-        // return success message
-        $response = ['message', 'Child Category delete success'];
-        return response()->json($response, 200);
+    /**
+     * @param $slug
+     * @return JsonResponse
+     */
+    public function destroy($slug): JsonResponse
+    {
+        return $this->childCategoryService->deleteChildCategory($slug);
     }
 }
