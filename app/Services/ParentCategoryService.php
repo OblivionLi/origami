@@ -41,7 +41,7 @@ class ParentCategoryService
             return response()->json(['message' => 'Parent category store failed'], 500);
         }
 
-        return response()->json(['message' => 'Parent category create success'], 200);
+        return response()->json(['message' => 'Parent category created'], 200);
     }
 
     /**

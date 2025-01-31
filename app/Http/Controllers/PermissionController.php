@@ -4,109 +4,62 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\permission\PermissionStoreRequest;
 use App\Http\Requests\permission\PermissionUpdateRequest;
-use App\Http\Resources\permission\PermissionIndexResource;
 use App\Http\Resources\permission\PermissionShowResource;
-use App\Models\Permission;
-use Illuminate\Http\Request;
+use App\Services\PermissionService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class PermissionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected PermissionService $permissionService;
+
+    public function __construct(PermissionService $permissionService)
     {
-        // return role resource with all relationship data
-        return PermissionIndexResource::collection(Permission::with('roles')->get());
+        $this->permissionService = $permissionService;
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return AnonymousResourceCollection
      */
-    public function store(PermissionStoreRequest $request)
+    public function index(): AnonymousResourceCollection
     {
-        // Create the permission
-        Permission::create([
-            'name'  => $request->name,
-        ]);
-        
-        // return success message
-        $response = ['message' => 'Permission create success'];
-        return response()->json($response, 200);
+        return $this->permissionService->getPermissionsWithRelations();
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Permission  $permission
-     * @return \Illuminate\Http\Response
+     * @param PermissionStoreRequest $request
+     * @return JsonResponse
      */
-    public function show($id)
+    public function store(PermissionStoreRequest $request): JsonResponse
     {
-        // get permission by id with relationships
-        $permission = Permission::find($id);
-
-        // if permission doesnt exist return error message
-        $response = ['message' => 'Permission does not exist..'];
-        if (!$permission) return response()->json($response, 422);
-
-        // return permission resource
-        return new PermissionShowResource($permission);
+        return $this->permissionService->savePermission($request);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Permission  $permission
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return PermissionShowResource|JsonResponse
      */
-    public function update(PermissionUpdateRequest $request, $id)
+    public function show($id): PermissionShowResource|JsonResponse
     {
-        // get permission by id
-        $permission = Permission::find($id);
-
-        // if permission doesnt exist return error message
-        if (!$permission) return response()->json(['message' => 'Permission does not exist..']);
-
-        // update permission data
-        $permission->name = $request->name;
-
-        // save the new permission data
-        $permission->save();
-
-        // return success message
-        $response = ['message', 'Permission update success'];
-        return response()->json($response, 200);
+        return $this->permissionService->showPermission($id);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Permission  $permission
-     * @return \Illuminate\Http\Response
+     * @param PermissionUpdateRequest $request
+     * @param $id
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function update(PermissionUpdateRequest $request, $id): JsonResponse
     {
-        // get permission by id
-        $permission = Permission::find($id);
+        return $this->permissionService->updatePermission($request, $id);
+    }
 
-        // if permission doesnt exist return error message
-        if (!$permission) return response()->json(['message' => 'Permission does not exist..']);
-
-        // detach permission_role pivot
-        $permission->roles()->detach();
-
-        // delete the permission
-        $permission->delete();
-
-        // return success message
-        $response = ['message', 'Permission delete success'];
-        return response()->json($response, 200);
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function destroy($id): JsonResponse
+    {
+        return $this->permissionService->deletePermission($id);
     }
 }

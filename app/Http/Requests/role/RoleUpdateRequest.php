@@ -4,6 +4,10 @@ namespace App\Http\Requests\role;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property-read string $name
+ * @property-read bool $is_admin
+ */
 class RoleUpdateRequest extends FormRequest
 {
     /**
@@ -11,7 +15,7 @@ class RoleUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,11 +25,11 @@ class RoleUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name'      => 'string|required|max:30',
-            'is_admin'  => 'boolean'
+            'name' => 'string|required|max:30',
+            'is_admin' => 'boolean'
         ];
     }
 }

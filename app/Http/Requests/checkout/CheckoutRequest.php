@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\role;
+namespace App\Http\Requests\checkout;
 
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property-read string $name
+ * @property-read double $amount
  */
-class RoleStoreRequest extends FormRequest
+class CheckoutRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,7 @@ class RoleStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'string|required|max:30'
+            'amount' => 'numeric|required|min:0.1'
         ];
     }
 }
