@@ -3,7 +3,12 @@
 namespace App\Http\Requests\productImg;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
+/**
+ * @property-read int $product_id
+ * @property-read UploadedFile $image
+ */
 class ProductImageUpdateRequest extends FormRequest
 {
     /**
@@ -11,7 +16,7 @@ class ProductImageUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,11 +26,11 @@ class ProductImageUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'product_id'    => 'required|numeric',
-            'image'        => 'required|max:10000|mimes:png,jpg,jpeg'
+            'product_id' => 'required|numeric',
+            'image' => 'required|max:10000|mimes:png,jpg,jpeg'
         ];
     }
 }

@@ -4,6 +4,10 @@ namespace App\Http\Requests\review;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property-read string $user_comment
+ * @property-read string $admin_comment
+ */
 class ReviewUpdateRequest extends FormRequest
 {
     /**
@@ -11,7 +15,7 @@ class ReviewUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,11 +25,11 @@ class ReviewUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'user_comment'       => 'required',
-            'admin_comment'      => 'string|required'
+            'user_comment' => 'required',
+            'admin_comment' => 'string|required'
         ];
     }
 }

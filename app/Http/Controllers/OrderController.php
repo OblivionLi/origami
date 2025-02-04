@@ -3,242 +3,89 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\order\OrderStoreRequest;
-use App\Http\Resources\order\OrderIndexAdminResource;
 use App\Http\Resources\order\OrderIndexResource;
 use App\Http\Resources\order\OrderShowResource;
-use App\Models\Order;
-use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use PDF;
-use Illuminate\Support\Str;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected OrderService $orderService;
+
+    public function __construct(OrderService $orderService)
     {
-        // return order resource with all relationship data
-        return OrderIndexResource::collection(Order::info()->get());
+        $this->orderService = $orderService;
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return AnonymousResourceCollection
      */
-    public function store(OrderStoreRequest $request)
+    public function index(): AnonymousResourceCollection
     {
-        // create unique order id
-        $unique_order_id = Str::random(25);
-
-        // create order
-        $order = Order::create([
-            'user_id'                   => Auth::id(),
-            'order_id'                  => $unique_order_id,
-            'status'                    => 'PENDING',
-            'products_price'            => $request->products_price,
-            'products_discount_price'   => $request->products_discount_price,
-            'shipping_price'            => $request->shipping_price,
-            'tax_price'                 => $request->tax_price,
-            'total_price'               => $request->total_price
-        ]);
-
-        // loop through cart items
-        foreach ($request->cart_items as $item) {
-            // attach data to pivot table between products and orders
-            $order->products()->attach(
-                $item['product'],
-                [
-                    'order_id'      => $order->id,
-                    'product_id'    => $item['product'],
-                    'qty'           => $item['qty']
-                ]
-            );
-
-            // define totalQty with the quantity value from inside the cart
-            $totalQty = $item['qty'];
-
-            // decrement total_quantities from product table based on the qty data inside the cart
-            // so that when an order is placed decrease the total quantities value for said product based
-            // on the qty value inside the cart
-            DB::table('products')->where('id', $item['product'])->decrement('total_quantities', $totalQty);
-        }
-
-        // return success message
-        $response = ['message' => 'Order create success', 'id'  => $order->order_id];
-        return response()->json($response, 200);
+        return $this->orderService->getOrderWithRelations();
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * @param OrderStoreRequest $request
+     * @return JsonResponse
      */
-    public function show($id)
+    public function store(OrderStoreRequest $request): JsonResponse
     {
-        // get order by id
-        $order = Order::info()->where('order_id', $id)->firstOrFail();
-
-        // if order doesnt exist return error message
-        $response = ['message' => 'Order does not exist..'];
-        if (!$order) return response()->json($response, 422);
-
-        // return order resource
-        return new OrderShowResource($order);
+        return $this->orderService->storeOrder($request);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return OrderShowResource|JsonResponse
      */
-    public function update(Request $request, Order $order)
+    public function show($id): OrderShowResource|JsonResponse
     {
-        //
+        return $this->orderService->showOrder($id);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        // get order by id
-        $order = Order::find($id);
-
-        // if order doesnt exist return error message
-        if (!$order) return response()->json(['message' => 'Order does not exist..']);
-
-        // delete the order
-        $order->products()->sync([]);
-        $order->delete();
-
-        // return success message
-        $response = ['message', 'Order delete success'];
-        return response()->json($response, 200);
+        return $this->orderService->deleteOrder($id);
     }
 
     /**
-     * Update Order is_paid
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * @param string $status
+     * @param int $id
+     * @return OrderShowResource|JsonResponse
      */
-    public function updateOrderToPaid($id)
+    public function updateOrderStatus(string $status, int $id): OrderShowResource|JsonResponse
     {
-        // get order by id
-        $order = Order::info()->where('order_id', $id)->firstOrFail();
-
-        // if order doesnt exist return error message
-        $response = ['message' => 'Order does not exist..'];
-        if (!$order) return response()->json($response, 422);
-
-        // update order data
-        $order->is_paid = 1;
-        $order->paid_at = Carbon::now();
-        $order->status  = 'PAID';
-
-        // save updated order data into database
-        $order->save();
-
-        // return order resource
-        return new OrderShowResource($order);
+        return $this->orderService->updateOrderStatus($status, $id);
     }
 
     /**
-     * Update Order is_delivered
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * @return OrderIndexResource|JsonResponse
      */
-    public function updateOrderToDelivered($id)
+    public function getUserOrders(): OrderIndexResource|JsonResponse
     {
-        // get order by id
-        $order = Order::info()->where('order_id', $id)->firstOrFail();
-
-        // if order doesnt exist return error message
-        $response = ['message' => 'Order does not exist..'];
-        if (!$order) return response()->json($response, 422);
-
-        // update order data
-        $order->is_delivered = 1;
-        $order->delivered_at = Carbon::now();
-        $order->status  = 'PAID';
-
-        // save updated order data into database
-        $order->save();
-
-        // return order resource
-        return new OrderShowResource($order);
+        return $this->orderService->getUserOrders();
     }
 
     /**
-     * Get user's orders
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse|Response
      */
-    public function getUserOrders()
+    public function createPDF(int $id): JsonResponse|Response
     {
-        // get order where user_id
-        $order = Order::info()->where('user_id', Auth::id())->get();
-
-        // if order doesnt exist return error message
-        $response = ['message' => 'Order does not exist..'];
-        if (!$order) return response()->json($response, 422);
-
-        // return order resource
-        return OrderIndexResource::collection($order);
+        return $this->orderService->createOrderPDF($id);
     }
 
-    // Generate PDF
-    public function createPDF($id) {
-        // get order by id
-        $order = Order::info()->where('order_id', $id)->firstOrFail();
-
-        // if order doesnt exist return error message
-        $response = ['message' => 'Order does not exist..'];
-        if (!$order) return response()->json($response, 422);
-  
-        // share data to view
-        view()->share('order', $order);
-        $pdf = PDF::loadView('invoice.orderPDF', $order);
-  
-        // download PDF file with download method
-        return $pdf->download('Your-Order-Invoice.pdf');
-        // return $pdf->stream();
-    }
-
-    public function orderCharts()
+    /**
+     * @return JsonResponse
+     */
+    public function orderCharts(): JsonResponse
     {
-        $orderCount         = Order::orderCount();
-        $revenueLastMonth   = Order::revenueLastMonth();
-        $revenueAllTime     = Order::revenueAllTime();
-        $averageRevenue     = Order::averageRevenue();
-        $userCount          = User::userCount();
-
-        $data = [
-            'orderCount'        => $orderCount,
-            'userCount'         => $userCount,
-            'revenueLastMonth'  => $revenueLastMonth,
-            'revenueAllTime'    => $revenueAllTime,
-            'averageRevenue'    => $averageRevenue,
-
-        ];
-
-        return response()->json($data);
+        return $this->orderService->prepareOrderData();
     }
 }

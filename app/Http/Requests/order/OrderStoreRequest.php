@@ -4,6 +4,14 @@ namespace App\Http\Requests\order;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property-read double $products_price
+ * @property-read double $products_discount_price
+ * @property-read double $shipping_price
+ * @property-read double $tax_price
+ * @property-read double $total_price
+ * @property-read array $cart_items
+ */
 class OrderStoreRequest extends FormRequest
 {
     /**
@@ -11,7 +19,7 @@ class OrderStoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,15 +29,15 @@ class OrderStoreRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'products_price'            => 'required|numeric',
-            'products_discount_price'   => 'required|numeric',
-            'shipping_price'            => 'required|numeric',
-            'tax_price'                 => 'required|numeric',
-            'total_price'               => 'required|numeric',
-            'cart_items'                => 'required'
+            'products_price' => 'required|numeric',
+            'products_discount_price' => 'required|numeric',
+            'shipping_price' => 'required|numeric',
+            'tax_price' => 'required|numeric',
+            'total_price' => 'required|numeric',
+            'cart_items' => 'required'
         ];
     }
 }

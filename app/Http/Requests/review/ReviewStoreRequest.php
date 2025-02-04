@@ -4,6 +4,12 @@ namespace App\Http\Requests\review;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property-read string $username
+ * @property-read int $user_id
+ * @property-read int $rating
+ * @property-read string $comment
+ */
 class ReviewStoreRequest extends FormRequest
 {
     /**
@@ -11,7 +17,7 @@ class ReviewStoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,12 +27,12 @@ class ReviewStoreRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'username'      => 'string|required',
-            'rating'        => 'required|numeric|max:5',
-            'comment'       => 'required',
+            'username' => 'string|required',
+            'rating' => 'required|numeric|max:5',
+            'comment' => 'required',
         ];
     }
 }

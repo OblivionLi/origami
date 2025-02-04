@@ -2,113 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\user\UserUpdateRequest;
 use App\Http\Resources\auth\UserUpdateResource;
-use App\Http\Resources\user\UserIndexResource;
 use App\Http\Resources\user\UserShowResource;
-use App\Models\User;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
     {
-        // return user resource with relationships
-        return UserIndexResource::collection(User::info()->get());
+        $this->userService = $userService;
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return AnonymousResourceCollection
      */
-    public function store(Request $request)
+    public function index(): AnonymousResourceCollection
     {
-        //
+        return $this->userService->getUserWithRelations();
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return UserShowResource
      */
-    public function show($id)
+    public function show(int $id): UserShowResource
     {
-        // return user object
-        return new UserShowResource(User::info()->where('user_id', $id)->firstOrFail());
+        return $this->userService->showUser($id);
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return UserUpdateResource|JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): UserUpdateResource|JsonResponse
     {
-        // get user by id
-        $user = User::where('user_id', $id)->firstOrFail();
-
-        $request->validate([
-            'name' => 'string',
-            'email' => [
-                Rule::unique('users')->ignore($user->id),
-            ],
-            'password' => 'confirmed'
-        ]);
-
-        // if user exist
-        if ($user) {
-            // insert data into user object
-            $user->name = $request->name;
-            $user->email = $request->email;
-
-            // save user obj with the new data
-            $user->save();
-
-            // save relationship data
-            $user->roles()->sync($request->role);
-        } else {
-            // return error message
-            $response = ['message' => 'User not found'];
-            return response()->json($response, 404);
-        }
-
-        // return resource
-        return new UserUpdateResource($user);
+        return $this->userService->updateUser($request, $id);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        // get user by id
-        $user = User::find($id);
-
-        // if user doesnt exist return error message
-        if (!$user) return response()->json(['message' => 'User does not exist..']);
-
-        // detach user_role pivot
-        $user->roles()->detach();
-
-        // delete the user
-        $user->delete();
-
-        // return success message
-        $response = ['message', 'User delete success'];
-        return response()->json($response, 200);
+        return $this->userService->deleteUser($id);
     }
 }

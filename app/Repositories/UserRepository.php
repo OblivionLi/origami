@@ -176,11 +176,22 @@ class UserRepository
         }
     }
 
-    public function getUserWithRelations(): Builder
+    /**
+     * @param int|string|null $userId
+     * @return Builder
+     */
+    public function getUserWithRelations(int|string|null $userId): Builder
     {
+        if ($userId) {
+            return User::with(['products', 'reviews', 'orders', 'roles', 'addresses'])->where('user_id', $userId)->first();
+        }
+
         return User::with(['products', 'reviews', 'orders', 'roles', 'addresses']);
     }
 
+    /**
+     * @return array
+     */
     public function getUserCountsByMonth(): array
     {
         $userCounts = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
@@ -194,5 +205,31 @@ class UserRepository
         }
 
         return $monthlyCounts;
+    }
+
+    /**
+     * @param array $requestData
+     * @param User $user
+     * @return bool
+     */
+    public function updateUser(array $requestData, User $user): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $user->update([
+                'name' => $requestData['name'],
+                'email' => $requestData['email']
+            ]);
+
+            $user->roles()->sync($requestData['role']);
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to update user: " . $e->getMessage());
+            return false;
+        }
     }
 }
