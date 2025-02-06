@@ -41,7 +41,7 @@ class ChildCategoryService
             return response()->json(['message' => 'Child category store failed'], 500);
         }
 
-        return response()->json(['message' => 'Child category create success'], 200);
+        return response()->json(['message' => 'Child category created'], 200);
     }
 
     /**
@@ -51,7 +51,7 @@ class ChildCategoryService
     public function showChildCategoryWithRelations(string $slug): ChildCategoryShowResource|JsonResponse
     {
         try {
-            $childCategory = ChildCategory::findBySlug($slug);
+            $childCategory = $this->childCategoryRepository->getChildCategoryBySlug($slug);
             if (!$childCategory) {
                 return response()->json(['message' => 'ChildCategory does not exist..'], 422);
             }
@@ -70,7 +70,7 @@ class ChildCategoryService
      */
     public function updateChildCategory(ChildCategoryUpdateRequest $request, string $slug): JsonResponse
     {
-        $childCategory = $this->childCategoryRepository->updateChildCategory($request, $slug);
+        $childCategory = $this->childCategoryRepository->updateChildCategory($request->validated(), $slug);
         if (!$childCategory) {
             return response()->json(['message' => 'Child Category does not exist'], 422);
         }

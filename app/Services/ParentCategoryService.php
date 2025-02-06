@@ -51,7 +51,7 @@ class ParentCategoryService
     public function showParentCategoryWithRelations(string $slug): ParentCategoryShowResource|JsonResponse
     {
         try {
-            $parentCategory = ParentCategory::findBySlug($slug);
+            $parentCategory = $this->parentCategoryRepository->getParentCategoryBySlug($slug);
             if (!$parentCategory) {
                 return response()->json(['message' => 'ParentCategory does not exist..'], 422);
             }
@@ -70,7 +70,7 @@ class ParentCategoryService
      */
     public function updateParentCategory(ParentCategoryUpdateRequest $request, string $slug): JsonResponse
     {
-        $parentCategory = $this->parentCategoryRepository->updateParentCategory($request, $slug);
+        $parentCategory = $this->parentCategoryRepository->updateParentCategory($request->validated(), $slug);
         if (!$parentCategory) {
             return response()->json(['message' => 'Parent Category does not exist'], 422);
         }

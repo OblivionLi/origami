@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\parentCat\ParentCategoryStoreRequest;
-use App\Http\Requests\parentCat\ParentCategoryUpdateRequest;
 use App\Models\ParentCategory;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,14 +18,14 @@ class ParentCategoryRepository
     }
 
     /**
-     * @param ParentCategoryStoreRequest $request
+     * @param array $requestData
      * @return bool
      */
-    public function createParentCategory(ParentCategoryStoreRequest $request): bool
+    public function createParentCategory(array $requestData): bool
     {
         try {
             ParentCategory::create([
-               'name' => $request->name,
+               'name' => $requestData['name'],
             ]);
 
             return true;
@@ -38,11 +36,11 @@ class ParentCategoryRepository
     }
 
     /**
-     * @param ParentCategoryUpdateRequest $request
+     * @param array $requestData
      * @param string $slug
      * @return ParentCategory|null
      */
-    public function updateParentCategory(ParentCategoryUpdateRequest $request, string $slug): ?ParentCategory
+    public function updateParentCategory(array $requestData, string $slug): ?ParentCategory
     {
         try {
             $parentCategory = ParentCategory::findBySlug($slug);
@@ -51,7 +49,7 @@ class ParentCategoryRepository
             }
 
             $parentCategory->slug = null;
-            $parentCategory->name = $request->name;
+            $parentCategory->name = $requestData['name'];
 
             $parentCategory->save();
 
@@ -81,5 +79,14 @@ class ParentCategoryRepository
             Log::error("Database error deleting parent category: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param string $slug
+     * @return ParentCategory|null
+     */
+    public function getParentCategoryBySlug(string $slug): ?ParentCategory
+    {
+        return ParentCategory::findBySlug($slug);
     }
 }

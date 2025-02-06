@@ -17,15 +17,15 @@ class ChildCategoryRepository
     }
 
     /**
-     * @param ChildCategoryStoreRequest $request
+     * @param array $requestData
      * @return bool
      */
-    public function createChildCategory(ChildCategoryStoreRequest $request): bool
+    public function createChildCategory(array $requestData): bool
     {
         try {
             ChildCategory::create([
-                'name' => $request->name,
-                'parent_category_id' => $request->parent_category_id,
+                'name' => $requestData['name'],
+                'parent_category_id' => $requestData['parent_category_id'],
                 'quantity' => 0
             ]);
 
@@ -37,11 +37,11 @@ class ChildCategoryRepository
     }
 
     /**
-     * @param ChildCategoryUpdateRequest $request
+     * @param array $requestData
      * @param string $slug
      * @return ChildCategory|null
      */
-    public function updateChildCategory(ChildCategoryUpdateRequest $request, string $slug): ?ChildCategory
+    public function updateChildCategory(array $requestData, string $slug): ?ChildCategory
     {
         try {
             $childCategory = ChildCategory::findBySlug($slug);
@@ -50,8 +50,8 @@ class ChildCategoryRepository
             }
 
             $childCategory->slug = null;
-            $childCategory->name = $request->name;
-            $childCategory->parent_category_id = $request->parent_category_id;
+            $childCategory->name = $requestData['name'];
+            $childCategory->parent_category_id = $requestData['parent_category_id'];
 
             $childCategory->save();
 
@@ -81,5 +81,14 @@ class ChildCategoryRepository
             Log::error("Database error deleting child category: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param string $slug
+     * @return ChildCategory|null
+     */
+    public function getChildCategoryBySlug(string $slug): ?ChildCategory
+    {
+        return ChildCategory::findBySlug($slug);
     }
 }
