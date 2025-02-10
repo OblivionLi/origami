@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Http\Requests\review\ReviewStoreRequest;
 use App\Http\Requests\review\ReviewUpdateRequest;
+use App\Http\Resources\review\ReviewIndexResource;
 use App\Http\Resources\review\ReviewShowResource;
-use App\Models\Review;
 use App\Repositories\ReviewRepository;
-use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReviewService
 {
@@ -23,15 +23,15 @@ class ReviewService
 
     /**
      * @param int|string|null $productId
-     * @return LengthAwarePaginator|Collection
+     * @return LengthAwarePaginator|AnonymousResourceCollection
      */
-    public function getReviewWithRelations(int|string|null $productId): LengthAwarePaginator|Collection
+    public function getReviewWithRelations(int|string|null $productId): LengthAwarePaginator|AnonymousResourceCollection
     {
         if ($productId) {
-            return $this->reviewRepository->getReviewWithRelations($productId)->paginate(6);
+            return ReviewIndexResource::collection($this->reviewRepository->getReviewWithRelations($productId)->paginate(6));
         }
 
-        return $this->reviewRepository->getReviewWithRelations(null)->get();
+        return ReviewIndexResource::collection($this->reviewRepository->getReviewWithRelations(null)->get());
     }
 
     /**
@@ -41,56 +41,51 @@ class ReviewService
      */
     public function storeReview(ReviewStoreRequest $request, string $slug): JsonResponse
     {
-        $tryToStoreReview = $this->reviewRepository->createReview($request, $slug);
-        if ($tryToStoreReview) {
-            return response()->json(['message' => 'Review created'], 201);
+        $tryToStoreReview = $this->reviewRepository->createReview($request->validated(), $slug);
+        if (!$tryToStoreReview) {
+            return response()->json(['message' => 'Failed to create review.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return response()->json(['message' => 'Review not created'], 500);
+        return response()->json(['message' => 'Review created successfully.'], Response::HTTP_CREATED);
     }
 
     /**
-     * @param int $reviewId
+     * @param int $id
      * @return ReviewShowResource|JsonResponse
      */
-    public function showReview(int $reviewId): ReviewShowResource|JsonResponse
+    public function showReview(int $id): ReviewShowResource|JsonResponse
     {
-        try {
-            $review = Review::find($reviewId);
-            if (!$review) {
-                return response()->json(['message' => 'Review not found'], 404);
-            }
-
-            return new ReviewShowResource($review);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        $review = $this->reviewRepository->getReviewById($id);
+        if (!$review) {
+            return response()->json(['message' => 'Review not found.'], Response::HTTP_NOT_FOUND);
         }
-    }
 
-    public function updateReview(ReviewUpdateRequest $request, int $reviewId): JsonResponse
-    {
-        $tryToUpdateReview = $this->reviewRepository->updateReview($request, $reviewId);
-        if (!$tryToUpdateReview) {
-            return response()->json(['message' => 'Review not updated'], 500);
-        }
-        return response()->json(['message' => 'Review updated'], 200);
+        return new ReviewShowResource($review);
     }
 
     /**
-     * @param int $reviewId
+     * @param ReviewUpdateRequest $request
+     * @param int $id
      * @return JsonResponse
      */
-    public function deleteReview(int $reviewId): JsonResponse
+    public function updateReview(ReviewUpdateRequest $request, int $id): JsonResponse
     {
-        try {
-            $review = Review::find($reviewId);
-            if (!$review) {
-                return response()->json(['message' => 'Review not found'], 404);
-            }
-
-            $review->delete();
-            return response()->json(['message' => 'Review deleted'], 200);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+        $tryToUpdateReview = $this->reviewRepository->updateReview($request->validated(), $id);
+        if (!$tryToUpdateReview) {
+            return response()->json(['message' => 'Failed to update review.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
+        return response()->json(['message' => 'Review updated successfully.'], Response::HTTP_OK);
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroyReview(int $id): JsonResponse
+    {
+        $tryToDeleteReview = $this->reviewRepository->deleteReview($id);
+        if (!$tryToDeleteReview) {
+            return response()->json(['message' => 'Failed to delete review.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        return response()->json(['message' => 'Review deleted successfully.'], Response::HTTP_OK);
     }
 }

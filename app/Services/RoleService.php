@@ -9,6 +9,7 @@ use App\Http\Resources\role\RoleShowResource;
 use App\Repositories\RoleRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class RoleService
 {
@@ -24,7 +25,7 @@ class RoleService
      */
     public function getRolesWithRelations(): AnonymousResourceCollection
     {
-        return RoleIndexResource::collection($this->roleRepository->getRoleWithRelations()->get());
+        return RoleIndexResource::collection($this->roleRepository->getRoleWithRelations(null)->get());
 
     }
 
@@ -34,12 +35,12 @@ class RoleService
      */
     public function storeRole(RoleStoreRequest $request): JsonResponse
     {
-        $tryToCreateRole = $this->roleRepository->createRole($request->name);
+        $tryToCreateRole = $this->roleRepository->createRole($request->validated());
         if (!$tryToCreateRole) {
-            return response()->json(['message' => 'Role store failed'], 500);
+            return response()->json(['message' => 'Failed to create role.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Role created'], 200);
+        return response()->json(['message' => 'Role created successfully.'], Response::HTTP_CREATED);
     }
 
     /**
@@ -50,7 +51,7 @@ class RoleService
     {
         $role = $this->roleRepository->getRoleWithRelations($id);
         if (!$role) {
-            return response()->json(['message' => 'Role not found'], 404);
+            return response()->json(['message' => 'Role not found.'], Response::HTTP_NOT_FOUND);
         }
 
         return new RoleShowResource($role);
@@ -64,23 +65,23 @@ class RoleService
     public function updateRole(RoleUpdateRequest $request, int $id): JsonResponse
     {
         // TODO:: check $request->perms ????
-        $tryToUpdateRole = $this->roleRepository->updateRole($request, $id);
+        $tryToUpdateRole = $this->roleRepository->updateRole($request->validated(), $id);
         if (!$tryToUpdateRole) {
-            return response()->json(['message' => 'Role update failed'], 500);
+            return response()->json(['message' => 'Failed to update role.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        return response()->json(['message' => 'Role updated'], 200);
+        return response()->json(['message' => 'Role updated successfully.'], Response::HTTP_OK);
     }
 
     /**
      * @param int $id
      * @return JsonResponse
      */
-    public function deleteRole(int $id): JsonResponse
+    public function destroyRole(int $id): JsonResponse
     {
-        $tryToDeleteRole = $this->roleRepository->destroyRole($id);
+        $tryToDeleteRole = $this->roleRepository->deleteRole($id);
         if (!$tryToDeleteRole) {
-            return response()->json(['message' => 'Role delete failed'], 500);
+            return response()->json(['message' => 'Failed to delete role.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return response()->json(['message' => 'Role deleted'], 200);
+        return response()->json(['message' => 'Role deleted successfully.'], Response::HTTP_OK);
     }
 }

@@ -32,7 +32,7 @@ class PermissionController extends Controller
      */
     public function store(PermissionStoreRequest $request): JsonResponse
     {
-        return $this->permissionService->savePermission($request);
+        return $this->permissionService->storePermission($request);
     }
 
     /**
@@ -60,6 +60,6 @@ class PermissionController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        return $this->permissionService->deletePermission($id);
+        return $this->permissionService->destroyPermission($id);
     }
 }

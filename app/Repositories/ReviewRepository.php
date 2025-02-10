@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\review\ReviewStoreRequest;
-use App\Http\Requests\review\ReviewUpdateRequest;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
@@ -29,47 +27,43 @@ class ReviewRepository
     }
 
     /**
-     * @param ReviewStoreRequest $request
+     * @param array $requestData
      * @param string $slug
      * @return bool
      */
-    public function createReview(ReviewStoreRequest $request, string $slug): bool
+    public function createReview(array $requestData, string $slug): bool
     {
         DB::beginTransaction();
 
         try {
             $product = Product::where('slug', $slug)->firstOrFail();
             if (!$product) {
-                Log::warning('Product not found', ['slug' => $slug]);
                 return false;
             }
 
             $existingReview = Review::where([
                 ['product_id', '=', $product->id],
-                ['user_id', '=', $request->user_id]
+                ['user_id', '=', $requestData['user_id']],
             ])->get();
 
             if ($existingReview->isEmpty()) {
-                Log::warning('Review not found', ['slug' => $slug]);
                 return false;
             }
 
             if ($existingReview->count() >= 1) {
-                Log::warning('Review already exists', ['slug' => $slug]);
                 return false;
             }
 
             Review::create([
                 'product_id' => $product->id,
-                'user_id' => $request->user_id,
-                'user_name' => $request->username,
-                'rating' => $request->rating,
-                'user_comment' => $request->comment
+                'user_id' => $requestData['user_id'],
+                'user_name' => $requestData['username'],
+                'rating' => $requestData['rating'],
+                'user_comment' => $requestData['comment'],
             ]);
 
             $reviews = Review::where('product_id', $product->id)->get();
             if ($reviews->isEmpty()) {
-                Log::warning('Reviews not found', ['slug' => $slug]);
                 return false;
             }
 
@@ -88,40 +82,66 @@ class ReviewRepository
     }
 
     /**
-     * @param ReviewUpdateRequest $request
+     * @param array $requestData
      * @param int $reviewId
-     * @return bool
+     * @return null|Review
      */
-    public function updateReview(ReviewUpdateRequest $request, int $reviewId): bool
+    public function updateReview(array $requestData, int $reviewId): null|Review
     {
         try {
             $review = Review::find($reviewId);
             if (!$review) {
-                Log::warning('Review not found', ['slug' => $reviewId]);
-                return false;
+                return null;
             }
 
             $userId = Auth::id();
             if(!$userId) {
-                Log::warning('User not logged in', ['user_id' => $userId]);
-                return false;
+                return null;
             }
 
             $user = User::find($userId);
             if (!$user) {
-                Log::warning('User not logged in', ['user_id' => $userId]);
-                return false;
+                return null;
             }
 
             $review->admin_name = $user->name;
-            $review->user_comment = $request->user_comment;
-            $review->admin_comment = $request->admin_comment;
+            $review->user_comment = $requestData['user_comment'];
+            $review->admin_comment = $requestData['admin_comment'];
 
             $review->save();
 
-            return true;
+            return $review;
         } catch (Exception $e) {
             Log::error('Error while updating review: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * @param int $reviewId
+     * @return Review|null
+     */
+    public function getReviewById(int $reviewId): ?Review
+    {
+        return Review::find($reviewId);
+    }
+
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function deleteReview(int $id): bool
+    {
+        try {
+            $review = Review::find($id);
+            if (!$review) {
+                return false;
+            }
+
+            $review->delete();
+            return true;
+        } catch (Exception $e) {
+            Log::error('Database error deleting review: ' . $e->getMessage());
             return false;
         }
     }

@@ -63,6 +63,6 @@ class ReviewController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        return $this->reviewService->deleteReview($id);
+        return $this->reviewService->destroyReview($id);
     }
 }

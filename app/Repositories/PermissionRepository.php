@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\permission\PermissionStoreRequest;
-use App\Http\Requests\permission\PermissionUpdateRequest;
 use App\Models\Permission;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,14 +20,14 @@ class PermissionRepository
     }
 
     /**
-     * @param PermissionStoreRequest $request
+     * @param array $requestData
      * @return bool
      */
-    public function createPermission(PermissionStoreRequest $request): bool
+    public function createPermission(array $requestData): bool
     {
         try {
             Permission::create([
-                'name' => $request->name
+                'name' => $requestData['name'],
             ]);
 
             return true;
@@ -40,27 +38,26 @@ class PermissionRepository
     }
 
     /**
-     * @param PermissionUpdateRequest $request
+     * @param array $requestData
      * @param int $id
-     * @return bool
+     * @return Permission|null
      */
-    public function updatePermission(PermissionUpdateRequest $request, int $id): bool
+    public function updatePermission(array $requestData, int $id): ?Permission
     {
         try {
             $permission = Permission::find($id)->first();
             if (!$permission) {
-                Log::error('Permission not found');
-                return false;
+                return null;
             }
 
             $permission->update([
-                'name' => $request->name
+                'name' => $requestData['name'],
             ]);
 
-            return true;
+            return $permission;
         } catch (Exception $e) {
             Log::error('Error updating permission: ' . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -75,7 +72,6 @@ class PermissionRepository
         try {
             $permission = Permission::find($id);
             if (!$permission) {
-                Log::error('Permission not found');
                 return false;
             }
 
@@ -89,5 +85,14 @@ class PermissionRepository
             DB::rollBack();
             return false;
         }
+    }
+
+    /**
+     * @param int $id
+     * @return Permission|null
+     */
+    public function getPermissionById(int $id): ?Permission
+    {
+        return Permission::find($id)->first();
     }
 }

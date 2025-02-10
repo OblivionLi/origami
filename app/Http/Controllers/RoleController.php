@@ -60,6 +60,6 @@ class RoleController extends Controller
      */
     public function destroy($id): JsonResponse
     {
-        return $this->roleService->deleteRole($id);
+        return $this->roleService->destroyRole($id);
     }
 }

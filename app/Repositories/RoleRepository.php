@@ -40,14 +40,14 @@ class RoleRepository
     }
 
     /**
-     * @param string $name
+     * @param array $requestData
      * @return bool
      */
-    public function createRole(string $name): bool
+    public function createRole(array $requestData): bool
     {
         try {
             Role::create([
-                'name' => $name,
+                'name' => $requestData['name'],
                 'is_admin' => 0
             ]);
 
@@ -60,43 +60,44 @@ class RoleRepository
 
     /**
      * @param int|null $id
-     * @return Builder|Collection
+     * @return null|Role|Builder
      */
-    public function getRoleWithRelations(?int $id = null): Builder|Collection
+    public function getRoleWithRelations(?int $id = null): Role|Builder|null
     {
         if ($id) {
             return Role::with(['users:name,email', 'permissions:id,name'])->find($id);
         }
-        return Role::with(['users:name,email', 'permissions:id,name'])->get();
+
+        return Role::with(['users:name,email', 'permissions:id,name']);
     }
 
     /**
-     * @param RoleUpdateRequest $request
+     * @param array $requestData
      * @param int $id
-     * @return bool
+     * @return Role|null
      */
-    public function updateRole(RoleUpdateRequest $request, int $id): bool
+    public function updateRole(array $requestData, int $id): ?Role
     {
         DB::beginTransaction();
         try {
             $role = Role::find($id);
             if (!$role) {
-                return false;
+                return null;
             }
 
-            $role->name = $request->name;
-            $role->is_admin = $request->is_admin;
+            $role->name = $requestData['name'];
+            $role->is_admin = $requestData['is_admin'];
 
             $role->save();
 
 //            $role->permissions()->sync($request->perms); // ??
 
             DB::commit();
-            return true;
+            return $role;
         } catch (Exception $e) {
             Log::error("Database error updating role: " . $e->getMessage());
             DB::rollBack();
-            return false;
+            return null;
         }
     }
 
@@ -104,7 +105,7 @@ class RoleRepository
      * @param int $id
      * @return bool
      */
-    public function destroyRole(int $id): bool
+    public function deleteRole(int $id): bool
     {
         DB::beginTransaction();
 
