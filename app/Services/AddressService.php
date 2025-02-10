@@ -6,14 +6,15 @@ use App\Http\Requests\address\AddressStoreRequest;
 use App\Http\Requests\address\AddressUpdateRequest;
 use App\Http\Resources\address\AddressIndexResource;
 use App\Http\Resources\address\AddressShowResource;
-use App\Models\Address;
 use App\Repositories\AddressRepository;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class AddressService
 {
-    // TODO:: Fix status codes for all controllers
     protected AddressRepository $addressRepository;
 
     public function __construct(AddressRepository $addressRepository)
@@ -26,9 +27,9 @@ class AddressService
      */
     public function getAddressesWithRelations(): JsonResponse|AnonymousResourceCollection
     {
-        $addresses = $this->addressRepository->getRoleWithRelations()->get();
+        $addresses = $this->addressRepository->getAddressesWithRelations()->get();
         if ($addresses->isEmpty()) {
-            return response()->json(['Could not fetch addresses with relations.'], 404);
+            return response()->json(['Could not fetch addresses with relations.'], Response::HTTP_NOT_FOUND);
         }
 
         return AddressIndexResource::collection($addresses);
@@ -40,26 +41,31 @@ class AddressService
      */
     public function storeAddress(AddressStoreRequest $request): JsonResponse
     {
-        $tryToStoreAddress = $this->addressRepository->storeAddress($request);
+        $tryToStoreAddress = $this->addressRepository->createAddress($request->validated());
         if (!$tryToStoreAddress) {
-            return response()->json(['Could not create address.'], 500);
+            return response()->json(['message' => 'Failed to create address.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['Address created'], 201);
+        return response()->json(['message' => 'Address created successfully.'], Response::HTTP_CREATED);
     }
 
     /**
-     * @param int $id
-     * @return JsonResponse|AnonymousResourceCollection
+     * @param int $userId
+     * @return JsonResponse|AddressShowResource
      */
-    public function showAddress(int $id): JsonResponse|AnonymousResourceCollection
+    public function showAddress(int $userId): JsonResponse|AddressShowResource
     {
-        $address = Address::where('user_id', $id)->first();
-        if (!$address) {
-            return response()->json(['Address not found.'], 404);
-        }
+        try {
+            $address = $this->addressRepository->getAddressByUserId($userId);
+            if (!$address) {
+                return response()->json(['message' => 'Address not found.'], Response::HTTP_NOT_FOUND);
+            }
 
-        return AddressShowResource::collection($address);
+            return new AddressShowResource($address);
+        } catch (Exception $e) {
+            Log::error("Error trying to find address by id: " . $e->getMessage());
+            return response()->json(['message' => 'Error trying to find address by id'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -69,12 +75,12 @@ class AddressService
      */
     public function updateAddress(AddressUpdateRequest $request, int $id): JsonResponse
     {
-        $tryToUpdateAddress = $this->addressRepository->updateAddress($request, $id);
+        $tryToUpdateAddress = $this->addressRepository->updateAddress($request->validated(), $id);
         if (!$tryToUpdateAddress) {
-            return response()->json(['Could not update address.'], 500);
+            return response()->json(['message' => 'Failed to update address.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return response()->json(['Address updated'], 200);
+        return response()->json(['message' => 'Address updated successfully.'], Response::HTTP_OK);
     }
 
     /**
@@ -85,9 +91,9 @@ class AddressService
     {
         $tryToDeleteAddress = $this->addressRepository->destroyAddress($id);
         if (!$tryToDeleteAddress) {
-            return response()->json(['Could not delete address.'], 500);
+            return response()->json(['message' => 'Failed to delete address.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['Address deleted'], 200);
+        return response()->json(['message' => 'Address deleted successfully.'], Response::HTTP_OK);
     }
 }

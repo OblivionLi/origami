@@ -6,12 +6,12 @@ use App\Http\Requests\parentCat\ParentCategoryStoreRequest;
 use App\Http\Requests\parentCat\ParentCategoryUpdateRequest;
 use App\Http\Resources\parentCat\ParentCategoryIndexResource;
 use App\Http\Resources\parentCat\ParentCategoryShowResource;
-use App\Models\ParentCategory;
 use App\Repositories\ParentCategoryRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class ParentCategoryService
 {
@@ -23,11 +23,16 @@ class ParentCategoryService
     }
 
     /**
-     * @return AnonymousResourceCollection
+     * @return JsonResponse|AnonymousResourceCollection
      */
-    public function getParentCategoriesWithRelations(): AnonymousResourceCollection
+    public function getParentCategoriesWithRelations(): JsonResponse|AnonymousResourceCollection
     {
-        return ParentCategoryIndexResource::collection($this->parentCategoryRepository->getParentCategoryWithRelations()->get());
+        $parentCategories = $this->parentCategoryRepository->getParentCategoryWithRelations()->get();
+        if ($parentCategories->isEmpty()) {
+            return response()->json(['Could not fetch parent categories with relations.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return ParentCategoryIndexResource::collection($parentCategories);
     }
 
     /**
@@ -38,10 +43,10 @@ class ParentCategoryService
     {
         $tryToSaveParentCategory = $this->parentCategoryRepository->createParentCategory($request->validated());
         if (!$tryToSaveParentCategory) {
-            return response()->json(['message' => 'Parent category store failed'], 500);
+            return response()->json(['message' => 'Failed to create parent category.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Parent category created'], 200);
+        return response()->json(['message' => 'Parent category created successfully.'], Response::HTTP_CREATED);
     }
 
     /**
@@ -53,13 +58,13 @@ class ParentCategoryService
         try {
             $parentCategory = $this->parentCategoryRepository->getParentCategoryBySlug($slug);
             if (!$parentCategory) {
-                return response()->json(['message' => 'ParentCategory does not exist..'], 422);
+                return response()->json(['message' => 'ParentCategory not found.'], Response::HTTP_NOT_FOUND);
             }
 
             return new ParentCategoryShowResource($parentCategory);
         } catch (Exception $e) {
             Log::error("Error trying to find parent category by slug: " . $e->getMessage());
-            return response()->json(['message' => 'Error trying to find parent category by slug'], 500);
+            return response()->json(['message' => 'Error trying to find parent category by slug'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -72,10 +77,10 @@ class ParentCategoryService
     {
         $parentCategory = $this->parentCategoryRepository->updateParentCategory($request->validated(), $slug);
         if (!$parentCategory) {
-            return response()->json(['message' => 'Parent Category does not exist'], 422);
+            return response()->json(['message' => 'Failed to update parent category.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return response()->json(['message', 'Parent Category update success'], 200);
+        return response()->json(['message' => 'Parent Category updated successfully.'], Response::HTTP_OK);
     }
 
     /**
@@ -86,9 +91,9 @@ class ParentCategoryService
     {
         $tryToDeleteParentCategory = $this->parentCategoryRepository->deleteParentCategory($slug);
         if (!$tryToDeleteParentCategory) {
-            return response()->json(['message' => 'Parent category delete failed'], 422);
+            return response()->json(['message' => 'Failed to delete parent category.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Parent category delete success'], 200);
+        return response()->json(['message' => 'Parent category deleted successfully.'], Response::HTTP_OK);
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\childCat\ChildCategoryStoreRequest;
-use App\Http\Requests\childCat\ChildCategoryUpdateRequest;
 use App\Models\ChildCategory;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;

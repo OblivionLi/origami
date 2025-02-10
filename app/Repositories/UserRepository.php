@@ -178,9 +178,9 @@ class UserRepository
 
     /**
      * @param int|string|null $userId
-     * @return Builder
+     * @return User|Builder|null
      */
-    public function getUserWithRelations(int|string|null $userId): Builder
+    public function getUserWithRelations(int|string|null $userId): User|Builder|null
     {
         if ($userId) {
             return User::with(['products', 'reviews', 'orders', 'roles', 'addresses'])->where('user_id', $userId)->first();

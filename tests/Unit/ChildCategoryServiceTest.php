@@ -87,8 +87,8 @@ class ChildCategoryServiceTest extends TestCase
         $response = $this->childCategoryService->storeChildCategory($request);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(['message' => 'Child category created'], $response->getData(true));
+        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(['message' => 'Child category created successfully.'], $response->getData(true));
     }
 
     public function test_store_child_category_failure(): void
@@ -106,7 +106,7 @@ class ChildCategoryServiceTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(['message' => 'Child category store failed'], $response->getData(true));
+        $this->assertEquals(['message' => 'Failed to create child category.'], $response->getData(true));
     }
 
     public function test_show_child_category_with_relations_success(): void
@@ -137,8 +137,8 @@ class ChildCategoryServiceTest extends TestCase
         $result = $this->childCategoryService->showChildCategoryWithRelations('non-existent-slug');
 
         $this->assertInstanceOf(JsonResponse::class, $result);
-        $this->assertEquals(422, $result->getStatusCode());
-        $this->assertEquals(['message' => 'ChildCategory does not exist..'], $result->getData(true));
+        $this->assertEquals(404, $result->getStatusCode());
+        $this->assertEquals(['message' => 'ChildCategory not found.'], $result->getData(true));
     }
 
     public function test_show_child_category_with_relations_exception(): void
@@ -177,7 +177,7 @@ class ChildCategoryServiceTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(['message', 'Child Category update success'], $response->getData(true));
+        $this->assertEquals(['message' => 'Child Category updated successfully.'], $response->getData(true));
     }
 
     public function test_update_child_category_not_found(): void
@@ -232,6 +232,6 @@ class ChildCategoryServiceTest extends TestCase
         $response = $this->childCategoryService->deleteChildCategory($slug);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals(500, $response->getStatusCode());
     }
 }

@@ -2,8 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\address\AddressStoreRequest;
-use App\Http\Requests\address\AddressUpdateRequest;
 use App\Models\Address;
 use App\Models\User;
 use Exception;
@@ -16,7 +14,7 @@ class AddressRepository
     /**
      * @return Builder|null
      */
-    public function getRoleWithRelations(): Builder|null
+    public function getAddressesWithRelations(): Builder|null
     {
         try {
             return Address::with(['user']);
@@ -27,28 +25,27 @@ class AddressRepository
     }
 
     /**
-     * @param AddressStoreRequest $request
+     * @param array $requestData
      * @return bool
      */
-    public function storeAddress(AddressStoreRequest $request): bool
+    public function createAddress(array $requestData): bool
     {
         $addressDetails = [
-            'user_id' => $request->user_id,
-            'name' => $request->name,
-            'surname' => $request->surname,
-            'country' => $request->country,
-            'city' => $request->city,
-            'address' => $request->address,
-            'postal_code' => $request->postal_code,
-            'phone_number' => $request->phone_number,
+            'user_id' => $requestData['user_id'],
+            'name' => $requestData['name'],
+            'surname' => $requestData['surname'],
+            'country' => $requestData['country'],
+            'city' => $requestData['city'],
+            'address' => $requestData['address'],
+            'postal_code' => $requestData['postal_code'],
+            'phone_number' => $requestData['phone_number'],
         ];
 
         DB::beginTransaction();
 
         try {
-            $user = User::find($request->user_id);
+            $user = User::find($requestData['user_id']);
             if (!$user) {
-                Log::error('User not found');
                 return false;
             }
 
@@ -64,33 +61,32 @@ class AddressRepository
     }
 
     /**
-     * @param AddressUpdateRequest $request
+     * @param array $requestData
      * @param int $id
-     * @return bool
+     * @return Address|null
      */
-    public function updateAddress(AddressUpdateRequest $request, int $id): bool
+    public function updateAddress(array $requestData, int $id): Address|null
     {
         try {
             $address = Address::find($id)->first();
             if (!$address) {
-                Log::error('Address not found');
-                return false;
+                return null;
             }
 
-            $address->name = $request->name;
-            $address->surname = $request->surname;
-            $address->country = $request->country;
-            $address->city = $request->city;
-            $address->address = $request->address;
-            $address->postal_code = $request->postal_code;
-            $address->phone_number = $request->phone_number;
+            $address->name = $requestData['name'];
+            $address->surname = $requestData['surname'];
+            $address->country = $requestData['country'];
+            $address->city = $requestData['city'];
+            $address->address = $requestData['address'];
+            $address->postal_code = $requestData['postal_code'];
+            $address->phone_number = $requestData['phone_number'];
 
             $address->save();
 
-            return true;
+            return $address;
         } catch (Exception $e) {
             Log::error('Error updating address: ' . $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -103,7 +99,6 @@ class AddressRepository
         try {
             $address = Address::find($id)->first();
             if (!$address) {
-                Log::error('Address not found');
                 return false;
             }
 
@@ -114,5 +109,14 @@ class AddressRepository
             Log::error('Error deleting address: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param int $id
+     * @return Address|null
+     */
+    public function getAddressByUserId(int $id): Address|null
+    {
+        return Address::with(['user'])->where('user_id', $id)->first();
     }
 }

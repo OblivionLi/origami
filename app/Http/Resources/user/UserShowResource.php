@@ -14,7 +14,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property-read int $id
- * @property-read int $user_id
  * @property-read string $name
  * @property-read string $email
  * @property-read Carbon $created_at
@@ -37,7 +36,6 @@ class UserShowResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
             'name' => $this->name,
             'email' => $this->email,
             'created_at' => $this->created_at,

@@ -30,7 +30,7 @@ class OrderService
      */
     public function getOrderWithRelations(): AnonymousResourceCollection
     {
-        return OrderIndexResource::collection($this->orderRepository->getOrderWithRelations());
+        return OrderIndexResource::collection($this->orderRepository->getOrderWithRelations(null));
     }
 
     /**

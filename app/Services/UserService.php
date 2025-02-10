@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserService
 {
@@ -22,11 +23,16 @@ class UserService
     }
 
     /**
-     * @return AnonymousResourceCollection
+     * @return AnonymousResourceCollection|JsonResponse
      */
-    public function getUserWithRelations(): AnonymousResourceCollection
+    public function getUserWithRelations(): AnonymousResourceCollection|JsonResponse
     {
-        return UserIndexResource::collection($this->userRepository->getUserWithRelations(null)->get());
+        $users = $this->userRepository->getUserWithRelations(null)->get();
+        if ($users->isEmpty()) {
+            return response()->json(['message' => 'Could not fetch users with relations.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return UserIndexResource::collection($users);
     }
 
     /**
@@ -47,7 +53,7 @@ class UserService
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
         }
 
         $request->validate([
@@ -66,7 +72,7 @@ class UserService
 
         $tryToUpdateUser = $this->userRepository->updateUser($preparedRequestData, $user);
         if (!$tryToUpdateUser) {
-            return response()->json(['message' => 'User update failed'], 500);
+            return response()->json(['message' => 'Failed to update user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return new UserUpdateResource($user);
@@ -80,14 +86,14 @@ class UserService
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
         }
 
         $tryToDeleteUser = $this->userRepository->deleteUser($user->email);
         if (!$tryToDeleteUser) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
         }
 
-        return response()->json(['message' => 'User deleted successfully'], 200);
+        return response()->json(['message' => 'User deleted successfully.'], Response::HTTP_OK);
     }
 }
