@@ -10,10 +10,9 @@ use App\Models\ChildCategory;
 use App\Models\ParentCategory;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductService
 {
@@ -29,7 +28,7 @@ class ProductService
      */
     public function getProductsWithRelations(): AnonymousResourceCollection
     {
-        return ProductIndexResource::collection($this->productRepository->getProductWithRelations());
+        return ProductIndexResource::collection($this->productRepository->getProductWithRelations()->get());
     }
 
     /**
@@ -40,29 +39,24 @@ class ProductService
     {
         $savedProduct = $this->productRepository->createProduct($request->validated());
         if (!$savedProduct) {
-            return response()->json(['message' => 'Product store failed'], 500);
+            return response()->json(['message' => 'Failed to store product.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Product create success'], 200);
+        return response()->json(['message' => 'Product created successfully.'], Response::HTTP_CREATED);
     }
 
     /**
      * @param string $slug
      * @return ProductShowResource|JsonResponse
      */
-    public function showProductWithRelations(string $slug): ProductShowResource|JsonResponse
+    public function showProduct(string $slug): ProductShowResource|JsonResponse
     {
-        try {
-            $product = Product::findBySlug($slug);
-            if (!$product) {
-                return response()->json(['message' => 'Product does not exist..'], 422);
-            }
-
-            return new ProductShowResource($product);
-        } catch (Exception $e) {
-            Log::error("Error trying to find product by slug: " . $e->getMessage());
-            return response()->json(['message' => 'Error trying to find product by slug'], 500);
+        $product = $this->productRepository->getProductBySlug($slug);
+        if (!$product) {
+            return response()->json(['message' => 'Product not found.'], Response::HTTP_NOT_FOUND);
         }
+
+        return new ProductShowResource($product);
     }
 
     /**
@@ -72,26 +66,26 @@ class ProductService
      */
     public function updateProduct(ProductUpdateRequest $request, string $slug): JsonResponse
     {
-        $product = $this->productRepository->updateProduct($request, $slug);
+        $product = $this->productRepository->updateProduct($request->validated(), $slug);
         if (!$product) {
-            return response()->json(['message' => 'Product does not exist'], 422);
+            return response()->json(['message' => 'Failed to update product.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        return response()->json(['message', 'Product update success'], 200);
+        return response()->json(['message' => 'Product updated successfully.'], Response::HTTP_OK);
     }
 
     /**
      * @param string $slug
      * @return JsonResponse
      */
-    public function deleteProduct(string $slug): JsonResponse
+    public function destroyProduct(string $slug): JsonResponse
     {
         $tryToDeleteProduct = $this->productRepository->deleteProduct($slug);
         if (!$tryToDeleteProduct) {
-            return response()->json(['message' => 'Product delete failed'], 422);
+            return response()->json(['message' => 'Failed to delete product.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Product delete success'], 200);
+        return response()->json(['message' => 'Product delete successfully.'], Response::HTTP_OK);
     }
 
     /**

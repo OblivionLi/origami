@@ -51,7 +51,7 @@ class OrderController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        return $this->orderService->deleteOrder($id);
+        return $this->orderService->destroyOrder($id);
     }
 
     /**

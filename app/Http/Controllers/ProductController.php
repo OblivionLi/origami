@@ -41,7 +41,7 @@ class ProductController extends Controller
      */
     public function show(string $slug): ProductShowResource | JsonResponse
     {
-        return $this->productService->showProductWithRelations($slug);
+        return $this->productService->showProduct($slug);
     }
 
     /**
@@ -60,7 +60,7 @@ class ProductController extends Controller
      */
     public function destroy(string $slug): JsonResponse
     {
-        return $this->productService->deleteProduct($slug);
+        return $this->productService->destroyProduct($slug);
     }
 
     /**

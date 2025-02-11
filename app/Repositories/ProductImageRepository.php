@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\ProductImage;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -13,11 +13,11 @@ class ProductImageRepository
 
     /**
      * @param int $productId
-     * @return Collection
+     * @return int
      */
-    public function getProductImages(int $productId): Collection
+    public function getProductImageCount(int $productId): int
     {
-        return ProductImage::where('product_id', $productId)->get();
+        return ProductImage::where('product_id', $productId)->count();
     }
 
     /**
@@ -48,7 +48,6 @@ class ProductImageRepository
         try {
             $currentImage = ProductImage::find($id)->first();
             if (!$currentImage) {
-                Log::error('Product image not found');
                 return false;
             }
 
@@ -64,5 +63,17 @@ class ProductImageRepository
             Log::warning('Error replacing product images: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @param string $directory
+     * @param string $disk
+     * @return string
+     */
+    public function storeImage(UploadedFile $file, string $directory, string $disk = 'public'): string
+    {
+        $imgFileName = time() . '.' . $file->getClientOriginalName();
+        return  $file->storeAs($directory, $imgFileName, $disk);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductImageStoreRequest;
 use App\Http\Requests\productImg\ProductImageUpdateRequest;
 use App\Services\ProductImageService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ProductImageController extends Controller
 {
@@ -17,13 +17,12 @@ class ProductImageController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param int $id
+     * @param ProductImageStoreRequest $request
      * @return JsonResponse
      */
-    public function store(Request $request, int $id): JsonResponse
+    public function store(ProductImageStoreRequest $request): JsonResponse
     {
-        return $this->productImageService->storeProductImage($request, $id);
+        return $this->productImageService->storeProductImage($request);
     }
 
     /**
@@ -42,6 +41,6 @@ class ProductImageController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        return $this->productImageService->deleteProductImage($id);
+        return $this->productImageService->destroyProductImage($id);
     }
 }

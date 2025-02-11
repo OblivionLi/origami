@@ -2,12 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Http\Requests\order\OrderStoreRequest;
 use App\Models\Order;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +20,7 @@ class OrderRepository
     public function getOrderWithRelations(int|string|null $id): Builder
     {
         if ($id) {
-            return Order::with(['user', 'products', 'user.addresses'])->where('order_id', $id)->firstOrFail();
+            return Order::with(['user', 'products', 'user.addresses'])->where('order_id', $id);
         }
 
         return Order::with(['user', 'products', 'user.addresses']);
@@ -30,18 +28,18 @@ class OrderRepository
 
     /**
      * @param int $id
-     * @return Order|Model
+     * @return Order|null
      */
-    public function getUserOrderWithRelations(int $id): Order|Model
+    public function getUserOrderWithRelations(int $id): ?Order
     {
-        return Order::with(['user', 'products', 'user.addresses'])->where('user_id', $id)->firstOrFail();
+        return Order::with(['user', 'products', 'user.addresses'])->where('user_id', $id)->first();
     }
 
     /**
-     * @param OrderStoreRequest $request
+     * @param array $requestData
      * @return Order|null
      */
-    public function createOrder(OrderStoreRequest $request): Order|null
+    public function createOrder(array $requestData): Order|null
     {
         $unique_order_id = Str::random(15) . now()->format('YmdHis');
 
@@ -51,14 +49,14 @@ class OrderRepository
                 'user_id' => Auth::id(),
                 'order_id' => $unique_order_id,
                 'status' => 'PENDING',
-                'products_price' => $request->products_price,
-                'products_discount_price' => $request->products_discount_price,
-                'shipping_price' => $request->shipping_price,
-                'tax_price' => $request->tax_price,
-                'total_price' => $request->total_price
+                'products_price' => $requestData['products_price'],
+                'products_discount_price' => $requestData['products_discount_price'],
+                'shipping_price' => $requestData['shipping_price'],
+                'tax_price' => $requestData['tax_price'],
+                'total_price' => $requestData['total_price']
             ]);
 
-            foreach ($request->cart_items as $item) {
+            foreach ($requestData['cart_items'] as $item) {
                 $order->products()->attach(
                     $item['product'],
                     [
@@ -89,7 +87,7 @@ class OrderRepository
      * @param int $id
      * @return bool
      */
-    public function deleteProduct(int $id): bool
+    public function deleteOrder(int $id): bool
     {
         DB::beginTransaction();
 

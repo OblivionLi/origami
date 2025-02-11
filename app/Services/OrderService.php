@@ -12,9 +12,9 @@ use Barryvdh\DomPDF\PDF;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderService
 {
@@ -30,7 +30,7 @@ class OrderService
      */
     public function getOrderWithRelations(): AnonymousResourceCollection
     {
-        return OrderIndexResource::collection($this->orderRepository->getOrderWithRelations(null));
+        return OrderIndexResource::collection($this->orderRepository->getOrderWithRelations(null)->get());
     }
 
     /**
@@ -39,12 +39,12 @@ class OrderService
      */
     public function storeOrder(OrderStoreRequest $request): JsonResponse
     {
-        $savedOrder = $this->orderRepository->createOrder($request);
+        $savedOrder = $this->orderRepository->createOrder($request->validated());
         if (!$savedOrder) {
-            return response()->json(['message' => 'Order store failed'], 500);
+            return response()->json(['message' => 'Failed to store order.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Order create success'], 200);
+        return response()->json(['message' => 'Order created successfully.'], Response::HTTP_CREATED);
     }
 
     /**
@@ -53,26 +53,26 @@ class OrderService
      */
     public function showOrder(int $id): OrderShowResource|JsonResponse
     {
-        try {
-            $order = $this->orderRepository->getOrderWithRelations($id);
-            return new OrderShowResource($order);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Order not found'], 404);
+        $order = $this->orderRepository->getOrderWithRelations($id)->first();
+        if (!$order) {
+            return response()->json(['message' => 'Order not found.'], Response::HTTP_NOT_FOUND);
         }
+
+        return new OrderShowResource($order);
     }
 
     /**
      * @param int $id
      * @return JsonResponse
      */
-    public function deleteOrder(int $id): JsonResponse
+    public function destroyOrder(int $id): JsonResponse
     {
-        $tryToDeleteOrder = $this->orderRepository->deleteProduct($id);
+        $tryToDeleteOrder = $this->orderRepository->deleteOrder($id);
         if (!$tryToDeleteOrder) {
-            return response()->json(['message' => 'Order delete failed'], 422);
+            return response()->json(['message' => 'Failed to delete order.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        return response()->json(['message' => 'Order delete success'], 200);
+        return response()->json(['message' => 'Order delete successfully.'], Response::HTTP_OK);
     }
 
     /**
@@ -80,12 +80,12 @@ class OrderService
      */
     public function getUserOrders(): OrderIndexResource|JsonResponse
     {
-        try {
-            $order = $this->orderRepository->getUserOrderWithRelations(Auth::id());
-            return new OrderIndexResource($order);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'User has no orders'], 404);
+        $order = $this->orderRepository->getUserOrderWithRelations(Auth::id());
+        if (!$order) {
+            return response()->json(['message' => 'User has no orders.'], Response::HTTP_NOT_FOUND);
         }
+
+        return new OrderIndexResource($order);
     }
 
     /**
@@ -97,12 +97,12 @@ class OrderService
     {
         $status = strtoupper($status);
         if ($status != 'PAID' || $status != 'DELIVERED') {
-            return response()->json(['message' => 'Invalid status'], 400);
+            return response()->json(['message' => 'Invalid status.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $order = $this->orderRepository->updateOrderStatus($status, $id);
         if (!$order) {
-            return response()->json(['message' => 'Order status update failed'], 500);
+            return response()->json(['message' => 'Failed to update order status.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return new OrderShowResource($order);
@@ -125,7 +125,7 @@ class OrderService
             // return $pdf->stream();
         } catch (ModelNotFoundException $e) {
             Log::error($e->getMessage());
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['message' => 'Order not found.'], Response::HTTP_NOT_FOUND);
         }
     }
 
