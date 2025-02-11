@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthService
 {
@@ -47,14 +48,14 @@ class AuthService
 
         if (!$role) {
             Log::error("Failed to create role during registration (database error)");
-            return response()->json(['message' => 'Failed to create role'], 500);
+            return response()->json(['message' => 'Failed to create role'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $user = $this->userRepository->createUserWithRole($role->id, $request);
 
         if (!$user) {
             Log::error("Failed to create user during registration (database error)");
-            return response()->json(['message' => 'Failed to register user'], 500);
+            return response()->json(['message' => 'Failed to register user'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $accessToken = $this->userRepository->createUserToken($request->remember_me, $user);
@@ -75,12 +76,12 @@ class AuthService
         $user = $this->userRepository->getUserByEmail($request->email);
         if (!$user) {
             Log::error("Failed to login user (database error)");
-            return response()->json(['message' => 'Failed to login user'], 500);
+            return response()->json(['message' => 'Failed to login user'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if (!Hash::check($request->password, $user->password)) {
             $response = ['message' => 'User credentials are incorrect'];
-            return response()->json($response, 422);
+            return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $accessToken = $this->userRepository->createUserToken($request->remember_me, $user);
@@ -101,7 +102,7 @@ class AuthService
         $request->user()->token()->revoke();
 
         $response = ['message' => 'Successfully logged out'];
-        return response()->json($response, 200);
+        return response()->json($response, Response::HTTP_OK);
     }
 
     /**
@@ -114,21 +115,21 @@ class AuthService
         $user = User::where('email', $email)->first();
 
         if (!$user) {
-            return response()->json(['message' => 'If a matching account was found, a password reset link has been sent to your email address'], 200);
+            return response()->json(['message' => 'If a matching account was found, a password reset link has been sent to your email address'], Response::HTTP_OK);
         }
 
         $token = Str::random(90);
 
         if ($this->userRepository->tryInsertingToPasswordReset($email, $token)) {
-            return response()->json(['message' => 'Failed to send password reset email'], 500);
+            return response()->json(['message' => 'Failed to send password reset email'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         try {
             Mail::to($request->email)->send(new ForgotPassword($user->name, $user->email, $token));
-            return response()->json(['message' => 'If a matching account was found, a password reset link has been sent to your email address.'], 200);
+            return response()->json(['message' => 'If a matching account was found, a password reset link has been sent to your email address.'], Response::HTTP_OK);
         } catch (Exception $e) {
             Log::error("Failed to send password reset email: " . $e->getMessage());
-            return response()->json(['message' => 'Failed to send password reset email'], 500);
+            return response()->json(['message' => 'Failed to send password reset email'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -142,17 +143,17 @@ class AuthService
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return response()->json(['message' => 'User password changed with success'], 200);
+            return response()->json(['message' => 'User password change successfully.'], Response::HTTP_OK);
         }
 
         $isPasswordReset = $this->userRepository->tryResettingPassword($user, $request->password);
 
         if ($isPasswordReset) {
-            return response()->json(['message' => 'User password changed with success'], 200);
+            return response()->json(['message' => 'User password change successfully.'], Response::HTTP_OK);
         }
 
         Log::error("Failed to reset password (database error)");
-        return response()->json(['message' => 'User password changed with success'], 200);
+        return response()->json(['message' => 'User password change successfully.'], Response::HTTP_OK);
     }
 
     /**
@@ -171,10 +172,10 @@ class AuthService
     public function deleteMe(string $email): JsonResponse
     {
         if ($this->userRepository->deleteUser($email)) {
-            return response()->json(['message' => 'User delete success'], 200);
+            return response()->json(['message' => 'User delete successfully.'], Response::HTTP_OK);
         }
 
-        return response()->json(['message' => 'User does not exist..'], 422);
+        return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -187,7 +188,7 @@ class AuthService
         $user = $this->userRepository->getUserByEmail($request->email);
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
         }
 
         $user->name = $request->name ?? $user->name;
@@ -198,7 +199,7 @@ class AuthService
             $user->save();
         } catch (Exception $e) {
             Log::error("Failed to update user (database error)");
-            return response()->json(['message' => 'Failed to update user'], 500);
+            return response()->json(['message' => 'Failed to update user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return new UserUpdateResource($user);

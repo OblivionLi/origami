@@ -17,7 +17,7 @@ return array(
         /**
          * The location of the DOMPDF font directory
          *
-         * The location of the directory where DOMPDF will store fonts and font metrics
+         * The location of the directory where DOMPDF will storeOld fonts and font metrics
          * Note: This directory must exist and be writable by the webserver process.
          * *Please note the trailing slash.*
          *

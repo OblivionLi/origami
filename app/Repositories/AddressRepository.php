@@ -55,7 +55,7 @@ class AddressRepository
             return true;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Error store address: ' . $e->getMessage());
+            Log::error('Error storeOld address: ' . $e->getMessage());
             return false;
         }
     }

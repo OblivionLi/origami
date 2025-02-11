@@ -100,7 +100,7 @@ class OrderServiceTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(['message' => 'Failed to store order.'], $response->getData(true));
+        $this->assertEquals(['message' => 'Failed to storeOld order.'], $response->getData(true));
     }
 
     public function test_show_order_with_relations_success(): void

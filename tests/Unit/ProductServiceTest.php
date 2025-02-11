@@ -102,7 +102,7 @@ class ProductServiceTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(['message' => 'Failed to store product.'], $response->getData(true));
+        $this->assertEquals(['message' => 'Failed to storeOld product.'], $response->getData(true));
     }
 
     public function test_show_product_with_relations_success(): void

@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckoutController extends Controller
 {
@@ -15,7 +16,7 @@ class CheckoutController extends Controller
      */
     public function secretKey(): JsonResponse
     {
-        return response()->json(config('stripe.STRIPE_SECRET'), 200);
+        return response()->json(config('stripe.STRIPE_SECRET'), Response::HTTP_OK);
     }
 
     /**
@@ -23,7 +24,7 @@ class CheckoutController extends Controller
      */
     public function publicKey(): JsonResponse
     {
-        return response()->json(config('stripe.STRIPE_KEY'), 200);
+        return response()->json(config('stripe.STRIPE_KEY'), Response::HTTP_OK);
     }
 
     /**

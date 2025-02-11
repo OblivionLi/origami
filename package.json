@@ -1,50 +1,25 @@
 {
     "private": true,
+    "type": "module",
     "scripts": {
-        "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "prod": "npm run production",
-        "production": "mix --production"
+        "dev": "vite",
+        "build": "vite build"
     },
     "devDependencies": {
-        "@babel/preset-react": "^7.26.3",
-        "axios": "^1.7.9",
-        "bootstrap": "^5.3.3",
-        "jquery": "^3.7.1",
-        "laravel-mix": "^6.0.49",
-        "lodash": "^4.17.21",
-        "postcss": "^8.5.1",
-        "react": "^19.0.0",
-        "react-dom": "^19.0.0",
-        "resolve-url-loader": "^5.0.0",
-        "sass": "^1.83.4",
-        "sass-loader": "^16.0.4"
+        "@types/lodash": "^4.17.15",
+        "@types/node": "^22.13.1",
+        "@types/react": "^19.0.8",
+        "@types/react-dom": "^19.0.3",
+        "@vitejs/plugin-react": "^4.3.4",
+        "laravel-vite-plugin": "^1.2.0",
+        "vite": "^6.1.0"
     },
     "dependencies": {
-        "@mui/material": "^6.4.1",
-        "@mui/icons-material": "^6.4.1",
-        "@mui/lab": "^6.0.0-beta.24",
-        "@mui/utils": "^6.4.1",
-        "chart.js": "^4.4.7",
-        "material-table": "^1.69.3",
-        "moment": "^2.30.1",
-        "react-bootstrap": "^2.10.8",
-        "react-chartjs-2": "^5.3.0",
-        "react-dropzone": "^14.3.5",
-        "react-icons": "^5.4.0",
-        "react-moment": "^1.1.3",
-        "react-number-format": "^5.4.3",
-        "react-paginate": "^7.1.5",
+        "@reduxjs/toolkit": "^2.5.1",
+        "axios": "^1.7.9",
+        "lodash": "^4.17.21",
+        "react-dom": "^19.0.0",
         "react-redux": "^9.2.0",
-        "react-responsive-carousel": "^3.2.23",
-        "react-router-bootstrap": "^0.26.3",
-        "react-router-dom": "^7.1.3",
-        "redux": "^5.0.1",
-        "redux-devtools-extension": "^2.13.9",
-        "redux-thunk": "^3.1.0",
-        "sweetalert2": "^11.15.10"
+        "react-router-dom": "^7.1.5"
     }
 }

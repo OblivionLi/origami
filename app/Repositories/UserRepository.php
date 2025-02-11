@@ -104,7 +104,7 @@ class UserRepository
 
             return true;
         } catch (Exception $e) {
-            Log::error("Failed to store password reset token: " . $e->getMessage());
+            Log::error("Failed to storeOld password reset token: " . $e->getMessage());
             return false;
         }
     }
