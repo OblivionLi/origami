@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "./../../../components/Navbar";
+import Navbar from "../../../components/Navbar.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
-import Footer from "./../../../components/Footer";
+import Footer from "../../../components/Footer.js";
 import { getOrigami } from "./../../../actions/categoryActions";
-import Loader from "../../../components/alert/Loader";
-import Message from "../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import {
     Breadcrumbs,
     Paper,

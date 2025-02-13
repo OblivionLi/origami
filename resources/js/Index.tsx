@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom';
 import {Provider} from "react-redux";
 import {store} from "./store";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import HomeScreen from './screens/HomeScreen';
-// import LoginScreen from './screens/public/users/LoginScreen';
-// import RegisterScreen from './screens/public/users/RegisterScreen';
-// import ResetPasswordScreen from './screens/public/users/ResetPasswordScreen';
-// import ForgotPasswordScreen from './screens/public/users/ForgotPasswordScreen';
+import HomeScreen from '@/screens/HomeScreen';
+import LoginScreen from '@/screens/public/users/LoginScreen';
+import RegisterScreen from '@/screens/public/users/RegisterScreen';
+import ResetPasswordScreen from '@/screens/public/users/ResetPasswordScreen';
+import ForgotPasswordScreen from '@/screens/public/users/ForgotPasswordScreen';
 // import SettingsScreen from './screens/public/users/SettingsScreen';
 // import AdminScreen from './screens/admin/AdminScreen';
 // import ShowProductScreen from './screens/public/products/ShowProductScreen';
@@ -27,11 +27,11 @@ function Index() {
             <Routes>
                 {/* Users */}
                 <Route path="/" element={<HomeScreen/>}/>
-                <Route path="/login" component={LoginScreen}/>
-                <Route path="/register" component={RegisterScreen}/>
-                <Route path="/reset-password/:id" component={ResetPasswordScreen}/>
-                <Route path="/forgot-password" component={ForgotPasswordScreen}/>
-                <Route path="/settings" component={SettingsScreen}/>
+                <Route path="/login" element={<LoginScreen/>}/>
+                <Route path="/register" element={<RegisterScreen/>}/>
+                <Route path="/reset-password/:id" element={<ResetPasswordScreen/>}/>
+                <Route path="/forgot-password" element={<ForgotPasswordScreen/>}/>
+                {/*<Route path="/settings" component={SettingsScreen}/>*/}
 
                 {/*/!* Product *!/*/}
                 {/*<Route path="/product/:slug" component={ShowProductScreen} />*/}

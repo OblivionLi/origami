@@ -9,14 +9,14 @@ import {
     Button,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import Navbar from "./../../../components/Navbar";
+import Navbar from "../../../components/Navbar.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
-import Footer from "../../../components/Footer";
+import Footer from "../../../components/Footer.js";
 import { getAddress } from "./../../../actions/addressActions";
 import { removeFromCart } from "./../../../actions/cartActions";
 import { createOrder } from "../../../actions/orderActions";
-import Message from "./../../../components/alert/Message";
-import Loader from "./../../../components/alert/Loader";
+import Message from "../../../components/alert/Message.js";
+import Loader from "../../../components/alert/Loader.js";
 import MaterialTable from "material-table";
 import Swal from "sweetalert2";
 

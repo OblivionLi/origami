@@ -9,13 +9,13 @@ import {
     Button,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import Navbar from "./../../../components/Navbar";
+import Navbar from "../../../components/Navbar.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
-import Footer from "../../../components/Footer";
+import Footer from "../../../components/Footer.js";
 import { getUser } from "./../../../actions/userActions";
 import { createAddress } from "../../../actions/addressActions";
-import Message from "./../../../components/alert/Message";
-import Loader from "./../../../components/alert/Loader";
+import Message from "../../../components/alert/Message.js";
+import Loader from "../../../components/alert/Loader.js";
 import Swal from "sweetalert2";
 
 const useStyles = makeStyles((theme) => ({

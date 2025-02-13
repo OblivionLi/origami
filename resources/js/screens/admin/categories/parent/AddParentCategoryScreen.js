@@ -11,8 +11,8 @@ import Swal from "sweetalert2";
 import { makeStyles } from "@material-ui/core/styles";
 import { PARENT_CATEGORY_LIST_RESET } from "../../../../constants/parentCategoryConstants";
 import { getParentCatsList, createParentCat } from './../../../../actions/parentCategoryActions';
-import Loader from './../../../../components/alert/Loader';
-import Message from './../../../../components/alert/Message';
+import Loader from '../../../../components/alert/Loader.js';
+import Message from '../../../../components/alert/Message.js';
 
 const useStyles = makeStyles((theme) => ({
     button: {

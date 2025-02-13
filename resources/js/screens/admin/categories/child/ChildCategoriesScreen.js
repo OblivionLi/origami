@@ -11,8 +11,8 @@ import {
 } from "./../../../../actions/childCategoryActions";
 import UpdateChildCategoryScreen from "./UpdateChildCategoryScreen";
 import AddChildCategoryScreen from "./AddChildCategoryScreen";
-import Loader from "./../../../../components/alert/Loader";
-import Message from "./../../../../components/alert/Message";
+import Loader from "../../../../components/alert/Loader.js";
+import Message from "../../../../components/alert/Message.js";
 
 const useStyles = makeStyles((theme) => ({
     divider: {

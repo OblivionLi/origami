@@ -3,13 +3,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { makeStyles, Button, TextField, Paper, Breadcrumbs, Typography } from "@material-ui/core";
 import { Link } from 'react-router-dom';
 import MaterialTable from "material-table";
-import Navbar from "./../../../components/Navbar";
-import Message from "./../../../components/alert/Message";
-import Loader from "./../../../components/alert/Loader";
+import Navbar from "../../../components/Navbar.js";
+import Message from "../../../components/alert/Message.js";
+import Loader from "../../../components/alert/Loader.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
 import { listUserOrders } from "../../../actions/orderActions";
 import Moment from "react-moment";
-import Footer from './../../../components/Footer';
+import Footer from '../../../components/Footer.js';
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: "bold",
         color: "#388667",
         width: '100%',
-        
+
         [theme.breakpoints.down("sm")]: {
             width: "100%",
         },

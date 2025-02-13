@@ -7,8 +7,8 @@ import Moment from "react-moment";
 import Swal from "sweetalert2";
 import { getRolesList, deleteRole } from "./../../../../actions/roleActions";
 import UpdateRoleScreen from "./UpdateRoleScreen";
-import Loader from "./../../../../components/alert/Loader";
-import Message from "./../../../../components/alert/Message";
+import Loader from "../../../../components/alert/Loader.js";
+import Message from "../../../../components/alert/Message.js";
 import AddRoleScreen from "./AddRoleScreen";
 
 const useStyles = makeStyles((theme) => ({

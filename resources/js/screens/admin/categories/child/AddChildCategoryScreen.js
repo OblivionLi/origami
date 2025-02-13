@@ -16,8 +16,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { createChildCat, getChildCatsList } from './../../../../actions/childCategoryActions';
 import { CHILD_CATEGORY_LIST_RESET } from "../../../../constants/childCategoryConstants";
 import { getParentCatsList } from './../../../../actions/parentCategoryActions';
-import Loader from './../../../../components/alert/Loader';
-import Message from './../../../../components/alert/Message';
+import Loader from '../../../../components/alert/Loader.js';
+import Message from '../../../../components/alert/Message.js';
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -94,7 +94,7 @@ const AddChildCategoryScreen = ({ setOpenAddDialog, setRequestData }) => {
                                     required
                                 />
                             </div>
-                            
+
                             <div className="form__field">
                                 <FormControl fullWidth>
                                     <InputLabel id="role-simple-select-label">

@@ -7,8 +7,8 @@ import Moment from "react-moment";
 import Swal from "sweetalert2";
 import { getReviewsList, deleteReview } from "./../../../actions/reviewActions";
 import UpdateReviewScreen from "./UpdateReviewScreen";
-import Loader from "./../../../components/alert/Loader";
-import Message from "./../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({

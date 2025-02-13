@@ -21,8 +21,8 @@ import {
     getRolesList,
 } from "./../../../../actions/roleActions";
 import { getPermissionsList } from "./../../../../actions/permissionActions";
-import Loader from "./../../../../components/alert/Loader";
-import Message from "./../../../../components/alert/Message";
+import Loader from "../../../../components/alert/Loader.js";
+import Message from "../../../../components/alert/Message.js";
 
 const useStyles = makeStyles((theme) => ({
     button: {

@@ -1,45 +1,55 @@
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import HomeIcon from "@material-ui/icons/Home";
-import AccountBoxIcon from "@material-ui/icons/AccountBox";
-import ShopIcon from "@material-ui/icons/Shop";
+import React, {useState} from "react";
+import {useSelector, useDispatch} from "react-redux";
+import {Link, useNavigate} from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
     Divider,
-    makeStyles,
+    styled,
     Menu,
     MenuItem,
     Badge,
-    IconButton,
-} from "@material-ui/core";
-import { logout } from "./../actions/userActions";
-import ShoppingCartIcon from "@material-ui/icons/ShoppingCart";
+    IconButton
+} from "@mui/material";
+import {logout} from "./../actions/userActions";
+import {RootState, AppDispatch} from '@/store'
+import {Root} from "react-dom/client";
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
-        width: "30%",
-        margin: "0 auto",
-        borderBottom: "2px solid #BE8E4C",
-    },
+const StyledDivider = styled(Divider)({
+    width: "30%",
+    margin: "0 auto",
+    borderBottom: "2px solid #BE8E4C",
+});
 
-    icon: {
-        color: "red",
-    },
-}));
+interface UserInfo {
+    data: {
+        is_admin: number;
+        access_token: string;
+    }
+}
 
-const Navbar = () => {
-    const classes = useStyles();
+interface CartItem {
+    id: number;
+    name: string;
+}
 
-    const [anchorEl, setAnchorEl] = useState(null);
+interface CartState {
+    cartItems: CartItem[]
+}
 
-    const dispatch = useDispatch();
+interface NavbarProps {
+}
 
-    const userLogin = useSelector((state) => state.userLogin);
-    const { userInfo } = userLogin;
+const Navbar: React.FC<NavbarProps> = () => {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
-    const cart = useSelector((state) => state.cart);
+    const userLogin = useSelector((state: RootState) => state.user.userInfo);
+    const cart = useSelector((state: RootState) => state.cart);
 
-    const handleClick = (event) => {
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -49,6 +59,7 @@ const Navbar = () => {
 
     const logoutHandler = () => {
         dispatch(logout());
+        navigate("/", {replace: true});
     };
 
     return (
@@ -58,7 +69,9 @@ const Navbar = () => {
                     <Link className="navigation-brand-link" to="/">
                         <img
                             className="navigation-brand-img"
+                            // TODO:: make this dynamic
                             src="http://127.0.0.1:8000/storage/logo.png"
+                            alt={"Logo"}
                         />
                     </Link>
                 </div>
@@ -66,24 +79,24 @@ const Navbar = () => {
                 <ul className="navigation-list">
                     <li>
                         <Link to="/">
-                            <HomeIcon />
+                            <HomeIcon/>
                         </Link>
                     </li>
                     <li>
                         <Link to="/cart">
                             <Badge badgeContent={cart.cartItems.length}>
-                                <ShoppingCartIcon />
+                                <ShoppingCartIcon/>
                             </Badge>
                         </Link>
                     </li>
                     <li>
-                        {userInfo ? (
+                        {userLogin ? (
                             <>
                                 <a
                                     className="navigation-list--item"
                                     onClick={handleClick}
                                 >
-                                    <AccountBoxIcon />
+                                    <AccountBoxIcon/>
                                 </a>
                                 <Menu
                                     id="simple-menu"
@@ -109,7 +122,7 @@ const Navbar = () => {
                                             Order History
                                         </Link>
                                     </MenuItem>
-                                    {userInfo.data.is_admin == 1 && (
+                                    {userLogin.data.is_admin == 1 && (
                                         <MenuItem onClick={handleClose}>
                                             <a
                                                 href="/admin"
@@ -132,14 +145,14 @@ const Navbar = () => {
                             </>
                         ) : (
                             <Link to="/login">
-                                <AccountBoxIcon />
+                                <AccountBoxIcon/>
                             </Link>
                         )}
                     </li>
                 </ul>
             </nav>
 
-            <Divider className={classes.divider} />
+            <StyledDivider />
         </>
     );
 };

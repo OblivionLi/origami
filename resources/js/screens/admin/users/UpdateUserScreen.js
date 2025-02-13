@@ -14,8 +14,8 @@ import {
 import Swal from "sweetalert2";
 import { getRolesList } from "./../../../actions/roleActions";
 import { getUser, getUsersList, editUser } from "../../../actions/userActions";
-import Loader from "../../../components/alert/Loader";
-import Message from "../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -92,7 +92,7 @@ const UpdateUserScreen = ({ setOpenEditDialog, setRequestData, userId }) => {
             },
         });
 
-        
+
         Swal.fire({
             position: "center",
             icon: "success",

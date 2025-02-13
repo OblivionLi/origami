@@ -28,7 +28,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import { FaUsers, FaUsersCog, FaUserTag, FaReceipt } from "react-icons/fa";
 import { logout } from "../../actions/userActions";
-import Loader from "../../components/alert/Loader";
+import Loader from "../../components/alert/Loader.js";
 import UsersScreen from "./users/UsersScreen";
 import RolesScreen from "./users/roles/RolesScreen";
 import PermissionsScreen from "./users/permissions/PermissionsScreen";

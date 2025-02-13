@@ -5,8 +5,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import MaterialTable from "material-table";
 import Moment from "react-moment";
 import Swal from "sweetalert2";
-import Loader from "./../../../components/alert/Loader";
-import Message from "./../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import { Link } from "react-router-dom";
 import { listOrders, createPDFOrder, deleteOrder } from "./../../../actions/orderActions";
 

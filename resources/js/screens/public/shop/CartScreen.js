@@ -11,12 +11,12 @@ import {
     Button,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import Navbar from "./../../../components/Navbar";
+import Navbar from "../../../components/Navbar.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
 import { removeFromCart, addToCart } from "../../../actions/cartActions";
-import Message from "./../../../components/alert/Message";
+import Message from "../../../components/alert/Message.js";
 import MaterialTable from "material-table";
-import Footer from "../../../components/Footer";
+import Footer from "../../../components/Footer.js";
 import Swal from "sweetalert2";
 
 const useStyles = makeStyles((theme) => ({

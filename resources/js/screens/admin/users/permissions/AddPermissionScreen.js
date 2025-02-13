@@ -9,8 +9,8 @@ import {
 } from "@material-ui/core";
 import Swal from "sweetalert2";
 import { makeStyles } from "@material-ui/core/styles";
-import Loader from './../../../../components/alert/Loader';
-import Message from './../../../../components/alert/Message';
+import Loader from '../../../../components/alert/Loader.js';
+import Message from '../../../../components/alert/Message.js';
 import { PERMISSION_LIST_RESET } from "../../../../constants/permissionConstants";
 import { getPermissionsList, createPermission } from './../../../../actions/permissionActions';
 

@@ -12,8 +12,8 @@ import {
 } from "./../../../actions/productActions";
 import AddProductScreen from "./AddProductScreen";
 import UpdateProductScreen from "./UpdateProductScreen";
-import Loader from "./../../../components/alert/Loader";
-import Message from "./../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import StarRateIcon from "@material-ui/icons/StarRate";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Navbar from "./../../../components/Navbar";
+import Navbar from "../../../components/Navbar.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
 import { makeStyles } from "@material-ui/core/styles";
-import Footer from "./../../../components/Footer";
+import Footer from "../../../components/Footer.js";
 import {
     Paper,
     Typography,
@@ -18,11 +18,11 @@ import {
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { getProduct } from "./../../../actions/productActions";
-import Loader from "./../../../components/alert/Loader";
+import Loader from "../../../components/alert/Loader.js";
 import Rating from "@material-ui/lab/Rating";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
-import Message from "./../../../components/alert/Message";
+import Message from "../../../components/alert/Message.js";
 import { REVIEW_STORE_RESET } from "../../../constants/reviewConstants";
 import { createReview } from "../../../actions/reviewActions";
 import Swal from "sweetalert2";

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Navbar from "./../../../components/Navbar";
+import Navbar from "../../../components/Navbar.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
-import Loader from "./../../../components/alert/Loader";
-import Message from "./../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import { makeStyles } from "@material-ui/core/styles";
 import { Paper, Typography, Breadcrumbs, Divider } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { getReviewsPagList } from "../../../actions/reviewActions";
 import Rating from "@material-ui/lab/Rating";
 import ReviewPaginate from "../../../components/ReviewPaginate";
-import Footer from './../../../components/Footer';
+import Footer from '../../../components/Footer.js';
 
 const useStyles = makeStyles((theme) => ({
     divider: {

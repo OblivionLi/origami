@@ -19,8 +19,8 @@ import {
     getChildCatsList,
     editChildCat,
 } from "./../../../../actions/childCategoryActions";
-import Message from "./../../../../components/alert/Message";
-import Loader from "./../../../../components/alert/Loader";
+import Message from "../../../../components/alert/Message.js";
+import Loader from "../../../../components/alert/Loader.js";
 
 const useStyles = makeStyles((theme) => ({
     button: {

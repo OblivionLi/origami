@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Paper } from "@material-ui/core";
-import Loader from "../../components/alert/Loader";
+import Loader from "../../components/alert/Loader.js";
 import { makeStyles } from "@material-ui/core/styles";
 import OrderCountChartScreen from "./charts/OrderCountChartScreen";
 import RevenueLastMonthScreen from "./charts/RevenueLastMonthScreen";

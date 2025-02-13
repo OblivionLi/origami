@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dialog, DialogActions, Paper, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MaterialTable from "material-table";
-import Message from "./../../../components/alert/Message";
-import Loader from "./../../../components/alert/Loader";
+import Message from "../../../components/alert/Message.js";
+import Loader from "../../../components/alert/Loader.js";
 import Moment from "react-moment";
 import UpdateUserScreen from "./UpdateUserScreen";
 import { getUsersList, deleteUser } from "../../../actions/userActions";
@@ -182,26 +182,26 @@ const UsersScreen = ({ history }) => {
                                     title: "Date Joined",
                                     field: "created_at",
                                     render: (users) => {
-                                        
+
                                             return (
                                                 <Moment format="DD/MM/YYYY HH:mm">
                                                     {users.created_at}
                                                 </Moment>
                                             );
-                                        
+
                                     },
                                 },
                                 {
                                     title: "Updated At",
                                     field: "updated_at",
                                     render: (users) => {
-                                        
+
                                             return (
                                                 <Moment format="DD/MM/YYYY HH:mm">
                                                     {users.created_at}
                                                 </Moment>
                                          );
-                                        
+
                                     },
                                 },
                             ]}

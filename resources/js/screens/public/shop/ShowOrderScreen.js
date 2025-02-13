@@ -10,12 +10,12 @@ import {
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import MaterialTable from "material-table";
-import Navbar from "./../../../components/Navbar";
-import Message from "./../../../components/alert/Message";
-import Loader from "./../../../components/alert/Loader";
+import Navbar from "../../../components/Navbar.js";
+import Message from "../../../components/alert/Message.js";
+import Loader from "../../../components/alert/Loader.js";
 import NavbarCategories from "./../../../components/NavbarCategories";
 import Moment from "react-moment";
-import Footer from "./../../../components/Footer";
+import Footer from "../../../components/Footer.js";
 import { getUser } from "./../../../actions/userActions";
 import { getOrder, deliverOrder } from "./../../../actions/orderActions";
 import {
@@ -170,8 +170,8 @@ const ShowOrderScreen = ({ match, history }) => {
     useEffect(() => {
         if (!userInfo || userInfo == null) {
             history.push("/login");
-        } 
-        
+        }
+
         if (userInfo) {
             dispatch(getUser(userInfo.data.user_id));
         }

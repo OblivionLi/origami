@@ -24,8 +24,8 @@ import {
 } from "./../../../actions/productActions";
 import NumberFormat from "react-number-format";
 import Dropzone from "react-dropzone";
-import Loader from "./../../../components/alert/Loader";
-import Message from "./../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import { getChildCatsList } from "./../../../actions/childCategoryActions";
 
 const useStyles = makeStyles((theme) => ({

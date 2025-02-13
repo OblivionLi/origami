@@ -11,8 +11,8 @@ import Swal from "sweetalert2";
 import { getRolesList, createRole } from "../../../../actions/roleActions";
 import { makeStyles } from "@material-ui/core/styles";
 import { ROLE_LIST_RESET } from "../../../../constants/roleConstants";
-import Loader from './../../../../components/alert/Loader';
-import Message from './../../../../components/alert/Message';
+import Loader from '../../../../components/alert/Loader.js';
+import Message from '../../../../components/alert/Message.js';
 
 const useStyles = makeStyles((theme) => ({
     button: {

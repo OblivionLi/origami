@@ -10,7 +10,7 @@ import {
     CardActions,
     Button,
 } from "@material-ui/core";
-import Loader from "../alert/Loader";
+import Loader from "../alert/Loader.js";
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({

@@ -9,8 +9,8 @@ import {
     getPermissionsList,
     deletePermission,
 } from "./../../../../actions/permissionActions";
-import Loader from "./../../../../components/alert/Loader";
-import Message from "./../../../../components/alert/Message";
+import Loader from "../../../../components/alert/Loader.js";
+import Message from "../../../../components/alert/Message.js";
 import UpdatePermissionScreen from "./UpdatePermissionScreen";
 import AddPermissionScreen from "./AddPermissionScreen";
 

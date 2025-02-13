@@ -7,8 +7,8 @@ import {
     getProductsList,
     replaceProductImage,
 } from "./../../../actions/productActions";
-import Loader from "./../../../components/alert/Loader";
-import Message from "./../../../components/alert/Message";
+import Loader from "../../../components/alert/Loader.js";
+import Message from "../../../components/alert/Message.js";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import ClearIcon from "@material-ui/icons/Clear";
 
