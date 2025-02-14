@@ -2,40 +2,33 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Address {
+interface Role {
     id: number;
-    user_id: number;
     name: string;
-    surname: string;
-    country: string;
-    city: string;
-    address: string;
-    postal_code: string;
-    phone_number: string;
 }
 
-interface AddressState {
-    addresses: Address[];
+interface RoleState {
+    role: Role[];
     loading: boolean;
     error: string | null;
-    currentAddress: Address | null;
+    currentRole: Role | null;
     success: boolean;
 }
 
-const initialState: AddressState = {
-    addresses: [],
+const initialState: RoleState = {
+    role: [],
     loading: false,
     error: null,
-    currentAddress: null,
+    currentRole: null,
     success: false,
 }
 
-export const fetchAddresses = createAsyncThunk<
-    Address[],
+export const fetchRoles = createAsyncThunk<
+    Role[],
     void,
-    { state: RootState; rejectValue: string }>
-(
-    'address/fetchAddresses',
+    { state: RootState, rejectValue: string }
+>(
+    'categories/fetchRoles',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -50,7 +43,7 @@ export const fetchAddresses = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address[]>('/api/address', config);
+            const {data} = await axios.get<Role[]>('/api/roles', config);
 
             return data;
         } catch (error: any) {
@@ -63,12 +56,12 @@ export const fetchAddresses = createAsyncThunk<
     }
 );
 
-export const fetchAddressById = createAsyncThunk<
-    Address,
+export const fetchRoleById = createAsyncThunk<
+    Role,
     { id: number },
-    { state: RootState; rejectValue: string }>
-(
-    'address/fetchAddressById',
+    { state: RootState, rejectValue: string }
+>(
+    'categories/fetchRoleById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -83,7 +76,7 @@ export const fetchAddressById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address>(`/api/address/${id}`, config);
+            const {data} = await axios.get<Role>(`/api/roles/${id}`, config);
 
             return data;
         } catch (error: any) {
@@ -96,31 +89,13 @@ export const fetchAddressById = createAsyncThunk<
     }
 );
 
-export const createAddress = createAsyncThunk<
-    Address,
-    {
-        user_id: number;
-        name: string;
-        surname: string;
-        country: string;
-        city: string;
-        address: string;
-        postal_code: number;
-        phone_number: number
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
-    async ({
-               user_id,
-               name,
-               surname,
-               country,
-               city,
-               address,
-               postal_code,
-               phone_number
-           }, thunkAPI) => {
+export const createRole = createAsyncThunk<
+    Role,
+    { name: string },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/createRole',
+    async ({name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -134,19 +109,7 @@ export const createAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<Address>(`/api/address`,
-                {
-                    user_id,
-                    name,
-                    surname,
-                    country,
-                    city,
-                    address,
-                    postal_code,
-                    phone_number
-                },
-                config
-            );
+            const {data} = await axios.post<Role>(`/api/roles`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -159,31 +122,13 @@ export const createAddress = createAsyncThunk<
     }
 );
 
-export const updateAddress = createAsyncThunk<
-    Address,
-    {
-        id: number;
-        name: string;
-        surname: string;
-        country: string;
-        city: string;
-        address: string;
-        postal_code: number;
-        phone_number: number
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
-    async ({
-               id,
-               name,
-               surname,
-               country,
-               city,
-               address,
-               postal_code,
-               phone_number
-           }, thunkAPI) => {
+export const updateRole = createAsyncThunk<
+    Role,
+    { id: number, name: string, is_admin: number, perms: [] },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/updateRole',
+    async ({id, name, is_admin, perms}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -197,18 +142,7 @@ export const updateAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Address>(`/api/address/${id}`,
-                {
-                    name,
-                    surname,
-                    country,
-                    city,
-                    address,
-                    postal_code,
-                    phone_number
-                },
-                config
-            );
+            const {data} = await axios.patch<Role>(`/api/roles/${id}`, {name, is_admin, perms}, config);
 
             return data;
         } catch (error: any) {
@@ -221,14 +155,12 @@ export const updateAddress = createAsyncThunk<
     }
 );
 
-export const deleteAddress = createAsyncThunk<
+export const deleteRole = createAsyncThunk<
     number,
-    {
-        id: number;
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
+    { id: number },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/deleteRole',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -243,9 +175,9 @@ export const deleteAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.delete(`/api/address/${id}`, config);
+            await axios.delete(`/api/roles/${id}`, config);
 
-            return data;
+            return id;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -256,97 +188,98 @@ export const deleteAddress = createAsyncThunk<
     }
 );
 
-const addressSlice = createSlice({
-    name: 'address',
+const roleSlice = createSlice({
+    name: 'role',
     initialState,
     reducers: {
-        resetAddressState: (state) => {
+        resetRoleState: (state) => {
             return initialState;
         },
-        clearCurrentAddress: (state) => {
-            state.currentAddress = null;
+        clearCurrentRole: (state) => {
+            state.currentRole = null;
         }
     },
     extraReducers: (builder) => {
         builder
-            // Handle fetchAddresses
-            .addCase(fetchAddresses.pending, (state) => {
+            // Handle fetchRole
+            .addCase(fetchRoles.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAddresses.fulfilled, (state, action: PayloadAction<Address[]>) => {
+            .addCase(fetchRoles.fulfilled, (state, action: PayloadAction<Role[]>) => {
                 state.loading = false;
-                state.addresses = action.payload;
+                state.role = action.payload;
             })
-            .addCase(fetchAddresses.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-            })
-            // Handle fetchAddressById
-            .addCase(fetchAddressById.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchAddressById.fulfilled, (state, action: PayloadAction<Address>) => {
-                state.loading = false;
-                state.currentAddress = action.payload;
-            })
-            .addCase(fetchAddressById.rejected, (state, action) => {
+            .addCase(fetchRoles.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
 
-            // Handle createAddress
-            .addCase(createAddress.pending, (state) => {
+            // Handle fetchRoleById
+            .addCase(fetchRoleById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchRoleById.fulfilled, (state, action: PayloadAction<Role>) => {
+                state.loading = false;
+                state.currentRole = action.payload;
+            })
+            .addCase(fetchRoleById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
+            // Handle createRole
+            .addCase(createRole.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(createAddress.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(createRole.fulfilled, (state, action: PayloadAction<Role>) => {
                 state.loading = false;
-                state.addresses.push(action.payload); // Immer allows this!
+                state.role.push(action.payload); // Immer allows this!
                 state.success = true;
             })
-            .addCase(createAddress.rejected, (state, action) => {
+            .addCase(createRole.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle updateAddress
-            .addCase(updateAddress.pending, (state) => {
+            // Handle updateRole
+            .addCase(updateRole.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(updateAddress.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(updateRole.fulfilled, (state, action: PayloadAction<Role>) => {
                 state.loading = false;
-                const index = state.addresses.findIndex((a) => a.id === action.payload.id);
+                const index = state.role.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.addresses[index] = action.payload; // Immer allows this!
+                    state.role[index] = action.payload; // Immer allows this!
                 }
                 state.success = true;
             })
-            .addCase(updateAddress.rejected, (state, action) => {
+            .addCase(updateRole.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle deleteAddress
-            .addCase(deleteAddress.pending, (state) => {
+            // Handle deleteRole
+            .addCase(deleteRole.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
 
             })
-            .addCase(deleteAddress.fulfilled, (state, action: PayloadAction<number>) => {
+            .addCase(deleteRole.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.addresses = state.addresses.filter((a) => a.id !== action.payload); // OK with Immer
+                state.role = state.role.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
 
             })
-            .addCase(deleteAddress.rejected, (state, action) => {
+            .addCase(deleteRole.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
@@ -354,5 +287,5 @@ const addressSlice = createSlice({
     },
 });
 
-export const {resetAddressState, clearCurrentAddress} = addressSlice.actions;
-export default addressSlice.reducer;
+export const {resetRoleState, clearCurrentRole} = roleSlice.actions;
+export default roleSlice.reducer;

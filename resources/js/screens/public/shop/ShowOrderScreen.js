@@ -13,7 +13,7 @@ import MaterialTable from "material-table";
 import Navbar from "../../../components/Navbar.js";
 import Message from "../../../components/alert/Message.js";
 import Loader from "../../../components/alert/Loader.js";
-import NavbarCategories from "./../../../components/NavbarCategories";
+import NavbarCategories from "../../../components/NavbarCategories.js";
 import Moment from "react-moment";
 import Footer from "../../../components/Footer.js";
 import { getUser } from "./../../../actions/userActions";

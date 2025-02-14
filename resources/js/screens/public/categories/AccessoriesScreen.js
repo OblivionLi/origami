@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "./../../../components/NavbarCategories";
+import NavbarCategories from "../../../components/NavbarCategories.js";
 import Footer from "../../../components/Footer.js";
 import { getAccessories } from "./../../../actions/categoryActions";
 import Loader from "../../../components/alert/Loader.js";

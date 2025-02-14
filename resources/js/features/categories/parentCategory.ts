@@ -2,40 +2,33 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Address {
+interface ParentCategory {
     id: number;
-    user_id: number;
     name: string;
-    surname: string;
-    country: string;
-    city: string;
-    address: string;
-    postal_code: string;
-    phone_number: string;
 }
 
-interface AddressState {
-    addresses: Address[];
+interface ParentCategoryState {
+    parentCategories: ParentCategory[];
     loading: boolean;
     error: string | null;
-    currentAddress: Address | null;
+    currentParentCategory: ParentCategory | null;
     success: boolean;
 }
 
-const initialState: AddressState = {
-    addresses: [],
+const initialState: ParentCategoryState = {
+    parentCategories: [],
     loading: false,
     error: null,
-    currentAddress: null,
+    currentParentCategory: null,
     success: false,
 }
 
-export const fetchAddresses = createAsyncThunk<
-    Address[],
+export const fetchParentCategories = createAsyncThunk<
+    ParentCategory[],
     void,
-    { state: RootState; rejectValue: string }>
-(
-    'address/fetchAddresses',
+    { state: RootState, rejectValue: string }
+>(
+    'categories/fetchParentCategories',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -50,7 +43,7 @@ export const fetchAddresses = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address[]>('/api/address', config);
+            const {data} = await axios.get<ParentCategory[]>('/api/parent-categories', config);
 
             return data;
         } catch (error: any) {
@@ -63,12 +56,12 @@ export const fetchAddresses = createAsyncThunk<
     }
 );
 
-export const fetchAddressById = createAsyncThunk<
-    Address,
+export const fetchParentCategoryById = createAsyncThunk<
+    ParentCategory,
     { id: number },
-    { state: RootState; rejectValue: string }>
-(
-    'address/fetchAddressById',
+    { state: RootState, rejectValue: string }
+>(
+    'categories/fetchParentCategoryById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -83,7 +76,7 @@ export const fetchAddressById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address>(`/api/address/${id}`, config);
+            const {data} = await axios.get<ParentCategory>(`/api/parent-categories/${id}`, config);
 
             return data;
         } catch (error: any) {
@@ -96,31 +89,13 @@ export const fetchAddressById = createAsyncThunk<
     }
 );
 
-export const createAddress = createAsyncThunk<
-    Address,
-    {
-        user_id: number;
-        name: string;
-        surname: string;
-        country: string;
-        city: string;
-        address: string;
-        postal_code: number;
-        phone_number: number
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
-    async ({
-               user_id,
-               name,
-               surname,
-               country,
-               city,
-               address,
-               postal_code,
-               phone_number
-           }, thunkAPI) => {
+export const createParentCategory = createAsyncThunk<
+    ParentCategory,
+    { name: string },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/createParentCategory',
+    async ({name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -134,19 +109,7 @@ export const createAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<Address>(`/api/address`,
-                {
-                    user_id,
-                    name,
-                    surname,
-                    country,
-                    city,
-                    address,
-                    postal_code,
-                    phone_number
-                },
-                config
-            );
+            const {data} = await axios.post<ParentCategory>(`/api/parent-categories`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -159,31 +122,13 @@ export const createAddress = createAsyncThunk<
     }
 );
 
-export const updateAddress = createAsyncThunk<
-    Address,
-    {
-        id: number;
-        name: string;
-        surname: string;
-        country: string;
-        city: string;
-        address: string;
-        postal_code: number;
-        phone_number: number
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
-    async ({
-               id,
-               name,
-               surname,
-               country,
-               city,
-               address,
-               postal_code,
-               phone_number
-           }, thunkAPI) => {
+export const updateParentCategory = createAsyncThunk<
+    ParentCategory,
+    { id: number, name: string },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/updateParentCategory',
+    async ({id, name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -197,18 +142,7 @@ export const updateAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Address>(`/api/address/${id}`,
-                {
-                    name,
-                    surname,
-                    country,
-                    city,
-                    address,
-                    postal_code,
-                    phone_number
-                },
-                config
-            );
+            const {data} = await axios.patch<ParentCategory>(`/api/parent-categories/${id}`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -221,14 +155,12 @@ export const updateAddress = createAsyncThunk<
     }
 );
 
-export const deleteAddress = createAsyncThunk<
+export const deleteParentCategory = createAsyncThunk<
     number,
-    {
-        id: number;
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
+    { id: number },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/deleteParentCategory',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -243,9 +175,9 @@ export const deleteAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.delete(`/api/address/${id}`, config);
+            await axios.delete(`/api/parent-categories/${id}`, config);
 
-            return data;
+            return id;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -256,97 +188,98 @@ export const deleteAddress = createAsyncThunk<
     }
 );
 
-const addressSlice = createSlice({
-    name: 'address',
+const parentCategorySlice = createSlice({
+    name: 'parentCategory',
     initialState,
     reducers: {
-        resetAddressState: (state) => {
+        resetParentCategoryState: (state) => {
             return initialState;
         },
-        clearCurrentAddress: (state) => {
-            state.currentAddress = null;
+        clearCurrentParentCategory: (state) => {
+            state.currentParentCategory = null;
         }
     },
     extraReducers: (builder) => {
         builder
-            // Handle fetchAddresses
-            .addCase(fetchAddresses.pending, (state) => {
+            // Handle fetchParentCategories
+            .addCase(fetchParentCategories.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAddresses.fulfilled, (state, action: PayloadAction<Address[]>) => {
+            .addCase(fetchParentCategories.fulfilled, (state, action: PayloadAction<ParentCategory[]>) => {
                 state.loading = false;
-                state.addresses = action.payload;
+                state.parentCategories = action.payload;
             })
-            .addCase(fetchAddresses.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-            })
-            // Handle fetchAddressById
-            .addCase(fetchAddressById.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchAddressById.fulfilled, (state, action: PayloadAction<Address>) => {
-                state.loading = false;
-                state.currentAddress = action.payload;
-            })
-            .addCase(fetchAddressById.rejected, (state, action) => {
+            .addCase(fetchParentCategories.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
 
-            // Handle createAddress
-            .addCase(createAddress.pending, (state) => {
+            // Handle fetchParentCategoryById
+            .addCase(fetchParentCategoryById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchParentCategoryById.fulfilled, (state, action: PayloadAction<ParentCategory>) => {
+                state.loading = false;
+                state.currentParentCategory = action.payload;
+            })
+            .addCase(fetchParentCategoryById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
+            // Handle createParentCategory
+            .addCase(createParentCategory.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(createAddress.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(createParentCategory.fulfilled, (state, action: PayloadAction<ParentCategory>) => {
                 state.loading = false;
-                state.addresses.push(action.payload); // Immer allows this!
+                state.parentCategories.push(action.payload); // Immer allows this!
                 state.success = true;
             })
-            .addCase(createAddress.rejected, (state, action) => {
+            .addCase(createParentCategory.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle updateAddress
-            .addCase(updateAddress.pending, (state) => {
+            // Handle updateParentCategory
+            .addCase(updateParentCategory.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(updateAddress.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(updateParentCategory.fulfilled, (state, action: PayloadAction<ParentCategory>) => {
                 state.loading = false;
-                const index = state.addresses.findIndex((a) => a.id === action.payload.id);
+                const index = state.parentCategories.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.addresses[index] = action.payload; // Immer allows this!
+                    state.parentCategories[index] = action.payload; // Immer allows this!
                 }
                 state.success = true;
             })
-            .addCase(updateAddress.rejected, (state, action) => {
+            .addCase(updateParentCategory.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle deleteAddress
-            .addCase(deleteAddress.pending, (state) => {
+            // Handle deleteParentCategory
+            .addCase(deleteParentCategory.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
 
             })
-            .addCase(deleteAddress.fulfilled, (state, action: PayloadAction<number>) => {
+            .addCase(deleteParentCategory.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.addresses = state.addresses.filter((a) => a.id !== action.payload); // OK with Immer
+                state.parentCategories = state.parentCategories.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
 
             })
-            .addCase(deleteAddress.rejected, (state, action) => {
+            .addCase(deleteParentCategory.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
@@ -354,5 +287,5 @@ const addressSlice = createSlice({
     },
 });
 
-export const {resetAddressState, clearCurrentAddress} = addressSlice.actions;
-export default addressSlice.reducer;
+export const {resetParentCategoryState, clearCurrentParentCategory} = parentCategorySlice.actions;
+export default parentCategorySlice.reducer;

@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "./../../../components/NavbarCategories";
+import NavbarCategories from "../../../components/NavbarCategories.js";
 import Footer from "../../../components/Footer.js";
 import { getUser } from "./../../../actions/userActions";
 import { createAddress } from "../../../actions/addressActions";

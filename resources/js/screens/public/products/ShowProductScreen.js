@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "./../../../components/NavbarCategories";
+import NavbarCategories from "../../../components/NavbarCategories.js";
 import { makeStyles } from "@material-ui/core/styles";
 import Footer from "../../../components/Footer.js";
 import {

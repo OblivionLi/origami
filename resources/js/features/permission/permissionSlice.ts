@@ -2,40 +2,33 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Address {
+interface Permission {
     id: number;
-    user_id: number;
     name: string;
-    surname: string;
-    country: string;
-    city: string;
-    address: string;
-    postal_code: string;
-    phone_number: string;
 }
 
-interface AddressState {
-    addresses: Address[];
+interface PermissionState {
+    permission: Permission[];
     loading: boolean;
     error: string | null;
-    currentAddress: Address | null;
+    currentPermission: Permission | null;
     success: boolean;
 }
 
-const initialState: AddressState = {
-    addresses: [],
+const initialState: PermissionState = {
+    permission: [],
     loading: false,
     error: null,
-    currentAddress: null,
+    currentPermission: null,
     success: false,
 }
 
-export const fetchAddresses = createAsyncThunk<
-    Address[],
+export const fetchPermissions = createAsyncThunk<
+    Permission[],
     void,
-    { state: RootState; rejectValue: string }>
-(
-    'address/fetchAddresses',
+    { state: RootState, rejectValue: string }
+>(
+    'categories/fetchPermissions',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -50,7 +43,7 @@ export const fetchAddresses = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address[]>('/api/address', config);
+            const {data} = await axios.get<Permission[]>('/api/permissions', config);
 
             return data;
         } catch (error: any) {
@@ -63,12 +56,12 @@ export const fetchAddresses = createAsyncThunk<
     }
 );
 
-export const fetchAddressById = createAsyncThunk<
-    Address,
+export const fetchPermissionById = createAsyncThunk<
+    Permission,
     { id: number },
-    { state: RootState; rejectValue: string }>
-(
-    'address/fetchAddressById',
+    { state: RootState, rejectValue: string }
+>(
+    'categories/fetchPermissionById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -83,7 +76,7 @@ export const fetchAddressById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address>(`/api/address/${id}`, config);
+            const {data} = await axios.get<Permission>(`/api/permissions/${id}`, config);
 
             return data;
         } catch (error: any) {
@@ -96,31 +89,13 @@ export const fetchAddressById = createAsyncThunk<
     }
 );
 
-export const createAddress = createAsyncThunk<
-    Address,
-    {
-        user_id: number;
-        name: string;
-        surname: string;
-        country: string;
-        city: string;
-        address: string;
-        postal_code: number;
-        phone_number: number
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
-    async ({
-               user_id,
-               name,
-               surname,
-               country,
-               city,
-               address,
-               postal_code,
-               phone_number
-           }, thunkAPI) => {
+export const createPermission = createAsyncThunk<
+    Permission,
+    { name: string },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/createPermission',
+    async ({name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -134,19 +109,7 @@ export const createAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<Address>(`/api/address`,
-                {
-                    user_id,
-                    name,
-                    surname,
-                    country,
-                    city,
-                    address,
-                    postal_code,
-                    phone_number
-                },
-                config
-            );
+            const {data} = await axios.post<Permission>(`/api/permissions`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -159,31 +122,13 @@ export const createAddress = createAsyncThunk<
     }
 );
 
-export const updateAddress = createAsyncThunk<
-    Address,
-    {
-        id: number;
-        name: string;
-        surname: string;
-        country: string;
-        city: string;
-        address: string;
-        postal_code: number;
-        phone_number: number
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
-    async ({
-               id,
-               name,
-               surname,
-               country,
-               city,
-               address,
-               postal_code,
-               phone_number
-           }, thunkAPI) => {
+export const updatePermission = createAsyncThunk<
+    Permission,
+    { id: number, name: string },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/updatePermission',
+    async ({id, name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -197,18 +142,7 @@ export const updateAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Address>(`/api/address/${id}`,
-                {
-                    name,
-                    surname,
-                    country,
-                    city,
-                    address,
-                    postal_code,
-                    phone_number
-                },
-                config
-            );
+            const {data} = await axios.patch<Permission>(`/api/permissions/${id}`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -221,14 +155,12 @@ export const updateAddress = createAsyncThunk<
     }
 );
 
-export const deleteAddress = createAsyncThunk<
+export const deletePermission = createAsyncThunk<
     number,
-    {
-        id: number;
-    },
-    { state: RootState; rejectValue: string }>
-(
-    'address/createAddress',
+    { id: number },
+    { state: RootState, rejectValue: string }
+>(
+    'categories/deletePermission',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -243,9 +175,9 @@ export const deleteAddress = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.delete(`/api/address/${id}`, config);
+            await axios.delete(`/api/permissions/${id}`, config);
 
-            return data;
+            return id;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -256,97 +188,98 @@ export const deleteAddress = createAsyncThunk<
     }
 );
 
-const addressSlice = createSlice({
-    name: 'address',
+const permissionSlice = createSlice({
+    name: 'permission',
     initialState,
     reducers: {
-        resetAddressState: (state) => {
+        resetPermissionState: (state) => {
             return initialState;
         },
-        clearCurrentAddress: (state) => {
-            state.currentAddress = null;
+        clearCurrentPermission: (state) => {
+            state.currentPermission = null;
         }
     },
     extraReducers: (builder) => {
         builder
-            // Handle fetchAddresses
-            .addCase(fetchAddresses.pending, (state) => {
+            // Handle fetchPermission
+            .addCase(fetchPermissions.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAddresses.fulfilled, (state, action: PayloadAction<Address[]>) => {
+            .addCase(fetchPermissions.fulfilled, (state, action: PayloadAction<Permission[]>) => {
                 state.loading = false;
-                state.addresses = action.payload;
+                state.permission = action.payload;
             })
-            .addCase(fetchAddresses.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-            })
-            // Handle fetchAddressById
-            .addCase(fetchAddressById.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchAddressById.fulfilled, (state, action: PayloadAction<Address>) => {
-                state.loading = false;
-                state.currentAddress = action.payload;
-            })
-            .addCase(fetchAddressById.rejected, (state, action) => {
+            .addCase(fetchPermissions.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
 
-            // Handle createAddress
-            .addCase(createAddress.pending, (state) => {
+            // Handle fetchPermissionById
+            .addCase(fetchPermissionById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchPermissionById.fulfilled, (state, action: PayloadAction<Permission>) => {
+                state.loading = false;
+                state.currentPermission = action.payload;
+            })
+            .addCase(fetchPermissionById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
+            // Handle createPermission
+            .addCase(createPermission.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(createAddress.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(createPermission.fulfilled, (state, action: PayloadAction<Permission>) => {
                 state.loading = false;
-                state.addresses.push(action.payload); // Immer allows this!
+                state.permission.push(action.payload); // Immer allows this!
                 state.success = true;
             })
-            .addCase(createAddress.rejected, (state, action) => {
+            .addCase(createPermission.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle updateAddress
-            .addCase(updateAddress.pending, (state) => {
+            // Handle updatePermission
+            .addCase(updatePermission.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(updateAddress.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(updatePermission.fulfilled, (state, action: PayloadAction<Permission>) => {
                 state.loading = false;
-                const index = state.addresses.findIndex((a) => a.id === action.payload.id);
+                const index = state.permission.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.addresses[index] = action.payload; // Immer allows this!
+                    state.permission[index] = action.payload; // Immer allows this!
                 }
                 state.success = true;
             })
-            .addCase(updateAddress.rejected, (state, action) => {
+            .addCase(updatePermission.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle deleteAddress
-            .addCase(deleteAddress.pending, (state) => {
+            // Handle deletePermission
+            .addCase(deletePermission.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
 
             })
-            .addCase(deleteAddress.fulfilled, (state, action: PayloadAction<number>) => {
+            .addCase(deletePermission.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.addresses = state.addresses.filter((a) => a.id !== action.payload); // OK with Immer
+                state.permission = state.permission.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
 
             })
-            .addCase(deleteAddress.rejected, (state, action) => {
+            .addCase(deletePermission.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
@@ -354,5 +287,5 @@ const addressSlice = createSlice({
     },
 });
 
-export const {resetAddressState, clearCurrentAddress} = addressSlice.actions;
-export default addressSlice.reducer;
+export const {resetPermissionState, clearCurrentPermission} = permissionSlice.actions;
+export default permissionSlice.reducer;

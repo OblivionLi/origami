@@ -218,8 +218,8 @@ export const updateCredentials = createAsyncThunk<
                 ...userInfo,
                 name: data.name,
                 email: data.email,
-                ...(data.role && { role: data.role }),
-                ...(data.is_admin && { is_admin: data.is_admin }),
+                ...(data.role && {role: data.role}),
+                ...(data.is_admin && {is_admin: data.is_admin}),
                 data: {
                     ...userInfo.data,
                     message: userInfo.data.message,
@@ -247,7 +247,7 @@ export const getUsersList = createAsyncThunk<
     'user/getUsersList',
     async (_, thunkAPI) => {
         try {
-            const { userInfo } = thunkAPI.getState().user;
+            const {userInfo} = thunkAPI.getState().user;
 
             if (!userInfo?.data?.access_token) {
                 return thunkAPI.rejectWithValue("User not logged in or token missing.");
@@ -274,7 +274,7 @@ export const getUser = createAsyncThunk<
     'user/getUser',
     async (id, thunkAPI) => {
         try {
-            const { userInfo } = thunkAPI.getState().user;
+            const {userInfo} = thunkAPI.getState().user;
 
             if (!userInfo?.data?.access_token) {
                 return thunkAPI.rejectWithValue("User not logged in or token missing.");
@@ -301,7 +301,7 @@ export const editUser = createAsyncThunk<
     'user/editUser',
     async ({id, name, email, role}, thunkAPI) => {
         try {
-            const { userInfo } = thunkAPI.getState().user;
+            const {userInfo} = thunkAPI.getState().user;
 
             if (!userInfo?.data?.access_token) {
                 return thunkAPI.rejectWithValue("User not logged in or token missing.");
@@ -333,7 +333,7 @@ export const deleteUser = createAsyncThunk<
     'user/deleteUser',
     async (id, thunkAPI) => {
         try {
-            const { userInfo } = thunkAPI.getState().user;
+            const {userInfo} = thunkAPI.getState().user;
 
             if (!userInfo?.data?.access_token) {
                 return thunkAPI.rejectWithValue("User not logged in or token missing.");

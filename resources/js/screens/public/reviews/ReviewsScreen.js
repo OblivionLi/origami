@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "./../../../components/NavbarCategories";
+import NavbarCategories from "../../../components/NavbarCategories.js";
 import Loader from "../../../components/alert/Loader.js";
 import Message from "../../../components/alert/Message.js";
 import { makeStyles } from "@material-ui/core/styles";
