@@ -2,16 +2,16 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface ParentCategory {
+interface ParentCategorySlice {
     id: number;
     name: string;
 }
 
 interface ParentCategoryState {
-    parentCategories: ParentCategory[];
+    parentCategories: ParentCategorySlice[];
     loading: boolean;
     error: string | null;
-    currentParentCategory: ParentCategory | null;
+    currentParentCategory: ParentCategorySlice | null;
     success: boolean;
 }
 
@@ -24,11 +24,11 @@ const initialState: ParentCategoryState = {
 }
 
 export const fetchParentCategories = createAsyncThunk<
-    ParentCategory[],
+    ParentCategorySlice[],
     void,
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchParentCategories',
+    'parentCategory/fetchParentCategories',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -43,7 +43,7 @@ export const fetchParentCategories = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<ParentCategory[]>('/api/parent-categories', config);
+            const {data} = await axios.get<ParentCategorySlice[]>('/api/parent-categories', config);
 
             return data;
         } catch (error: any) {
@@ -57,11 +57,11 @@ export const fetchParentCategories = createAsyncThunk<
 );
 
 export const fetchParentCategoryById = createAsyncThunk<
-    ParentCategory,
+    ParentCategorySlice,
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchParentCategoryById',
+    'parentCategory/fetchParentCategoryById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -76,7 +76,7 @@ export const fetchParentCategoryById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<ParentCategory>(`/api/parent-categories/${id}`, config);
+            const {data} = await axios.get<ParentCategorySlice>(`/api/parent-categories/${id}`, config);
 
             return data;
         } catch (error: any) {
@@ -90,11 +90,11 @@ export const fetchParentCategoryById = createAsyncThunk<
 );
 
 export const createParentCategory = createAsyncThunk<
-    ParentCategory,
+    ParentCategorySlice,
     { name: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/createParentCategory',
+    'parentCategory/createParentCategory',
     async ({name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -109,7 +109,7 @@ export const createParentCategory = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<ParentCategory>(`/api/parent-categories`, {name}, config);
+            const {data} = await axios.post<ParentCategorySlice>(`/api/parent-categories`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -123,11 +123,11 @@ export const createParentCategory = createAsyncThunk<
 );
 
 export const updateParentCategory = createAsyncThunk<
-    ParentCategory,
+    ParentCategorySlice,
     { id: number, name: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/updateParentCategory',
+    'parentCategory/updateParentCategory',
     async ({id, name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -142,7 +142,7 @@ export const updateParentCategory = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<ParentCategory>(`/api/parent-categories/${id}`, {name}, config);
+            const {data} = await axios.patch<ParentCategorySlice>(`/api/parent-categories/${id}`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -160,7 +160,7 @@ export const deleteParentCategory = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/deleteParentCategory',
+    'parentCategory/deleteParentCategory',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -206,7 +206,7 @@ const parentCategorySlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchParentCategories.fulfilled, (state, action: PayloadAction<ParentCategory[]>) => {
+            .addCase(fetchParentCategories.fulfilled, (state, action: PayloadAction<ParentCategorySlice[]>) => {
                 state.loading = false;
                 state.parentCategories = action.payload;
             })
@@ -220,7 +220,7 @@ const parentCategorySlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchParentCategoryById.fulfilled, (state, action: PayloadAction<ParentCategory>) => {
+            .addCase(fetchParentCategoryById.fulfilled, (state, action: PayloadAction<ParentCategorySlice>) => {
                 state.loading = false;
                 state.currentParentCategory = action.payload;
             })
@@ -235,7 +235,7 @@ const parentCategorySlice = createSlice({
                 state.error = null;
                 state.success = false;
             })
-            .addCase(createParentCategory.fulfilled, (state, action: PayloadAction<ParentCategory>) => {
+            .addCase(createParentCategory.fulfilled, (state, action: PayloadAction<ParentCategorySlice>) => {
                 state.loading = false;
                 state.parentCategories.push(action.payload); // Immer allows this!
                 state.success = true;
@@ -252,7 +252,7 @@ const parentCategorySlice = createSlice({
                 state.error = null;
                 state.success = false;
             })
-            .addCase(updateParentCategory.fulfilled, (state, action: PayloadAction<ParentCategory>) => {
+            .addCase(updateParentCategory.fulfilled, (state, action: PayloadAction<ParentCategorySlice>) => {
                 state.loading = false;
                 const index = state.parentCategories.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {

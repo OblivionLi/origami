@@ -1,42 +1,17 @@
-import React, {useState} from "react";
+import React from "react";
+import {RootState, AppDispatch} from '@/store';
 import {useSelector, useDispatch} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
-    Divider,
-    styled,
     Menu,
     MenuItem,
-    Badge,
-    IconButton
+    Badge
 } from "@mui/material";
-import {logout} from "./../actions/userActions";
-import {RootState, AppDispatch} from '@/store'
-import {Root} from "react-dom/client";
-
-const StyledDivider = styled(Divider)({
-    width: "30%",
-    margin: "0 auto",
-    borderBottom: "2px solid #BE8E4C",
-});
-
-interface UserInfo {
-    data: {
-        is_admin: number;
-        access_token: string;
-    }
-}
-
-interface CartItem {
-    id: number;
-    name: string;
-}
-
-interface CartState {
-    cartItems: CartItem[]
-}
+import {logoutUser} from "@/features/user/userSlice";
+import {StyledDivider2} from "@/styles/muiStyles";
 
 interface NavbarProps {
 }
@@ -58,9 +33,11 @@ const Navbar: React.FC<NavbarProps> = () => {
     };
 
     const logoutHandler = () => {
-        dispatch(logout());
+        dispatch(logoutUser());
         navigate("/", {replace: true});
     };
+
+    const isAdmin = userLogin?.data?.is_admin === 1 || userLogin?.is_admin === 1;
 
     return (
         <>
@@ -95,6 +72,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                                 <a
                                     className="navigation-list--item"
                                     onClick={handleClick}
+                                    style={{cursor: 'pointer'}}
                                 >
                                     <AccountBoxIcon/>
                                 </a>
@@ -122,7 +100,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                                             Order History
                                         </Link>
                                     </MenuItem>
-                                    {userLogin.data.is_admin == 1 && (
+                                    {isAdmin && (
                                         <MenuItem onClick={handleClose}>
                                             <a
                                                 href="/admin"
@@ -132,14 +110,11 @@ const Navbar: React.FC<NavbarProps> = () => {
                                             </a>
                                         </MenuItem>
                                     )}
-                                    <MenuItem onClick={handleClose}>
-                                        <a
-                                            href="/"
-                                            onClick={logoutHandler}
-                                            className="nav-links"
-                                        >
-                                            Logout
-                                        </a>
+                                    <MenuItem onClick={() => {
+                                        handleClose();
+                                        logoutHandler();
+                                    }}>
+                                        Logout
                                     </MenuItem>
                                 </Menu>
                             </>
@@ -152,7 +127,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                 </ul>
             </nav>
 
-            <StyledDivider />
+            <StyledDivider2/>
         </>
     );
 };

@@ -2,53 +2,46 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-export interface Product {
+export interface Order {
     id: number;
-    name: string;
-    slug: string;
-    child_category_id?: number;
-    product_code?: string;
-    price?: number;
-    discount?: number;
-    description?: string;
-    special_offer?: number | null;
-    qty?: number;
-    product_images: { id: number; path: string }[];
-    total_reviews: number;
-    rating: number;
-    reviews: [];
+    user_id: number;
+    cart_items?: [];
+    products_price?: number;
+    shipping_price?: number;
+    tax_price?: number;
+    total_price?: number;
+    products_discount_price?: number;
+    order_id: number;
+    status: "PENDING" | "PAID" | "DELIVERED" | "FAILED";
+    is_paid: number; // 0 or 1
+    is_delivered: number; // 0 or 1
+    paid_at: string | null;
+    delivered_at: string | null;
+    created_at: string;
 }
 
-interface ShowcaseData {
-    latestProducts: Product[];
-    latestDiscounts: Product[];
-    mostCommented: Product[];
-}
-
-interface ProductState {
-    product: Product[];
+interface OrderState {
+    order: Order[];
     loading: boolean;
     error: string | null;
-    currentProduct: Product | null;
+    currentOrder: Order | null;
     success: boolean;
-    showcase: ShowcaseData | null;
 }
 
-const initialState: ProductState = {
-    product: [],
+const initialState: OrderState = {
+    order: [],
     loading: false,
     error: null,
-    currentProduct: null,
+    currentOrder: null,
     success: false,
-    showcase: null,
 }
 
-export const fetchProducts = createAsyncThunk<
-    Product[],
+export const fetchOrders = createAsyncThunk<
+    Order[],
     void,
     { state: RootState, rejectValue: string }
 >(
-    'product/fetchProducts',
+    'order/fetchOrders',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -63,7 +56,7 @@ export const fetchProducts = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Product[]>('/api/products', config);
+            const {data} = await axios.get<Order[]>('/api/orders', config);
 
             return data;
         } catch (error: any) {
@@ -76,147 +69,104 @@ export const fetchProducts = createAsyncThunk<
     }
 );
 
-export const fetchProductBySlug = createAsyncThunk<
-    Product,
-    { slug: string },
-    { state: RootState, rejectValue: string }
->(
-    'product/fetchProductBySlug',
-    async (slug, thunkAPI) => {
-        try {
-            const {user: {userInfo}} = thunkAPI.getState();
-
-            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
-                return thunkAPI.rejectWithValue("User not logged in or token missing.");
-            }
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${userInfo.data.access_token}`,
-                }
-            };
-
-            const {data} = await axios.get<Product>(`/api/products/${slug}`, config);
-
-            return data;
-        } catch (error: any) {
-            const message =
-                error.response && error.response.data.message
-                    ? error.response.data.message
-                    : error.message;
-            return thunkAPI.rejectWithValue(message);
-        }
-    }
-);
-
-export const createProduct = createAsyncThunk<
-    Product,
-    {
-        name: string;
-        child_category_id?: number;
-        product_code?: string,
-        price?: number,
-        discount?: number,
-        description?: string,
-        special_offer?: number,
-        qty?: number
-    }, { state: RootState, rejectValue: string }
->(
-    'product/createProduct',
-    async ({name, child_category_id, product_code, price, discount, description, special_offer, qty}, thunkAPI) => {
-        try {
-            const {user: {userInfo}} = thunkAPI.getState();
-
-            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
-                return thunkAPI.rejectWithValue("User not logged in or token missing.");
-            }
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${userInfo.data.access_token}`,
-                }
-            };
-
-            const {data} = await axios.post<Product>(`/api/products`, {
-                name,
-                child_category_id,
-                product_code,
-                price,
-                discount,
-                description,
-                special_offer,
-                qty
-            }, config);
-
-            return data;
-        } catch (error: any) {
-            const message =
-                error.response && error.response.data.message
-                    ? error.response.data.message
-                    : error.message;
-            return thunkAPI.rejectWithValue(message);
-        }
-    }
-);
-
-export const updateProduct = createAsyncThunk<
-    Product,
-    {
-        id: number;
-        name: string;
-        child_category_id?: number;
-        product_code?: string,
-        price?: number,
-        discount?: number,
-        description?: string,
-        special_offer?: number,
-        qty?: number
-    },
-    { state: RootState, rejectValue: string }
->(
-    'product/updateProduct',
-    async ({id, name, child_category_id, product_code, price, discount, description, special_offer, qty}, thunkAPI) => {
-        try {
-            const {user: {userInfo}} = thunkAPI.getState();
-
-            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
-                return thunkAPI.rejectWithValue("User not logged in or token missing.");
-            }
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${userInfo.data.access_token}`,
-                }
-            };
-
-            const {data} = await axios.patch<Product>(`/api/products/${id}`, {
-                name,
-                child_category_id,
-                product_code,
-                price,
-                discount,
-                description,
-                special_offer,
-                qty
-            }, config);
-
-            return data;
-        } catch (error: any) {
-            const message =
-                error.response && error.response.data.message
-                    ? error.response.data.message
-                    : error.message;
-            return thunkAPI.rejectWithValue(message);
-        }
-    }
-);
-
-export const deleteProduct = createAsyncThunk<
-    number,
+export const fetchOrderById = createAsyncThunk<
+    Order,
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'product/deleteProduct',
+    'order/fetchOrderById',
+    async (id, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
+            const {data} = await axios.get<Order>(`/api/orders/${id}`, config);
+
+            return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const createOrder = createAsyncThunk<
+    Order,
+    {
+        user_id: string;
+        cart_items?: [];
+        products_price?: number,
+        products_discount_price?: number,
+        shipping_price?: number,
+        tax_price?: number,
+        total_price?: number
+    }, { state: RootState, rejectValue: string }
+>(
+    'order/createOrder',
+    async ({
+               user_id,
+               cart_items,
+               products_price,
+               products_discount_price,
+               shipping_price,
+               tax_price,
+               total_price
+           }, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
+            const {data} = await axios.post<Order>(`/api/orders`,
+                {
+                    user_id,
+                    cart_items,
+                    products_price,
+                    products_discount_price,
+                    shipping_price,
+                    tax_price,
+                    total_price,
+                }, config);
+
+            return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const payOrder = createAsyncThunk<
+    Order,
+    {
+        id: number;
+    },
+    { state: RootState, rejectValue: string }
+>(
+    'order/payOrder',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -231,7 +181,109 @@ export const deleteProduct = createAsyncThunk<
                 }
             };
 
-            await axios.delete(`/api/products/${id}`, config);
+            const {data} = await axios.patch<Order>(`/api/orders/${id}/pay`, {}, config);
+
+            return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const deliverOrder = createAsyncThunk<
+    Order,
+    {
+        id: number;
+    },
+    { state: RootState, rejectValue: string }
+>(
+    'order/deliverOrder',
+    async ({id}, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
+            const {data} = await axios.patch<Order>(`/api/orders/${id}/deliver`, {}, config);
+
+            return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const createPDFOrder = createAsyncThunk<
+    string,
+    {
+        id: number;
+    },
+    { state: RootState, rejectValue: string }
+>(
+    'order/createPDFOrder',
+    async ({id}, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const response = await axios.get(`/api/orders/${id}/pdf`, {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+                responseType: 'blob',
+            });
+
+            return window.URL.createObjectURL(new Blob([response.data]));
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const deleteOrder = createAsyncThunk<
+    number,
+    { id: number },
+    { state: RootState, rejectValue: string }
+>(
+    'order/deleteOrder',
+    async ({id}, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
+            await axios.delete(`/api/orders/${id}`, config);
 
             return id;
         } catch (error: any) {
@@ -244,230 +296,186 @@ export const deleteProduct = createAsyncThunk<
     }
 );
 
-export const createProductImage = createAsyncThunk<
-    any,
-    { productIdImage: number, formData: FormData },
-    { state: RootState; rejectValue: string }
->(
-    'products/createProductImage',
-    async ({productIdImage, formData}, thunkAPI) => {
-        try {
-            const {user: {userInfo}} = thunkAPI.getState();
-            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
-                return thunkAPI.rejectWithValue("User not logged in or token missing");
-            }
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${userInfo.data.access_token}`,
-                    "Content-Type": "multipart/form-data"
-                }
-            };
-
-            const {data} = await axios.post(
-                `/api/productImage/${productIdImage}`,
-                formData,
-                config
-            );
-            return data;
-
-        } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
-            return thunkAPI.rejectWithValue(message)
-        }
-    }
-);
-
-export const replaceProductImage = createAsyncThunk<
-    any,
-    { productReplaceImageId: number, formData: FormData },
+export const listUserOrders = createAsyncThunk<
+    Order[],
+    void,
     { state: RootState, rejectValue: string }
 >(
-    'products/replaceProductImage',
-    async ({productReplaceImageId, formData}, thunkAPI) => {
+    'order/listUserOrders',
+    async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
             if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
-                return thunkAPI.rejectWithValue("User not logged in or token missing");
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
             }
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${userInfo.data.access_token}`,
-                    "Content-Type": "multipart/form-data"
-                }
-            };
 
-            const {data} = await axios.post(
-                `/api/RproductImage/${productReplaceImageId}`,
-                formData,
-                config
-            )
-            return data;
-        } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
-            return thunkAPI.rejectWithValue(message);
-        }
-    }
-);
-
-export const deleteProductImage = createAsyncThunk<
-    any,
-    { id: number },
-    { state: RootState; rejectValue: string }
->(
-    'products/deleteProductImage',
-    async ({id}, thunkAPI) => {
-        try {
-            const {user: {userInfo}} = thunkAPI.getState();
-            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
-                return thunkAPI.rejectWithValue("user not logged in or token missing")
-            }
             const config = {
                 headers: {
                     Authorization: `Bearer ${userInfo.data.access_token}`
                 }
             };
 
-            const {data} = await axios.delete(`/api/productImage/${id}`, config);
+            const {data} = await axios.get<Order[]>('/api/user-orders', config);
             return data;
         } catch (error: any) {
             const message = error.response?.data?.message || error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
-);
-
-export const getShowcaseList = createAsyncThunk<
-    ShowcaseData,
-    void,
-    { state: RootState; rejectValue: string }
->(
-    'products/getShowcaseList',
-    async (_, thunkAPI) => {
-        try {
-            const {data} = await axios.get('/api/showcase-products');
-            return data;
-        } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
-            return thunkAPI.rejectWithValue(message)
-        }
-    }
 )
 
-const productSlice = createSlice({
-    name: 'product',
+const orderSlice = createSlice({
+    name: 'order',
     initialState,
     reducers: {
-        resetProductState: (state) => {
+        resetOrderState: (state) => {
             return initialState;
         },
-        clearCurrentProduct: (state) => {
-            state.currentProduct = null;
+        clearCurrentOrder: (state) => {
+            state.currentOrder = null;
         }
     },
     extraReducers: (builder) => {
         builder
-            // Handle fetchProduct
-            .addCase(fetchProducts.pending, (state) => {
+            // Handle fetchOrder
+            .addCase(fetchOrders.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+            .addCase(fetchOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
                 state.loading = false;
-                state.product = action.payload;
+                state.order = action.payload;
             })
-            .addCase(fetchProducts.rejected, (state, action) => {
+            .addCase(fetchOrders.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
 
-            // Handle fetchProductBySlug
-            .addCase(fetchProductBySlug.pending, (state) => {
+            // Handle fetchOrderById
+            .addCase(fetchOrderById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchProductBySlug.fulfilled, (state, action: PayloadAction<Product>) => {
+            .addCase(fetchOrderById.fulfilled, (state, action: PayloadAction<Order>) => {
                 state.loading = false;
-                state.currentProduct = action.payload;
+                state.currentOrder = action.payload;
             })
-            .addCase(fetchProductBySlug.rejected, (state, action) => {
+            .addCase(fetchOrderById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
 
-            // Handle createProduct
-            .addCase(createProduct.pending, (state) => {
+            // Handle createOrder
+            .addCase(createOrder.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(createProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+            .addCase(createOrder.fulfilled, (state, action: PayloadAction<Order>) => {
                 state.loading = false;
-                state.product.push(action.payload); // Immer allows this!
+                state.order.push(action.payload); // Immer allows this!
                 state.success = true;
             })
-            .addCase(createProduct.rejected, (state, action) => {
+            .addCase(createOrder.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle updateProduct
-            .addCase(updateProduct.pending, (state) => {
+            // Handle payOrder
+            .addCase(payOrder.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
-            .addCase(updateProduct.fulfilled, (state, action: PayloadAction<Product>) => {
+            .addCase(payOrder.fulfilled, (state, action: PayloadAction<Order>) => {
                 state.loading = false;
-                const index = state.product.findIndex((a) => a.id === action.payload.id);
+                const index = state.order.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.product[index] = action.payload; // Immer allows this!
+                    state.order[index] = action.payload; // Immer allows this!
                 }
                 state.success = true;
             })
-            .addCase(updateProduct.rejected, (state, action) => {
+            .addCase(payOrder.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle deleteProduct
-            .addCase(deleteProduct.pending, (state) => {
+            // Handle deliverOrder
+            .addCase(deliverOrder.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(deliverOrder.fulfilled, (state, action: PayloadAction<Order>) => {
+                state.loading = false;
+                const index = state.order.findIndex((a) => a.id === action.payload.id);
+                if (index !== -1) {
+                    state.order[index] = action.payload; // Immer allows this!
+                }
+                state.success = true;
+            })
+            .addCase(deliverOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+                state.success = false;
+            })
+
+            // Handle createPDFOrder
+            .addCase(createPDFOrder.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(createPDFOrder.fulfilled, (state, action: PayloadAction<string>) => {
+                state.loading = false;
+                state.success = true;
+            })
+            .addCase(createPDFOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+                state.success = false;
+            })
+
+            // Handle deleteOrder
+            .addCase(deleteOrder.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
 
             })
-            .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<number>) => {
+            .addCase(deleteOrder.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.product = state.product.filter((a) => a.id !== action.payload); // OK with Immer
+                state.order = state.order.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
 
             })
-            .addCase(deleteProduct.rejected, (state, action) => {
+            .addCase(deleteOrder.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
                 state.success = false;
             })
 
-            // Handle getShowcaseList
-            .addCase(getShowcaseList.pending, (state) => {
+            .addCase(listUserOrders.pending, (state) => {
                 state.loading = true;
                 state.error = null;
+                state.success = false;
             })
-            .addCase(getShowcaseList.fulfilled, (state, action: PayloadAction<ShowcaseData>) => {
+            .addCase(listUserOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
                 state.loading = false;
-                state.showcase = action.payload;
+                state.order = action.payload;
+                state.success = true;
             })
-            .addCase(getShowcaseList.rejected, (state, action) => {
+            .addCase(listUserOrders.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
+                state.success = false;
+                state.error = action.payload ? action.payload : "Unknown Error"
             });
 
         // add the remaining reducers
     },
 });
 
-export const {resetProductState, clearCurrentProduct} = productSlice.actions;
-export default productSlice.reducer;
+export const {resetOrderState, clearCurrentOrder} = orderSlice.actions;
+export default orderSlice.reducer;

@@ -28,7 +28,7 @@ export const fetchRoles = createAsyncThunk<
     void,
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchRoles',
+    'role/fetchRoles',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -61,7 +61,7 @@ export const fetchRoleById = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchRoleById',
+    'role/fetchRoleById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -94,7 +94,7 @@ export const createRole = createAsyncThunk<
     { name: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/createRole',
+    'role/createRole',
     async ({name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -127,7 +127,7 @@ export const updateRole = createAsyncThunk<
     { id: number, name: string, is_admin: number, perms: [] },
     { state: RootState, rejectValue: string }
 >(
-    'categories/updateRole',
+    'role/updateRole',
     async ({id, name, is_admin, perms}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -160,7 +160,7 @@ export const deleteRole = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/deleteRole',
+    'role/deleteRole',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();

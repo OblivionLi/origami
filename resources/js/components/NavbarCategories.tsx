@@ -1,11 +1,6 @@
 import React from "react";
-import { Paper, makeStyles } from "@material-ui/core";
-
-const useStyles = makeStyles((theme) => ({
-}));
 
 const NavbarCategories = () => {
-    const classes = useStyles();
 
     return (
         <div className="categories">

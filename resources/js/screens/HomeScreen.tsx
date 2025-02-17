@@ -1,19 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from "@/store";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NavbarCategories from "@/components/NavbarCategories";
-import LatestProducts from "../components/homescreen/LatestProducts";
-import LatestDiscounts from "../components/homescreen/LatestDiscounts";
-import MostCommented from "../components/homescreen/MostCommented";
-import {getShowcaseList} from './../actions/productActions';
-
-interface ShowcaseData {
-    latestProducts: any[];
-    latestDiscounts: any[];
-    mostCommented: any[];
-}
+import {getShowcaseList} from "@/features/product/productSlice";
+import {StyledDivider3} from "@/styles/muiStyles";
+import Loader from "@/components/alert/Loader";
+import Message from "@/components/alert/Message";
+import LatestProducts from "@/components/homescreen/LatestProducts";
+import LatestDiscounts from "@/components/homescreen/LatestDiscounts";
+import MostCommented from "@/components/homescreen/MostCommented";
 
 interface HomeScreenProps {
 }
@@ -28,25 +25,23 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
         dispatch(getShowcaseList());
     }, [dispatch]);
 
-    // const [isShowcaseEmpty, setIsShowcaseEmpty] = useState(true)
-    //
-    // const productShowcase = useSelector((state) => state.productShowcase);
-    // const {showcase} = productShowcase;
-    //
-    // useEffect(() => {
-    //     isShowcaseEmpty ? dispatch(getShowcaseList()) : setIsShowcaseEmpty(false);
-    // }, [isShowcaseEmpty])
-
     return (
         <>
             <Navbar/>
             <NavbarCategories/>
 
-            <LatestProducts latestProducts={showcase.latestProducts || []}/>
-            <LatestDiscounts latestDiscounts={showcase.latestDiscounts || []}/>
-            <MostCommented mostCommented={showcase.mostCommented || []}/>
+            {loading && <Loader/>}
+            {error && <Message variant="error">Product showcases not loaded.</Message>}
 
-            <hr className="divider2"/>
+            {showcase && (
+                <>
+                    <LatestProducts latestProducts={showcase.latestProducts}/>
+                    <LatestDiscounts latestDiscounts={showcase.latestDiscounts}/>
+                    <MostCommented mostCommented={showcase.mostCommented}/>
+                </>
+            )}
+
+            <StyledDivider3/>
 
             <Footer/>
         </>

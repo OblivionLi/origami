@@ -2,16 +2,16 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface ChildCategory {
+interface ChildCategorySlice {
     id: number;
     name: string;
 }
 
 interface ChildCategoryState {
-    childCategories: ChildCategory[];
+    childCategories: ChildCategorySlice[];
     loading: boolean;
     error: string | null;
-    currentChildCategory: ChildCategory | null;
+    currentChildCategory: ChildCategorySlice | null;
     success: boolean;
 }
 
@@ -24,11 +24,11 @@ const initialState: ChildCategoryState = {
 }
 
 export const fetchChildCategories = createAsyncThunk<
-    ChildCategory[],
+    ChildCategorySlice[],
     void,
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchChildCategories',
+    'childCategory/fetchChildCategories',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -43,7 +43,7 @@ export const fetchChildCategories = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<ChildCategory[]>('/api/child-categories', config);
+            const {data} = await axios.get<ChildCategorySlice[]>('/api/child-categories', config);
 
             return data;
         } catch (error: any) {
@@ -57,11 +57,11 @@ export const fetchChildCategories = createAsyncThunk<
 );
 
 export const fetchChildCategoryById = createAsyncThunk<
-    ChildCategory,
+    ChildCategorySlice,
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchChildCategoryById',
+    'childCategory/fetchChildCategoryById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -76,7 +76,7 @@ export const fetchChildCategoryById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<ChildCategory>(`/api/child-categories/${id}`, config);
+            const {data} = await axios.get<ChildCategorySlice>(`/api/child-categories/${id}`, config);
 
             return data;
         } catch (error: any) {
@@ -90,11 +90,11 @@ export const fetchChildCategoryById = createAsyncThunk<
 );
 
 export const createChildCategory = createAsyncThunk<
-    ChildCategory,
+    ChildCategorySlice,
     { parent_category_id: number, name: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/createChildCategory',
+    'childCategory/createChildCategory',
     async ({parent_category_id, name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -109,7 +109,7 @@ export const createChildCategory = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<ChildCategory>(`/api/child-categories`, {name, parent_category_id}, config);
+            const {data} = await axios.post<ChildCategorySlice>(`/api/child-categories`, {name, parent_category_id}, config);
 
             return data;
         } catch (error: any) {
@@ -123,11 +123,11 @@ export const createChildCategory = createAsyncThunk<
 );
 
 export const updateChildCategory = createAsyncThunk<
-    ChildCategory,
+    ChildCategorySlice,
     { id: number, name: string, parent_category_id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/updateChildCategory',
+    'childCategory/updateChildCategory',
     async ({id, name, parent_category_id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -142,7 +142,7 @@ export const updateChildCategory = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<ChildCategory>(`/api/child-categories/${id}`, {name, parent_category_id}, config);
+            const {data} = await axios.patch<ChildCategorySlice>(`/api/child-categories/${id}`, {name, parent_category_id}, config);
 
             return data;
         } catch (error: any) {
@@ -160,7 +160,7 @@ export const deleteChildCategory = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/deleteChildCategory',
+    'childCategory/deleteChildCategory',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -206,7 +206,7 @@ const childCategorySlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchChildCategories.fulfilled, (state, action: PayloadAction<ChildCategory[]>) => {
+            .addCase(fetchChildCategories.fulfilled, (state, action: PayloadAction<ChildCategorySlice[]>) => {
                 state.loading = false;
                 state.childCategories = action.payload;
             })
@@ -220,7 +220,7 @@ const childCategorySlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchChildCategoryById.fulfilled, (state, action: PayloadAction<ChildCategory>) => {
+            .addCase(fetchChildCategoryById.fulfilled, (state, action: PayloadAction<ChildCategorySlice>) => {
                 state.loading = false;
                 state.currentChildCategory = action.payload;
             })
@@ -235,7 +235,7 @@ const childCategorySlice = createSlice({
                 state.error = null;
                 state.success = false;
             })
-            .addCase(createChildCategory.fulfilled, (state, action: PayloadAction<ChildCategory>) => {
+            .addCase(createChildCategory.fulfilled, (state, action: PayloadAction<ChildCategorySlice>) => {
                 state.loading = false;
                 state.childCategories.push(action.payload); // Immer allows this!
                 state.success = true;
@@ -252,7 +252,7 @@ const childCategorySlice = createSlice({
                 state.error = null;
                 state.success = false;
             })
-            .addCase(updateChildCategory.fulfilled, (state, action: PayloadAction<ChildCategory>) => {
+            .addCase(updateChildCategory.fulfilled, (state, action: PayloadAction<ChildCategorySlice>) => {
                 state.loading = false;
                 const index = state.childCategories.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {

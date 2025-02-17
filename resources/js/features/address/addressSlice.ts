@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Address {
+export interface Address {
     id: number;
     user_id: number;
     name: string;

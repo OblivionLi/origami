@@ -28,7 +28,7 @@ export const fetchPermissions = createAsyncThunk<
     void,
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchPermissions',
+    'permission/fetchPermissions',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -61,7 +61,7 @@ export const fetchPermissionById = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchPermissionById',
+    'permission/fetchPermissionById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -94,7 +94,7 @@ export const createPermission = createAsyncThunk<
     { name: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/createPermission',
+    'permission/createPermission',
     async ({name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -127,7 +127,7 @@ export const updatePermission = createAsyncThunk<
     { id: number, name: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/updatePermission',
+    'permission/updatePermission',
     async ({id, name}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -160,7 +160,7 @@ export const deletePermission = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/deletePermission',
+    'permission/deletePermission',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();

@@ -2,13 +2,47 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Review {
+export interface Review {
     id: number;
-    name: string;
+    user_name: string;
+    rating: string;
+    user_comment: string;
+    created_at: string;
+    updated_at: string;
+    admin_name: string | null;
+    admin_comment: string | null;
+    product: {
+        slug: string;
+        name: string
+    }
+}
+
+export interface PaginationLinks {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+}
+
+export interface PaginationMeta {
+    current_page: number;
+    from: number;
+    last_page: number;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+}
+
+export interface PaginatedReviews {
+    data: Review[];
+    links: PaginationLinks;
+    meta: PaginationMeta;
 }
 
 interface ReviewState {
-    review: Review[];
+    reviews: Review[] | null;
+    paginatedReviews: PaginatedReviews | null;
     loading: boolean;
     error: string | null;
     currentReview: Review | null;
@@ -16,7 +50,8 @@ interface ReviewState {
 }
 
 const initialState: ReviewState = {
-    review: [],
+    reviews: null,
+    paginatedReviews: null,
     loading: false,
     error: null,
     currentReview: null,
@@ -28,7 +63,7 @@ export const fetchReviews = createAsyncThunk<
     void,
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchReviews',
+    'review/fetchReviews',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -57,12 +92,12 @@ export const fetchReviews = createAsyncThunk<
 );
 
 export const fetchReviewsWithPagination = createAsyncThunk<
-    Review[],
-    { id: number, page: string | null },
+    PaginatedReviews,
+    { productId: number, page: number | null },
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchReviewsWithPagination',
-    async ({id, page}, thunkAPI) => {
+    'review/fetchReviewsWithPagination',
+    async ({productId, page}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -76,11 +111,9 @@ export const fetchReviewsWithPagination = createAsyncThunk<
                 }
             };
 
-            if (page == null) {
-                page = "";
-            }
+            const pageParam = page === null ? '' : `?page=${page}`;
 
-            const {data} = await axios.get<Review[]>(`/api/reviews/${id}?page=${page}`, config);
+            const {data} = await axios.get<PaginatedReviews>(`/api/reviews/${productId}${pageParam}`, config);
 
             return data;
         } catch (error: any) {
@@ -98,7 +131,7 @@ export const fetchReviewById = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/fetchReviewById',
+    'review/fetchReviewById',
     async (id, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -131,7 +164,7 @@ export const createReview = createAsyncThunk<
     { product_id: number, user_id: number, username: string, rating: number, comment: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/createReview',
+    'review/createReview',
     async ({product_id, user_id, username, rating, comment}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -169,7 +202,7 @@ export const updateReview = createAsyncThunk<
     { id: number, user_comment: string, admin_comment: string },
     { state: RootState, rejectValue: string }
 >(
-    'categories/updateReview',
+    'review/updateReview',
     async ({id, user_comment, admin_comment}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -206,7 +239,7 @@ export const deleteReview = createAsyncThunk<
     { id: number },
     { state: RootState, rejectValue: string }
 >(
-    'categories/deleteReview',
+    'review/deleteReview',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -254,7 +287,8 @@ const reviewSlice = createSlice({
             })
             .addCase(fetchReviews.fulfilled, (state, action: PayloadAction<Review[]>) => {
                 state.loading = false;
-                state.review = action.payload;
+                state.reviews = action.payload;
+                state.paginatedReviews = null;
             })
             .addCase(fetchReviews.rejected, (state, action) => {
                 state.loading = false;
@@ -266,9 +300,10 @@ const reviewSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchReviewsWithPagination.fulfilled, (state, action: PayloadAction<Review[]>) => {
+            .addCase(fetchReviewsWithPagination.fulfilled, (state, action: PayloadAction<PaginatedReviews>) => {
                 state.loading = false;
-                state.review = action.payload;
+                state.paginatedReviews = action.payload;
+                state.reviews = null;
             })
             .addCase(fetchReviewsWithPagination.rejected, (state, action) => {
                 state.loading = false;
@@ -297,8 +332,11 @@ const reviewSlice = createSlice({
             })
             .addCase(createReview.fulfilled, (state, action: PayloadAction<Review>) => {
                 state.loading = false;
-                state.review.push(action.payload); // Immer allows this!
                 state.success = true;
+                state.reviews = null;
+                if (state.paginatedReviews && state.paginatedReviews.data) {
+                    state.paginatedReviews.data = [action.payload, ...state.paginatedReviews.data]
+                }
             })
             .addCase(createReview.rejected, (state, action) => {
                 state.loading = false;
@@ -314,11 +352,19 @@ const reviewSlice = createSlice({
             })
             .addCase(updateReview.fulfilled, (state, action: PayloadAction<Review>) => {
                 state.loading = false;
-                const index = state.review.findIndex((a) => a.id === action.payload.id);
-                if (index !== -1) {
-                    state.review[index] = action.payload; // Immer allows this!
-                }
                 state.success = true;
+                if (state.reviews) {
+                    const index = state.reviews.findIndex((review) => review.id === action.payload.id);
+                    if (index !== -1) {
+                        state.reviews[index] = action.payload;
+                    }
+                } else if (state.paginatedReviews && state.paginatedReviews.data) {
+                    const index = state.paginatedReviews.data.findIndex((review) => review.id === action.payload.id);
+
+                    if (index !== -1) {
+                        state.paginatedReviews.data[index] = action.payload;
+                    }
+                }
             })
             .addCase(updateReview.rejected, (state, action) => {
                 state.loading = false;
@@ -335,9 +381,12 @@ const reviewSlice = createSlice({
             })
             .addCase(deleteReview.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.review = state.review.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
-
+                if (state.reviews) {
+                    state.reviews = state.reviews.filter((review) => review.id !== action.payload);
+                } else if (state.paginatedReviews && state.paginatedReviews.data) {
+                    state.paginatedReviews.data = state.paginatedReviews.data.filter((review) => review.id !== action.payload);
+                }
             })
             .addCase(deleteReview.rejected, (state, action) => {
                 state.loading = false;

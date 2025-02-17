@@ -1,6 +1,7 @@
 import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
+import {Address} from '@/features/address/addressSlice';
 
 interface User {
     id: number;
@@ -16,6 +17,7 @@ interface User {
         email?: string,
         role?: string,
         is_admin?: number,
+        address: Address,
     }
 }
 

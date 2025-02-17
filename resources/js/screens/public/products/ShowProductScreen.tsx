@@ -1,129 +1,90 @@
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "../../../components/NavbarCategories.js";
-import { makeStyles } from "@material-ui/core/styles";
-import Footer from "../../../components/Footer.js";
+import React, {useEffect, useState} from "react";
+import {AppDispatch, RootState} from "@/store";
+import {useSelector, useDispatch} from "react-redux";
+import {Link, useParams, useNavigate} from "react-router-dom";
 import {
     Paper,
     Typography,
     Breadcrumbs,
     Divider,
-    Button,
     Accordion,
     AccordionSummary,
     AccordionDetails,
     Box,
     TextField,
-} from "@material-ui/core";
-import { Link } from "react-router-dom";
-import { getProduct } from "./../../../actions/productActions";
-import Loader from "../../../components/alert/Loader.js";
-import Rating from "@material-ui/lab/Rating";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from "react-responsive-carousel";
-import Message from "../../../components/alert/Message.js";
-import { REVIEW_STORE_RESET } from "../../../constants/reviewConstants";
-import { createReview } from "../../../actions/reviewActions";
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Swal from "sweetalert2";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
-        marginBottom: "20px",
-        borderBottom: "1px solid #855C1B",
-        paddingBottom: "10px",
-        width: "30%",
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import {Carousel} from "react-responsive-carousel";
 
-        [theme.breakpoints.down("sm")]: {
-            width: "90%",
-            margin: "0 auto 20px auto",
-        },
-    },
+import Message from "@/components/alert/Message.js";
+import Loader from "@/components/alert/Loader.js";
+import Navbar from "@/components/Navbar.js";
+import NavbarCategories from "@/components/NavbarCategories.js";
+import Footer from "@/components/Footer.js";
+import {fetchProductBySlug} from '@/features/product/productSlice';
+import {resetReviewState, createReview, Review} from '@/features/review/reviewSlice';
+import {StyledButton, StyledDivider, StyledRating} from "@/styles/muiStyles";
 
-    card: {
-        maxWidth: 345,
-        minWidth: 345,
-        boxShadow:
-            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
-    },
 
-    media: {
-        height: 345,
-        width: "100%",
-    },
+// const useStyles = makeStyles((theme) => ({
+//
+//     link2: {
+//         color: "wheat",
+//
+//         "&:hover": {
+//             color: "wheat",
+//             textDecoration: "none",
+//         },
+//     },
+//
+//     link: {
+//         color: "#855C1B",
+//         fontWeight: "600",
+//
+//         "&:hover": {
+//             color: "#388667",
+//         },
+//     },
+// }));
 
-    button: {
-        fontFamily: "Quicksand",
-        backgroundColor: "#855C1B",
-        color: "white",
+interface ShowProductScreenProps {
+}
 
-        "&:hover": {
-            backgroundColor: "#388667",
-        },
-    },
+const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const {slug: productSlug} = useParams();
 
-    button2: {
-        fontFamily: "Quicksand",
-        backgroundColor: "#855C1B",
+    const userLogin = useSelector((state: RootState) => state.user.userInfo);
 
-        "&:hover": {
-            backgroundColor: "#388667",
-        },
-    },
+    const [rating, setRating] = useState<number>(0);
+    const [comment, setComment] = useState<string>("");
+    const [qty, setQty] = useState<number>(1);
 
-    link2: {
-        color: "wheat",
+    const productShow = useSelector((state: RootState) => state.product);
+    const {loading, error, currentProduct} = productShow;
 
-        "&:hover": {
-            color: "wheat",
-            textDecoration: "none",
-        },
-    },
-
-    link: {
-        color: "#855C1B",
-        fontWeight: "600",
-
-        "&:hover": {
-            color: "#388667",
-        },
-    },
-}));
-
-const ShowProductScreen = ({ history, match }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
-
-    const productSlug = match.params.slug;
-
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState("");
-    const [qty, setQty] = useState(1);
-
-    const productShow = useSelector((state) => state.productShow);
-    const { loading, error, product } = productShow;
-    const { data } = product;
-
-    const userLogin = useSelector((state) => state.userLogin);
-    const { userInfo } = userLogin;
-
-    const reviewStore = useSelector((state) => state.reviewStore);
-    const { success: successProductReview, error: errorProductReview } =
-        reviewStore;
+    const reviewCreate = useSelector((state: RootState) => state.review);
+    const {success: successProductReview, error: errorProductReview} = reviewCreate;
 
     useEffect(() => {
+        if (!productSlug) return;
+
         if (successProductReview) {
             setRating(0);
             setComment("");
-            dispatch({ type: REVIEW_STORE_RESET });
+            dispatch(resetReviewState());
         }
 
-        dispatch(getProduct(productSlug));
-    }, [dispatch, successProductReview]);
+        dispatch(fetchProductBySlug({slug: productSlug}));
+    }, [dispatch, productSlug, successProductReview]);
 
-    const addToCartHandler = (e) => {
-        history.push(`/cart/${productSlug}?qty=${qty}`);
+    const addToCartHandler = () => {
+        if (!productSlug) return;
+        navigate(`/cart/${productSlug}?qty=${qty}`);
 
         const Toast = Swal.mixin({
             toast: true,
@@ -139,33 +100,41 @@ const ShowProductScreen = ({ history, match }) => {
 
         Toast.fire({
             icon: "success",
-            title: `Added Product ${data.name} to cart`,
+            title: `Added Product ${currentProduct?.name} to cart`,
         });
     };
 
-    const submitHandler = (e) => {
-        e.preventDefault();
+    const submitHandler = (event: React.FormEvent) => {
+        event.preventDefault();
 
-        dispatch(
-            createReview(
-                productSlug,
-                userInfo.data.id,
-                userInfo.data.name,
-                rating,
-                comment
-            )
-        );
+        if (!productSlug || !userLogin?.data?.id) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Product or user information is missing!",
+            });
+
+            return;
+        }
+
+        dispatch(createReview({
+            product_id: currentProduct!.id,
+            user_id: userLogin.data.id,
+            username: userLogin.data.name || "Unknown",
+            rating: rating,
+            comment: comment
+        }));
     };
 
     return (
         <>
-            <Navbar />
-            <NavbarCategories />
+            <Navbar/>
+            <NavbarCategories/>
 
             <section className="ctn">
                 {loading ? (
                     <div className="loaderCenter">
-                        <Loader />
+                        <Loader/>
                     </div>
                 ) : error ? (
                     <Message variant="error">{error}</Message>
@@ -177,29 +146,29 @@ const ShowProductScreen = ({ history, match }) => {
                                     Homescreen
                                 </Link>
                                 <Typography className="bc-p">
-                                    {data && data.name}
+                                    {currentProduct?.name}
                                 </Typography>
                             </Breadcrumbs>
                         </Paper>
                         <div className="show">
                             <div className="show__carousel">
                                 <Carousel>
-                                    {data &&
-                                        data.images.map((image) => (
-                                            <div key={image.id}>
-                                                <img
-                                                    className="show__carousel-img"
-                                                    src={`http://127.0.0.1:8000/storage/${image.path}`}
-                                                    title={`Image id: ${data.name}`}
-                                                />
-                                            </div>
-                                        ))}
+                                    {currentProduct?.product_images && currentProduct.product_images.map((image) => (
+                                        <div key={image.id}>
+                                            <img
+                                                className="show__carousel-img"
+                                                src={`http://127.0.0.1:8000/storage/${image.path}`}
+                                                alt={`Image for product: ${currentProduct?.name}`}
+                                                title={`Image id: ${currentProduct?.name}`}
+                                            />
+                                        </div>
+                                    ))}
                                 </Carousel>
                             </div>
 
                             <Paper className="show__paper">
                                 <div className="show__paper--rating">
-                                    {data && data.total_quantities > 0 ? (
+                                    {currentProduct && currentProduct.qty! > 0 ? (
                                         <p className="inStock">
                                             &#8226; Product in stock.
                                         </p>
@@ -209,18 +178,17 @@ const ShowProductScreen = ({ history, match }) => {
                                         </p>
                                     )}
 
-                                    <Rating
+                                    <StyledRating
                                         size="small"
                                         name="rating"
-                                        value={parseFloat(data && data.rating)}
-                                        text={`${
-                                            data && data.total_reviews
-                                        } reviews`}
+                                        value={Number(currentProduct?.rating ?? 0)}
+                                        // text={`${
+                                        //     currentProduct?.total_reviews
+                                        // } reviews`}
                                         precision={0.5}
-                                        className={classes.rating}
                                         readOnly
                                     />
-                                    <Divider />
+                                    <Divider/>
                                 </div>
 
                                 <div className="show__paper--details">
@@ -229,7 +197,7 @@ const ShowProductScreen = ({ history, match }) => {
                                             Product Name:
                                         </h4>
                                         <p className="show__paper--p">
-                                            {data && data.name}
+                                            {currentProduct?.name}
                                         </p>
                                     </div>
 
@@ -238,18 +206,18 @@ const ShowProductScreen = ({ history, match }) => {
                                             Product Code:
                                         </h4>
                                         <p className="show__paper--p">
-                                            {data && data.product_code}
+                                            {currentProduct?.product_code}
                                         </p>
                                     </div>
                                 </div>
                             </Paper>
 
-                            {data && data.total_quantities > 0 && (
+                            {currentProduct && currentProduct.qty! > 0 && (
                                 <Paper className="show__paper">
                                     <div className="show__paper--div">
                                         <h4 className="divider">Discount:</h4>
                                         <p className="show__paper--p">
-                                            {data && data.discount} %
+                                            {currentProduct?.discount} %
                                         </p>
                                     </div>
 
@@ -261,45 +229,39 @@ const ShowProductScreen = ({ history, match }) => {
                                         >
                                             &euro;
                                             {(
-                                                data &&
-                                                data.price -
-                                                    (data.price *
-                                                        data.discount) /
-                                                        100
+                                                currentProduct.price! -
+                                                (currentProduct.price! *
+                                                    currentProduct.discount!) /
+                                                100
                                             ).toFixed(2)}
                                         </span>
                                         {" - "}
-                                        <strike>
+                                        <s>
                                             &euro;
-                                            {data && data.price}
-                                        </strike>
+                                            {currentProduct?.price}
+                                        </s>
                                     </div>
 
                                     <div className="show__paper--div">
                                         <h4 className="divider">Quantity:</h4>
                                         <p className="show__paper--p">
-                                            {data && data.total_quantities} left
+                                            {currentProduct?.qty} left
                                         </p>
                                     </div>
 
-                                    <hr className="divider" />
+                                    <hr className="divider"/>
 
                                     <div className="show-tabel-form">
                                         <form>
                                             <div className="form__field">
-                                                <Button
+                                                <StyledButton
                                                     variant="contained"
-                                                    className={classes.button}
                                                     type="button"
                                                     onClick={addToCartHandler}
-                                                    disabled={
-                                                        data &&
-                                                        data.total_quantities ==
-                                                            0
-                                                    }
+                                                    disabled={currentProduct?.qty === 0}
                                                 >
                                                     Add to Cart
-                                                </Button>
+                                                </StyledButton>
                                             </div>
                                         </form>
                                     </div>
@@ -310,28 +272,28 @@ const ShowProductScreen = ({ history, match }) => {
                         <Paper className="show__container">
                             <h3 className="divider">Product Description</h3>
                             <p className="show__paper--p">
-                                {data && data.description} left
+                                {currentProduct?.description}
                             </p>
                         </Paper>
 
                         <Paper className="show__container">
                             <h3 className="divider">Reviews</h3>
-                            {data && data.reviews.length === 0 && (
+                            {currentProduct?.reviews && currentProduct.reviews.length === 0 && (
                                 <Message variant="info">No Reviews</Message>
                             )}
 
-                            <Accordion className={classes.accord}>
+                            <Accordion>
                                 <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
+                                    expandIcon={<ExpandMoreIcon/>}
                                     aria-controls="panel1a-content"
                                     id="panel1a-header"
                                 >
-                                    <Typography className={classes.heading}>
+                                    <Typography>
                                         Open Review form
                                     </Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    {userInfo ? (
+                                    {userLogin ? (
                                         <Paper
                                             className="reviews-form"
                                             elevation={3}
@@ -355,25 +317,19 @@ const ShowProductScreen = ({ history, match }) => {
                                                                     }
                                                                 </Message>
                                                             )}
-                                                            <Divider />
+                                                            <Divider/>
 
-                                                            <Rating
+                                                            <StyledRating
                                                                 size="small"
                                                                 name="Rating Label"
                                                                 precision={0.5}
                                                                 value={rating}
-                                                                onChange={(
-                                                                    e,
-                                                                    newValue
-                                                                ) => {
-                                                                    setRating(
-                                                                        newValue
-                                                                    );
+                                                                onChange={(event, newValue) => {
+                                                                    if (newValue !== null) {
+                                                                        setRating(newValue);
+                                                                    }
                                                                 }}
-                                                                className={
-                                                                    classes.rating
-                                                                }
-                                                                required
+                                                                // required
                                                             />
                                                         </Box>
                                                     </div>
@@ -396,15 +352,14 @@ const ShowProductScreen = ({ history, match }) => {
                                                         />
                                                     </div>
                                                 </div>
-                                                <Button
+                                                <StyledButton
                                                     variant="contained"
-                                                    className={classes.button}
                                                     name="submit"
                                                     type="submit"
                                                     fullWidth
                                                 >
                                                     Add Review
-                                                </Button>
+                                                </StyledButton>
                                             </form>
                                         </Paper>
                                     ) : (
@@ -412,7 +367,6 @@ const ShowProductScreen = ({ history, match }) => {
                                             Please{" "}
                                             <Link
                                                 to="/login"
-                                                className={classes.link}
                                             >
                                                 sign in
                                             </Link>{" "}
@@ -423,16 +377,16 @@ const ShowProductScreen = ({ history, match }) => {
                             </Accordion>
                         </Paper>
 
-                        {data && data.reviews.length > 0 && (
+                        {currentProduct?.reviews && currentProduct.reviews.length > 0 && (
                             <Paper className="show__container">
-                                {data.reviews.map((review) => (
+                                {currentProduct.reviews.map((review: Review) => (
                                     <Paper
                                         key={review.id}
                                         className="show__container--content"
                                     >
                                         <div className="review-top">
                                             <h3>{review.user_name}</h3>
-                                            <Rating
+                                            <StyledRating
                                                 size="small"
                                                 name="rating"
                                                 value={parseFloat(
@@ -440,10 +394,9 @@ const ShowProductScreen = ({ history, match }) => {
                                                 )}
                                                 precision={0.5}
                                                 readOnly
-                                                className={classes.rating}
                                             />
                                         </div>
-                                        <Divider />
+                                        <Divider/>
 
                                         <div className="review-bottom">
                                             <p className="show__paper--p">
@@ -461,7 +414,7 @@ const ShowProductScreen = ({ history, match }) => {
                                         {review.admin_name ||
                                         review.admin_comment ? (
                                             <>
-                                                <Divider />
+                                                <Divider/>
 
                                                 <div className="review-bottom">
                                                     <p>
@@ -494,18 +447,16 @@ const ShowProductScreen = ({ history, match }) => {
                                     </Paper>
                                 ))}
 
-                                {data && data.reviews.length > 1 && (
-                                    <Button
+                                {currentProduct?.reviews.length > 1 && (
+                                    <StyledButton
                                         size="small"
-                                        className={classes.button2}
                                     >
                                         <Link
-                                            to={`/reviews/product/${data.id}`}
-                                            className={classes.link2}
+                                            to={`/reviews/product/${currentProduct.id}`}
                                         >
                                             View all Reviews
                                         </Link>
-                                    </Button>
+                                    </StyledButton>
                                 )}
                             </Paper>
                         )}
@@ -513,8 +464,8 @@ const ShowProductScreen = ({ history, match }) => {
                 )}
             </section>
 
-            <hr className="divider2" />
-            <Footer />
+            <StyledDivider/>
+            <Footer/>
         </>
     );
 };
