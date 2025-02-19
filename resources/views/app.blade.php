@@ -11,7 +11,7 @@
 
     <!-- Scripts -->
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.tsx'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.tsx'])
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">

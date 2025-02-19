@@ -35,7 +35,7 @@ export const fetchProductsByOrigamiCategory = createAsyncThunk<
     { page: number },
     { state: RootState, rejectValue: string }
 >(
-    'category/fetchProducts',
+    'category/fetchProductsByOrigamiCategory',
     async ({page}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -68,7 +68,7 @@ export const fetchProductsByAccessoriesCategory = createAsyncThunk<
     { page: number },
     { state: RootState, rejectValue: string }
 >(
-    'category/fetchProducts',
+    'category/fetchProductsByAccessoriesCategory',
     async ({page}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
@@ -101,7 +101,7 @@ export const fetchProductsBySpecialOffers = createAsyncThunk<
     void,
     { state: RootState, rejectValue: string }
 >(
-    'category/fetchProducts',
+    'category/fetchProductsBySpecialOffers',
     async (_, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();

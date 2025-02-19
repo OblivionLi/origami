@@ -39,7 +39,7 @@ class ProductService
     {
         $savedProduct = $this->productRepository->createProduct($request->validated());
         if (!$savedProduct) {
-            return response()->json(['message' => 'Failed to storeOld product.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => 'Failed to store product.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json(['message' => 'Product created successfully.'], Response::HTTP_CREATED);

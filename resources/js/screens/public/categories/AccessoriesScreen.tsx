@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "../../../components/NavbarCategories.js";
-import Footer from "../../../components/Footer.js";
-import { getAccessories } from "./../../../actions/categoryActions";
-import Loader from "../../../components/alert/Loader.js";
-import Message from "../../../components/alert/Message.js";
+import React, {useState, useEffect} from "react";
+import {AppDispatch, RootState} from "@/store";
+import {Link, useParams, useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import Loader from "@/components/alert/Loader.js";
+import NavbarCategories from "@/components/NavbarCategories.js";
+import Navbar from "@/components/Navbar.js";
+import Footer from "@/components/Footer.js";
+import Message from "@/components/alert/Message.js";
 import {
     Breadcrumbs,
     Paper,
@@ -15,63 +16,36 @@ import {
     CardMedia,
     CardContent,
     CardActions,
-    Button,
     Box,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
+    Rating
+} from "@mui/material";
+import {StyledCard, StyledCardMedia, StyledDivider, StyledRating} from "@/styles/muiStyles";
+import {ChevronLeft, ChevronRight} from "@mui/icons-material";
 import AccessoriesPaginate from "./../../../components/paginations/AccessoriesPaginate";
 import ReactPaginate from "react-paginate";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import Rating from "@material-ui/lab/Rating";
+import {getAccessories} from "./../../../actions/categoryActions";
+import {Product} from '@/features/product/productSlice';
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
-        marginBottom: "20px",
-        borderBottom: "1px solid #855C1B",
-        paddingBottom: "10px",
-        width: "30%",
+const AccessoriesScreen = () => {
+    const dispatch = useDispatch<AppDispatch>();
 
-        [theme.breakpoints.down("sm")]: {
-            width: "90%",
-            margin: "0 auto 20px auto",
-        },
-    },
+    const {page: pageParam = '1'} = useParams();
+    const page = parseInt(pageParam, 10);
 
-    card: {
-        maxWidth: 345,
-        minWidth: 345,
-        boxShadow:
-            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
-    },
 
-    media: {
-        height: 345,
-        width: "100%",
-    },
-}));
 
-const AccessoriesScreen = ({ match }) => {
-    const classes = useStyles();
-
-    const dispatch = useDispatch();
-
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [childCatSlug, setChildCatSlug] = useState("");
 
-    const accessoryList = useSelector((state) => state.accessoryList);
-    const { loading, error, accessories } = accessoryList;
-    const { childCat, productsWithPag, products } = accessories;
+    const accessoryList = useSelector((state: RootState) => state.category);
+    const {loading, error, accessories} = accessoryList;
+    // const {childCat, productsWithPag, products} = accessories;
 
-    // paginate
-    const page = match.params.page || 1;
-    let current_page = productsWithPag && productsWithPag.current_page;
-    let last_page = productsWithPag && productsWithPag.last_page;
+    const current_page = accessories?.meta?.current_page ?? 1;
+    const last_page = accessories?.meta?.last_page ?? 1;
+
+    // let current_page = productsWithPag && productsWithPag.current_page;
+    // let last_page = productsWithPag && productsWithPag.last_page;
 
     const [pageNumber, setPageNumber] = useState(0);
     const productsPerPage = 6;
@@ -83,10 +57,9 @@ const AccessoriesScreen = ({ match }) => {
         filteredProducts.slice(pagesVisited, pagesVisited + productsPerPage)
     ).map((product) => {
         return (
-            <Card className={classes.card} key={product.id}>
+            <StyledCard key={product.id}>
                 <CardActionArea>
-                    <CardMedia
-                        className={classes.media}
+                    <StyledCardMedia
                         image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
                         title={`Image for product: ${product.name}`}
                     />
@@ -115,13 +88,12 @@ const AccessoriesScreen = ({ match }) => {
                         borderColor="transparent"
                         className={classes.box}
                     >
-                        <Rating
+                        <StyledRating
                             size="small"
                             name="rating"
                             value={parseFloat(product.rating)}
                             text={`${product.total_reviews} reviews`}
                             precision={0.5}
-                            className={classes.rating}
                             readOnly
                         />
                     </Box>
@@ -129,11 +101,11 @@ const AccessoriesScreen = ({ match }) => {
                         &euro;{product.price}
                     </span>
                 </CardActions>
-            </Card>
+            </StyledCard>
         );
     });
 
-    const changePage = ({ selected }) => {
+    const changePage = ({selected}) => {
         setPageNumber(selected);
     };
     // ======================
@@ -152,12 +124,12 @@ const AccessoriesScreen = ({ match }) => {
 
     return (
         <>
-            <Navbar />
-            <NavbarCategories />
+            <Navbar/>
+            <NavbarCategories/>
             <section className="ctn">
                 {loading ? (
                     <div className="loaderCenter">
-                        <Loader />
+                        <Loader/>
                     </div>
                 ) : error ? (
                     <Message variant="error">{error}</Message>
@@ -228,77 +200,77 @@ const AccessoriesScreen = ({ match }) => {
                                 <div className="category--products-items">
                                     {filteredProducts == ""
                                         ? productsWithPag &&
-                                          productsWithPag.data.map(
-                                              (product) => (
-                                                  <Card
-                                                      className={classes.card}
-                                                      key={product.id}
-                                                  >
-                                                      <CardActionArea>
-                                                          <CardMedia
-                                                              className={
-                                                                  classes.media
-                                                              }
-                                                              image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
-                                                              title={`Image for product: ${product.name}`}
-                                                          />
-                                                          <CardContent className="card-content-top">
-                                                              <Typography
-                                                                  gutterBottom
-                                                                  variant="h5"
-                                                                  component="h2"
-                                                                  className="card-content-h2"
-                                                              >
-                                                                  {product.name}
-                                                              </Typography>
-                                                              <Typography
-                                                                  variant="body2"
-                                                                  component="p"
-                                                                  className="card-content-p"
-                                                              >
-                                                                  {
-                                                                      product.description
-                                                                  }
-                                                              </Typography>
-                                                          </CardContent>
-                                                      </CardActionArea>
-                                                      <CardActions className="card-content">
-                                                          <Link
-                                                              to={`/product/${product.slug}`}
-                                                          >
-                                                              View Product
-                                                          </Link>
-                                                          <Box
-                                                              component="fieldset"
-                                                              borderColor="transparent"
-                                                              className={
-                                                                  classes.box
-                                                              }
-                                                          >
-                                                              <Rating
-                                                                  size="small"
-                                                                  name="rating"
-                                                                  value={parseFloat(
-                                                                      product.rating
-                                                                  )}
-                                                                  text={`${product.total_reviews} reviews`}
-                                                                  precision={
-                                                                      0.5
-                                                                  }
-                                                                  className={
-                                                                      classes.rating
-                                                                  }
-                                                                  readOnly
-                                                              />
-                                                          </Box>
-                                                          <span className="card-content--span">
+                                        productsWithPag.data.map(
+                                            (product) => (
+                                                <Card
+                                                    className={classes.card}
+                                                    key={product.id}
+                                                >
+                                                    <CardActionArea>
+                                                        <CardMedia
+                                                            className={
+                                                                classes.media
+                                                            }
+                                                            image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
+                                                            title={`Image for product: ${product.name}`}
+                                                        />
+                                                        <CardContent className="card-content-top">
+                                                            <Typography
+                                                                gutterBottom
+                                                                variant="h5"
+                                                                component="h2"
+                                                                className="card-content-h2"
+                                                            >
+                                                                {product.name}
+                                                            </Typography>
+                                                            <Typography
+                                                                variant="body2"
+                                                                component="p"
+                                                                className="card-content-p"
+                                                            >
+                                                                {
+                                                                    product.description
+                                                                }
+                                                            </Typography>
+                                                        </CardContent>
+                                                    </CardActionArea>
+                                                    <CardActions className="card-content">
+                                                        <Link
+                                                            to={`/product/${product.slug}`}
+                                                        >
+                                                            View Product
+                                                        </Link>
+                                                        <Box
+                                                            component="fieldset"
+                                                            borderColor="transparent"
+                                                            className={
+                                                                classes.box
+                                                            }
+                                                        >
+                                                            <Rating
+                                                                size="small"
+                                                                name="rating"
+                                                                value={parseFloat(
+                                                                    product.rating
+                                                                )}
+                                                                text={`${product.total_reviews} reviews`}
+                                                                precision={
+                                                                    0.5
+                                                                }
+                                                                className={
+                                                                    classes.rating
+                                                                }
+                                                                readOnly
+                                                            />
+                                                        </Box>
+                                                        <span className="card-content--span">
                                                               &euro;
-                                                              {product.price}
+                                                            {product.price}
                                                           </span>
-                                                      </CardActions>
-                                                  </Card>
-                                              )
-                                          )
+                                                    </CardActions>
+                                                </Card>
+                                            )
+                                        )
                                         : displayFilteredProducts}
                                 </div>
 
@@ -310,8 +282,8 @@ const AccessoriesScreen = ({ match }) => {
                                         />
                                     ) : (
                                         <ReactPaginate
-                                            previousLabel={<ChevronLeftIcon />}
-                                            nextLabel={<ChevronRightIcon />}
+                                            previousLabel={<ChevronLeftIcon/>}
+                                            nextLabel={<ChevronRightIcon/>}
                                             pageCount={pageCount}
                                             onPageChange={changePage}
                                             containerClassName={
@@ -338,8 +310,8 @@ const AccessoriesScreen = ({ match }) => {
                 )}
             </section>
 
-            <hr className="divider2" />
-            <Footer />
+            <StyledDivider/>
+            <Footer/>
         </>
     );
 };

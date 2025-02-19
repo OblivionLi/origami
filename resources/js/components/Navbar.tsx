@@ -10,8 +10,8 @@ import {
     MenuItem,
     Badge
 } from "@mui/material";
-import {logoutUser} from "@/features/user/userSlice";
-import {StyledDivider2} from "@/styles/muiStyles";
+import {logoutUser, resetUserState} from "@/features/user/userSlice";
+import {StyledDivider2, StyledLink} from "@/styles/muiStyles";
 
 interface NavbarProps {
 }
@@ -34,6 +34,7 @@ const Navbar: React.FC<NavbarProps> = () => {
 
     const logoutHandler = () => {
         dispatch(logoutUser());
+        dispatch(resetUserState());
         navigate("/", {replace: true});
     };
 
@@ -85,29 +86,29 @@ const Navbar: React.FC<NavbarProps> = () => {
                                     disableScrollLock={true}
                                 >
                                     <MenuItem onClick={handleClose}>
-                                        <Link
+                                        <StyledLink
                                             to={"/settings"}
                                             className="nav-links"
                                         >
                                             Settings
-                                        </Link>
+                                        </StyledLink>
                                     </MenuItem>
                                     <MenuItem onClick={handleClose}>
-                                        <Link
+                                        <StyledLink
                                             to={"/order-history"}
                                             className="nav-links"
                                         >
                                             Order History
-                                        </Link>
+                                        </StyledLink>
                                     </MenuItem>
                                     {isAdmin && (
                                         <MenuItem onClick={handleClose}>
-                                            <a
-                                                href="/admin"
+                                            <StyledLink
+                                                to={"/admin"}
                                                 className="nav-links"
                                             >
                                                 Admin Panel
-                                            </a>
+                                            </StyledLink>
                                         </MenuItem>
                                     )}
                                     <MenuItem onClick={() => {
@@ -119,9 +120,9 @@ const Navbar: React.FC<NavbarProps> = () => {
                                 </Menu>
                             </>
                         ) : (
-                            <Link to="/login">
+                            <StyledLink to="/login">
                                 <AccountBoxIcon/>
-                            </Link>
+                            </StyledLink>
                         )}
                     </li>
                 </ul>

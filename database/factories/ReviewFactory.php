@@ -19,10 +19,14 @@ class ReviewFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            //
+            'rating' => $this->faker->numberBetween(1, 5),
+            'user_name' => $this->faker->name,
+            'user_comment' => $this->faker->paragraph,
+            'admin_name' => $this->faker->optional(0.5)->name,  // 50% chance of admin review
+            'admin_comment' => $this->faker->optional(0.5)->paragraph,
         ];
     }
 }

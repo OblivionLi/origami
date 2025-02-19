@@ -20,8 +20,8 @@ interface SettingsScreenProps {
 const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     const dispatch = useDispatch<AppDispatch>();
 
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
+    const [name, setName] = useState<string | undefined>("");
+    const [email, setEmail] = useState<string | undefined>("");
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [message, setMessage] = useState<string | null>(null);
@@ -51,12 +51,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
             setPasswordConfirmation("");
             dispatch(clearUserSuccess());
         }
-    }, [updateCredentialsSuccess]);
+    }, [updateCredentialsSuccess, dispatch]);
 
     useEffect(() => {
-        if (userInfo) {
-            setName(userInfo.name);
-            setEmail(userInfo.email);
+        if (userInfo && userInfo.data) {
+            setName(userInfo?.data?.name);
+            setEmail(userInfo?.data?.email);
         }
     }, [userInfo]);
 
@@ -82,7 +82,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
         dispatch(
             updateCredentials({
-                id: userInfo.id.toString(),
+                id: userInfo?.data?.id,
                 name,
                 email,
                 password,

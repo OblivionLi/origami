@@ -41,7 +41,7 @@ class OrderService
     {
         $savedOrder = $this->orderRepository->createOrder($request->validated());
         if (!$savedOrder) {
-            return response()->json(['message' => 'Failed to storeOld order.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => 'Failed to store order.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json(['message' => 'Order created successfully.'], Response::HTTP_CREATED);

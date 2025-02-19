@@ -7,11 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ChildCategoryFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
+
     protected $model = ChildCategory::class;
 
     /**
@@ -19,10 +15,11 @@ class ChildCategoryFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->word, // This will be overridden in the seeder
+            'quantity' => $this->faker->numberBetween(1, 100),
         ];
     }
 }

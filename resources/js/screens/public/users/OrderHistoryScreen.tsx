@@ -17,10 +17,9 @@ import Message from "@/components/alert/Message.js";
 import Loader from "@/components/alert/Loader.js";
 import NavbarCategories from "@/components/NavbarCategories.js";
 import Footer from '@/components/Footer.js';
-import {listUserOrders} from '@/features/order/orderSlice';
+import {Order, listUserOrders} from '@/features/order/orderSlice';
 import {AppDispatch, RootState} from "@/store";
 import {StyledDivider, NotPaidSpan, IsPaidSpan, DeliveredSpan, FailedSpan} from "@/styles/muiStyles";
-import {Order} from '@/features/order/orderSlice';
 import {format} from "date-fns";
 
 interface OrderHistoryProps {
@@ -41,7 +40,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
         }
 
         dispatch(listUserOrders());
-    }, [dispatch, navigate, userLogin]);
+    }, [dispatch, navigate]);
 
     return (
         <>
@@ -53,8 +52,6 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                     <div className="loaderCenter">
                         <Loader/>
                     </div>
-                ) : error ? (
-                    <Message variant="error">{error}</Message>
                 ) : (
                     <>
                         <Paper elevation={3} className="content-title">
@@ -69,6 +66,11 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                         </Paper>
 
                         <Paper className="show__container">
+                            {error && (
+                                <>
+                                    <Message variant="error">{error}</Message>
+                                </>
+                            )}
                             <TableContainer component={Paper}>
                                 <Table aria-label="order history table">
                                     <TableHead>

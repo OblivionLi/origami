@@ -83,12 +83,13 @@ class AuthController extends Controller
 
     /**
      * @param UpdateUserRequest $request
+     * @param int $userId
      * @return UserUpdateResource|JsonResponse
      * @throws Exception
      */
-    public function updateMe(UpdateUserRequest $request): UserUpdateResource|JsonResponse
+    public function updateMe(UpdateUserRequest $request, int $userId): UserUpdateResource|JsonResponse
     {
-        return $this->authService->updateMe($request);
+        return $this->authService->updateMe($request, $userId);
     }
 
     /**

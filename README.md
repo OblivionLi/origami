@@ -2,7 +2,7 @@
 
 ## About Project
 
-The project represents an online origami storeOld with dynamic child categories for parent categories. 
+The project represents an online origami store with dynamic child categories for parent categories. 
 
 Has its own CMS system built from scratch that an admin can handle anything on the front-end and has a simple analytic charts (for users, orders paid, revenue).
 

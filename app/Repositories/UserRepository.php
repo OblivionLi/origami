@@ -104,7 +104,7 @@ class UserRepository
 
             return true;
         } catch (Exception $e) {
-            Log::error("Failed to storeOld password reset token: " . $e->getMessage());
+            Log::error("Failed to store password reset token: " . $e->getMessage());
             return false;
         }
     }
@@ -231,5 +231,14 @@ class UserRepository
             Log::error("Failed to update user: " . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param int $userId
+     * @return User|null
+     */
+    public function getUserById(int $userId): ?User
+    {
+        return User::find($userId)->first();
     }
 }

@@ -16,8 +16,9 @@ import {
     StyledCheckbox,
     StyledButton,
     StyledFormControlLabel,
+    StyledDivider3,
 } from "@/styles/muiStyles";
-import {registerUser} from '@/features/user/userSlice';
+import {registerUser, resetUserState} from '@/features/user/userSlice';
 
 interface RegisterScreenProps {
 }
@@ -42,7 +43,11 @@ const RegisterScreen: React.FC<RegisterScreenProps> = () => {
         if (userInfo) {
             navigate(redirect, {replace: true});
         }
-    }, [navigate, userInfo, redirect]);
+
+        return () => {
+            dispatch(resetUserState());
+        }
+    }, [navigate, userInfo, redirect, dispatch]);
 
     useEffect(() => {
         if (registerSuccess) {
@@ -193,7 +198,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = () => {
                 </div>
             </section>
 
-            <hr className="divider2"/>
+            <StyledDivider3/>
             <Footer/>
         </>
     );

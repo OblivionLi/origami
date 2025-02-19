@@ -9,14 +9,14 @@ import Navbar from "@/components/Navbar.js";
 import Message from "@/components/alert/Message.js";
 import Loader from "@/components/alert/Loader.js";
 import Footer from "@/components/Footer.js";
-import {loginUser} from "@/features/user/userSlice";
+import {loginUser, resetUserState} from "@/features/user/userSlice";
 import {
     Item,
     StyledDivider,
     StyledButton,
     StyledFormControlLabel,
     StyledCheckbox,
-    StyledTextField
+    StyledTextField, StyledDivider3, Item2
 } from "@/styles/muiStyles";
 
 interface LoginScreenProps {
@@ -39,6 +39,7 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
         if (userInfo) {
             navigate(redirect, {replace: true})
         }
+
     }, [navigate, userInfo, redirect]);
 
     const submitHandler = (e: React.FormEvent) => {
@@ -118,28 +119,28 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
                         </StyledButton>
 
                         <Grid2 container className="auth-form--action">
-                            <Item>
+                            <Item2 elevation={0}>
                                 <Link
                                     to="/forgot-password"
                                     className="auth-form--action__link"
                                 >
                                     Forgot password?
                                 </Link>
-                            </Item>
-                            <Item>
+                            </Item2>
+                            <Item2 elevation={0}>
                                 <Link
                                     to="/register"
                                     className="auth-form--action__link"
                                 >
                                     {"Don't have an account? Sign Up"}
                                 </Link>
-                            </Item>
+                            </Item2>
                         </Grid2>
                     </form>
                 </div>
             </section>
 
-            <hr className="divider2"/>
+            <StyledDivider3/>
             <Footer/>
         </>
     );

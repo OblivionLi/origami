@@ -2,7 +2,16 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface CartItem {
+export interface Cart {
+    cartItems: CartItem[];
+    itemsPrice: string;
+    itemsPriceDiscount: string;
+    shippingPrice: string;
+    taxPrice: string;
+    totalPrice: string;
+}
+
+export interface CartItem {
     product: number;
     name: string;
     slug: string;

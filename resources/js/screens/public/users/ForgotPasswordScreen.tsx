@@ -9,12 +9,12 @@ import {
     StyledDivider,
     StyledTextField,
     StyledButton,
-    Item,
+    Item2,
 } from "@/styles/muiStyles";
 import Swal from "sweetalert2";
 import Navbar from "@/components/Navbar.js";
 import Footer from "@/components/Footer.js";
-import {forgotPassword} from "@/features/user/userSlice";
+import {forgotPassword, resetUserState} from "@/features/user/userSlice";
 
 interface ForgotPasswordScreenProps {
 }
@@ -48,6 +48,12 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = () => {
             navigate("/login", {replace: true});
         }
     }, [forgotPasswordSuccess, navigate]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(resetUserState());
+        }
+    }, [dispatch]);
 
     const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
@@ -90,22 +96,22 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = () => {
                         </StyledButton>
 
                         <Grid2 container className="auth-form--action">
-                            <Item>
+                            <Item2 elevation={0}>
                                 <Link
                                     to="/login"
                                     className="auth-form--action__link"
                                 >
                                     {"Nevermind, I remembered my password.."}
                                 </Link>
-                            </Item>
-                            <Item>
+                            </Item2>
+                            <Item2 elevation={0}>
                                 <Link
                                     to="/register"
                                     className="auth-form--action__link"
                                 >
                                     {"Don't have an account? Sign Up"}
                                 </Link>
-                            </Item>
+                            </Item2>
                         </Grid2>
                     </form>
                 </div>

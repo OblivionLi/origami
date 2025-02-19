@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import {CardElement} from "@stripe/react-stripe-js";
 import Rating from "@mui/material/Rating";
+import {Link} from 'react-router-dom';
 
 export const StyledDivider = styled(Divider)({
     marginBottom: "20px",
@@ -45,6 +46,22 @@ export const Item = styled(Paper)(({theme}) => ({
     ...theme.applyStyles('dark', {
         backgroundColor: '#1A2027',
     }),
+}));
+
+export const Item2 = styled(Paper, {
+    shouldForwardProp: (prop) => prop !== 'elevation',
+})<{ elevation?: number }>(({theme, elevation}) => ({
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+    [theme.breakpoints.up('sm')]: {
+        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : 'transparent',
+    },
+    ...(elevation === 0 && {
+        boxShadow: 'none',
+    })
 }));
 
 export const StyledTextField = styled(TextField)({
@@ -146,4 +163,15 @@ export const FailedSpan = styled('span')({
 export const StyledRating = styled(Rating)({
     color: 'orange',
     fontWeight: 'bold',
+});
+
+export const StyledLink = styled(Link)({
+    color: "#855C1B",
+    fontWeight: "600",
+    textDecoration: "none",
+
+    "&:hover": {
+        color: "#388667",
+        textDecoration: "underline",
+    },
 });

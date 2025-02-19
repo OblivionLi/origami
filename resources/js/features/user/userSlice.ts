@@ -4,20 +4,20 @@ import {RootState} from "@/store";
 import {Address} from '@/features/address/addressSlice';
 
 interface User {
-    id: number;
-    name: string;
-    email: string;
+    id: number | undefined;
+    name: string | undefined;
+    email: string | undefined;
     role?: string;
     is_admin?: number;
     data?: {
-        access_token: string;
+        access_token?: string;
         message?: string;
         id?: number,
         name?: string,
         email?: string,
         role?: string,
         is_admin?: number,
-        address: Address,
+        address?: Address,
     }
 }
 
@@ -34,10 +34,24 @@ interface UserState {
     updateCredentialsSuccess: boolean;
 }
 
-const userInfoFromStorage = localStorage.getItem('userInfo');
+const getUserInfoFromStorage = (): User | null => {
+    try {
+        const userInfoString = localStorage.getItem('userInfo');
+        if (userInfoString) {
+            const parsedUserInfo = JSON.parse(userInfoString);
+            if (typeof parsedUserInfo === 'object' && parsedUserInfo !== null) {
+                return parsedUserInfo as User;
+            }
+        }
+    } catch (error) {
+        console.error("Error parsing userInfo from localStorage:", error);
+        localStorage.removeItem('userInfo');
+    }
+    return null;
+};
 
 const initialState: UserState = {
-    userInfo: userInfoFromStorage ? JSON.parse(userInfoFromStorage) : null,
+    userInfo: getUserInfoFromStorage(),
     loading: false,
     error: null,
     users: [],
@@ -74,9 +88,9 @@ export const registerUser = createAsyncThunk<
             return data;
         } catch (error: any) {
             const message =
-                error.response && error.response.data.message
-                    ? error.response.data.errors
-                    : error.message
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -107,9 +121,9 @@ export const loginUser = createAsyncThunk<
             return data;
         } catch (error: any) {
             const message =
-                error.response && error.response.data.message
-                    ? error.response.data.errors
-                    : error.message
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -122,7 +136,27 @@ export const logoutUser = createAsyncThunk<
 >(
     'user/logout',
     async (_, thunkAPI) => {
-        localStorage.removeItem('userInfo');
+        const userInfo = getUserInfoFromStorage();
+
+        try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${userInfo?.data?.access_token}`,
+                },
+            };
+
+            await axios.get('/api/logout', config);
+
+            localStorage.removeItem('userInfo');
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
     }
 );
 
@@ -144,7 +178,10 @@ export const forgotPassword = createAsyncThunk<
             const {data} = await axios.post('/api/forgot-password', {email}, config);
             return data;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -165,7 +202,10 @@ export const resetPassword = createAsyncThunk<
 
             return data;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -183,7 +223,7 @@ export const getTokenResetPassword = createAsyncThunk<
             return data;
         } catch (error: any) {
             const message =
-                error.response && error.response.data.message
+                error.response && error.response.data
                     ? error.response.data.message
                     : error.message;
             return thunkAPI.rejectWithValue(message);
@@ -193,7 +233,7 @@ export const getTokenResetPassword = createAsyncThunk<
 
 export const updateCredentials = createAsyncThunk<
     User,
-    { id: string; name: string; email: string; password?: string },
+    { id?: number; name?: string; email?: string; password?: string },
     { state: RootState; rejectValue: string }
 >(
     'user/updateCredentials',
@@ -211,31 +251,30 @@ export const updateCredentials = createAsyncThunk<
                 },
             };
             const {data} = await axios.patch<User>(
-                `/api/update-credentials/${id}`,
+                `/api/users/update-credentials/${id}`,
                 {name, email, password},
                 config
             );
 
-            const updatedUserInfo = {
+            const updatedUserInfo: User = {
                 ...userInfo,
-                name: data.name,
-                email: data.email,
-                ...(data.role && {role: data.role}),
-                ...(data.is_admin && {is_admin: data.is_admin}),
+                id: data?.data?.id,
+                name: data?.data?.name,
+                email: data?.data?.email,
                 data: {
-                    ...userInfo.data,
-                    message: userInfo.data.message,
-                    id: data.id,
-                    name: data.name,
-                    email: data.email,
-                    role: data.role,
-                    is_admin: data.is_admin,
+                    ...(userInfo?.data ?? {}),
+                    name: data?.data?.name,
+                    email: data?.data?.email,
                 }
             };
+
             localStorage.setItem("userInfo", JSON.stringify(updatedUserInfo));
-            return data;
+            return updatedUserInfo;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -262,7 +301,10 @@ export const getUsersList = createAsyncThunk<
             const {data} = await axios.get<User[]>('/api/users', config);
             return data;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -289,7 +331,10 @@ export const getUser = createAsyncThunk<
             const {data} = await axios.get<User>(`/api/users/${id}`, config);
             return data;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -321,7 +366,10 @@ export const editUser = createAsyncThunk<
             );
             return data;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -348,7 +396,10 @@ export const deleteUser = createAsyncThunk<
             await axios.delete(`/api/users/${id}`, config);
             return id;
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message;
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
             return thunkAPI.rejectWithValue(message);
         }
     }

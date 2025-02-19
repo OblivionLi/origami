@@ -9,7 +9,7 @@
         ],
         "allowJs": false,
         "skipLibCheck": true,
-        "esModuleInterop": false,
+        "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "strict": true,
         "forceConsistentCasingInFileNames": true,
@@ -27,8 +27,9 @@
         }
     },
     "include": [
-        "resources/js"
+        "resources/js/**/*"
     ],
+    "exclude": ["node_modules"],
     "references": [
         {
             "path": "./tsconfig.node.json"

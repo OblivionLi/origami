@@ -105,8 +105,8 @@ export const createAddress = createAsyncThunk<
         country: string;
         city: string;
         address: string;
-        postal_code: number;
-        phone_number: number
+        postal_code: string;
+        phone_number: string;
     },
     { state: RootState; rejectValue: string }>
 (
@@ -168,12 +168,12 @@ export const updateAddress = createAsyncThunk<
         country: string;
         city: string;
         address: string;
-        postal_code: number;
-        phone_number: number
+        postal_code: string;
+        phone_number: string;
     },
     { state: RootState; rejectValue: string }>
 (
-    'address/createAddress',
+    'address/updateAddress',
     async ({
                id,
                name,
@@ -228,7 +228,7 @@ export const deleteAddress = createAsyncThunk<
     },
     { state: RootState; rejectValue: string }>
 (
-    'address/createAddress',
+    'address/deleteAddress',
     async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();

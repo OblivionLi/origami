@@ -1,155 +1,111 @@
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { makeStyles } from "@material-ui/core/styles";
+import React, {useEffect, useState} from "react";
+import {useSelector, useDispatch} from "react-redux";
+import {Link, useNavigate, useParams, useLocation} from "react-router-dom";
+import Swal from "sweetalert2";
 import {
     Paper,
     Typography,
     Breadcrumbs,
-    TextField,
     Button,
-} from "@material-ui/core";
-import { Link } from "react-router-dom";
-import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "../../../components/NavbarCategories.js";
-import Footer from "../../../components/Footer.js";
-import { getAddress } from "./../../../actions/addressActions";
-import { removeFromCart } from "./../../../actions/cartActions";
-import { createOrder } from "../../../actions/orderActions";
-import Message from "../../../components/alert/Message.js";
-import Loader from "../../../components/alert/Loader.js";
-import MaterialTable from "material-table";
-import Swal from "sweetalert2";
+} from "@mui/material";
+import NavbarCategories from "@/components/NavbarCategories.js";
+import Navbar from "@/components/Navbar.js";
+import Footer from "@/components/Footer.js";
+import Message from "@/components/alert/Message.js";
+import Loader from "@/components/alert/Loader.js";
+import {getAddress} from "./@/actions/addressActions";
+import {removeFromCart} from "./@/actions/cartActions";
+import {createOrder} from "@/actions/orderActions";
+import {AppDispatch, RootState} from "@/store";
+import {Cart} from "@/features/cart/cartSlice";
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
-        marginBottom: "20px",
-        borderBottom: "1px solid #855C1B",
-        paddingBottom: "10px",
-        width: "30%",
+interface PlaceOrderScreenProps {
+}
 
-        [theme.breakpoints.down("sm")]: {
-            width: "90%",
-            margin: "0 auto 20px auto",
-        },
-    },
+const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const {id: userId} = useParams<{ id?: string }>();
 
-    card: {
-        maxWidth: 345,
-        minWidth: 345,
-        boxShadow:
-            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
-    },
+    const {userInfo} = useSelector((state: RootState) => state.user);
+    const {cartItems} = useSelector((state: RootState) => state.cart);
 
-    media: {
-        height: 345,
-        width: "100%",
-    },
+    const {
+        order,
+        success: orderSuccess,
+        error: orderError,
+        loading: orderLoading
+    } = useSelector((state: RootState) => state.order);
 
-    button: {
-        fontFamily: "Quicksand",
-        backgroundColor: "#855C1B",
-        color: "white",
+    const {
+        currentAddress: address,
+        loading: addressLoading,
+        error: addressError
+    } = useSelector((state: RootState) => state.address);
 
-        "&:hover": {
-            backgroundColor: "#388667",
-        },
-    },
-
-    materialTable: {
-        fontFamily: "Quicksand",
-        fontWeight: "bold",
-        color: "#388667",
-
-        [theme.breakpoints.down("sm")]: {
-            width: "100%",
-        },
-    },
-
-    link: {
-        color: "#855C1B",
-        fontWeight: "600",
-
-        "&:hover": {
-            color: "#388667",
-        },
-    },
-}));
-
-const PlaceOrderScreen = ({ match, history }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
-
-    const userId = match.params.id;
-
-    const userLogin = useSelector((state) => state.userLogin);
-    const { userInfo } = userLogin;
-
-    const cart = useSelector((state) => state.cart);
-    const { cartItems } = cart;
-
-    const orderCreate = useSelector((state) => state.orderCreate);
-    const { order, success, error } = orderCreate;
-
-    const addressShow = useSelector((state) => state.addressShow);
-    const { address, loading: addressLoading } = addressShow;
-
-    const addDecimals = (num) => {
+    const addDecimals = (num: number): string => {
         return (Math.round(num * 100) / 100).toFixed(2);
     };
 
-    cart.itemsPrice = addDecimals(
-        cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
+    const [newOrderId, setNewOrderId] = useState<number | null>(null);
+
+    const itemsPrice = addDecimals(
+        cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
     );
-
-    cart.itemsPriceDiscount = cartItems
-        .reduce(
-            (acc, item) =>
-                acc +
-                item.qty * (item.price - (item.price * item.discount) / 100),
-            0
-        )
-        .toFixed(2);
-
-    cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 15);
-
-    cart.taxPrice = addDecimals(Number((0.15 * cart.itemsPrice).toFixed(2)));
-
-    cart.totalPrice = (
-        Number(cart.itemsPriceDiscount) +
-        Number(cart.shippingPrice) +
-        Number(cart.taxPrice)
+    const itemsPriceDiscount = cartItems.reduce(
+        (acc, item) =>
+            acc + item.qty * (item.price - (item.price * (item.discount || 0)) / 100),
+        0
+    ).toFixed(2);
+    const shippingPrice = addDecimals(Number(itemsPrice) > 100 ? 0 : 15);
+    const taxPrice = addDecimals(Number((0.15 * Number(itemsPrice)).toFixed(2)));
+    const totalPrice = (
+        Number(itemsPriceDiscount) +
+        Number(shippingPrice) +
+        Number(taxPrice)
     ).toFixed(2);
 
-    useEffect(() => {
-        !userInfo || (userInfo.data.user_id != userId && history.push("/"));
+    const cart: Cart = {
+        cartItems,
+        itemsPrice,
+        itemsPriceDiscount,
+        shippingPrice,
+        taxPrice,
+        totalPrice
+    };
 
-        if (success) {
-            cartItems.map((item) => {
+    useEffect(() => {
+        if (!userInfo || (userId && userInfo?.id.toString() !== userId)) {
+            navigate("/");
+            return;
+        }
+
+        if (orderSuccess) {
+            cartItems.forEach((item) => {
                 dispatch(removeFromCart(item.product));
             });
 
-            order &&
-                history.push(
-                    `/order-history/${order.id}/${userInfo.data.user_id}`
-                );
+            order && navigate(`/order-history/${order?.id}/${userInfo?.id}`);
         }
 
-        dispatch(getAddress(userInfo.data.id));
-    }, [dispatch, order, userInfo, success]);
+        if (userInfo) {
+            dispatch(getAddress(userInfo?.id));
+        }
+    }, [dispatch, order, userInfo, orderSuccess, navigate, userId, cartItems]);
 
-    const placeOrderHandler = (e) => {
+    const placeOrderHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
         dispatch(
-            createOrder(
-                userInfo.data.id,
-                cart.cartItems,
-                cart.itemsPrice,
-                cart.shippingPrice,
-                cart.taxPrice,
-                cart.totalPrice,
-                cart.itemsPriceDiscount
-            )
+            createOrder({
+                user_id: userInfo?.id,
+                cart_items: cart.cartItems,
+                products_price: Number(cart.itemsPrice),
+                shipping_price: Number(cart.shippingPrice),
+                tax_price: Number(cart.taxPrice),
+                total_price: Number(cart.totalPrice),
+                products_discount_price: Number(cart.itemsPriceDiscount),
+            })
         );
 
         const Toast = Swal.mixin({
@@ -172,8 +128,8 @@ const PlaceOrderScreen = ({ match, history }) => {
 
     return (
         <>
-            <Navbar />
-            <NavbarCategories />
+            <Navbar/>
+            <NavbarCategories/>
 
             <section className="ctn">
                 <Paper elevation={3} className="content-title">
@@ -186,7 +142,7 @@ const PlaceOrderScreen = ({ match, history }) => {
                         </Link>
                         <Link
                             color="inherit"
-                            to={`/shipping-to/${userInfo.data.id}`}
+                            to={`/shipping-to/${userInfo?.id}`}
                             className="bc"
                         >
                             Shipping
@@ -200,44 +156,25 @@ const PlaceOrderScreen = ({ match, history }) => {
                         <div className="order__container--po-left">
                             {addressLoading ? (
                                 <div className="loaderCenter">
-                                    <Loader />
+                                    <Loader/>
                                 </div>
-                            ) : error ? (
-                                <Message variant="error">{error}</Message>
+                            ) : addressError ? (
+                                <Message variant="error">{addressError}</Message>
                             ) : (
                                 <div className="order__container--po-left-detail">
                                     <h2 className="order__container--po-left-detail--title">
                                         Sending to
                                     </h2>
                                     <div className="order__container--po-left-detail--par">
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].name}{" "}
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].surname}
+                                        {address?.[0]?.name} {address?.[0]?.surname}
                                     </div>
 
                                     <h2 className="order__container--po-left-detail--title">
                                         Address
                                     </h2>
                                     <div className="order__container--po-left-detail--par">
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].country}
-                                        {", "}
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].city}
-                                        {", "}
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].address}
-                                        {", "}
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].postal_code}
-                                        {", "}
+                                        {address?.[0]?.country}, {address?.[0]?.city},{" "}
+                                        {address?.[0]?.address}, {address?.[0]?.postal_code}
                                     </div>
 
                                     <h2 className="order__container--po-left-detail--title">
@@ -249,7 +186,7 @@ const PlaceOrderScreen = ({ match, history }) => {
                                             address.data[0].phone_number}
                                     </div>
 
-                                    <br />
+                                    <br/>
 
                                     <Message variant="info">
                                         Make sure your name, address and phone
@@ -321,7 +258,7 @@ const PlaceOrderScreen = ({ match, history }) => {
                                                                     cartItems.price -
                                                                     (cartItems.price *
                                                                         cartItems.discount) /
-                                                                        100
+                                                                    100
                                                                 ).toFixed(2)}
                                                             </span>
                                                             {"   "}
@@ -384,7 +321,7 @@ const PlaceOrderScreen = ({ match, history }) => {
                             <Paper className="show__paper">
                                 <h3 className="divider">Order Summary</h3>
 
-                                <br />
+                                <br/>
 
                                 <div className="show__paper--div">
                                     <h4 className="divider">
@@ -442,13 +379,13 @@ const PlaceOrderScreen = ({ match, history }) => {
                                     </p>
                                 </div>
 
-                                <hr className="divider" />
+                                <hr className="divider"/>
 
                                 <div className="show-tabel-form">
                                     <Message variant="info">
                                         Place Order and Pay After.
                                     </Message>
-                                    <br />
+                                    <br/>
                                     <form>
                                         <div className="form__field">
                                             <Button
@@ -468,8 +405,8 @@ const PlaceOrderScreen = ({ match, history }) => {
                 </Paper>
             </section>
 
-            <hr className="divider2" />
-            <Footer />
+            <hr className="divider2"/>
+            <Footer/>
         </>
     );
 };

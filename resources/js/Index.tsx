@@ -8,6 +8,10 @@ import LoginScreen from '@/screens/public/users/LoginScreen';
 import RegisterScreen from '@/screens/public/users/RegisterScreen';
 import ResetPasswordScreen from '@/screens/public/users/ResetPasswordScreen';
 import ForgotPasswordScreen from '@/screens/public/users/ForgotPasswordScreen';
+import SettingsScreen from "@/screens/public/users/SettingsScreen";
+import OrderHistoryScreen from "@/screens/public/users/OrderHistoryScreen";
+import CartScreen from "@/screens/public/shop/CartScreen";
+import AccessoriesScreen from "@/screens/public/categories/AccessoriesScreen";
 // import SettingsScreen from './screens/public/users/SettingsScreen';
 // import AdminScreen from './screens/admin/AdminScreen';
 // import ShowProductScreen from './screens/public/products/ShowProductScreen';
@@ -31,14 +35,14 @@ function Index() {
                 <Route path="/register" element={<RegisterScreen/>}/>
                 <Route path="/reset-password/:id" element={<ResetPasswordScreen/>}/>
                 <Route path="/forgot-password" element={<ForgotPasswordScreen/>}/>
-                {/*<Route path="/settings" component={SettingsScreen}/>*/}
+                <Route path="/settings" element={<SettingsScreen/>}/>
 
                 {/*/!* Product *!/*/}
                 {/*<Route path="/product/:slug" component={ShowProductScreen} />*/}
 
                 {/*/!* Categories *!/*/}
-                {/*<Route path="/accessories" component={AccessoriesScreen} exact />*/}
-                {/*<Route path="/accessories/:page?" component={AccessoriesScreen} />*/}
+                {/*<Route path="/accessories" element={<AccessoriesScreen/>}/>*/}
+                {/*<Route path="/accessories/:page?" element={<AccessoriesScreen/>}/>*/}
 
                 {/*<Route path="/origami" component={OrigamiScreen} exact />*/}
                 {/*<Route path="/origami/:page?" component={OrigamiScreen} />*/}
@@ -51,12 +55,12 @@ function Index() {
                 {/*<Route path="/reviews/product/:id/:page?" component={ReviewsScreen} />*/}
 
                 {/*/!* Cart *!/*/}
-                {/*<Route path="/cart/:id?" component={CartScreen} />*/}
+                <Route path="/cart/:id?" element={<CartScreen/>}/>
                 {/*<Route path="/shipping-to/:id?" component={ShippingScreen} />*/}
                 {/*<Route path="/placeorder/:id?" component={PlaceOrderScreen} />*/}
 
                 {/*/!* Order *!/*/}
-                {/*<Route path="/order-history" component={OrderHistoryScreen} exact />*/}
+                <Route path="/order-history" element={<OrderHistoryScreen/>}/>
                 {/*<Route path="/order-history/:id/:userId?" component={ShowOrderScreen} />*/}
 
                 {/*/!* Admin Section *!/*/}

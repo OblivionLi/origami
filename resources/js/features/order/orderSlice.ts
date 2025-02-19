@@ -315,7 +315,7 @@ export const listUserOrders = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Order[]>('/api/user-orders', config);
+            const {data} = await axios.get<Order[]>('/api/orders/me', config);
             return data;
         } catch (error: any) {
             const message = error.response?.data?.message || error.message;
@@ -449,7 +449,6 @@ const orderSlice = createSlice({
                 state.loading = false;
                 state.order = state.order.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
-
             })
             .addCase(deleteOrder.rejected, (state, action) => {
                 state.loading = false;
@@ -470,7 +469,8 @@ const orderSlice = createSlice({
             .addCase(listUserOrders.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
-                state.error = action.payload ? action.payload : "Unknown Error"
+                state.error = action.payload ? action.payload : "Unknown Error";
+                state.order = [];
             });
 
         // add the remaining reducers

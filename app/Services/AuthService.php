@@ -76,11 +76,11 @@ class AuthService
         $user = $this->userRepository->getUserByEmail($request->email);
         if (!$user) {
             Log::error("Failed to login user (database error)");
-            return response()->json(['message' => 'Failed to login user'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(['message' => 'Failed to login user.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if (!Hash::check($request->password, $user->password)) {
-            $response = ['message' => 'User credentials are incorrect'];
+            $response = ['message' => 'User credentials are incorrect.'];
             return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -120,7 +120,7 @@ class AuthService
 
         $token = Str::random(90);
 
-        if ($this->userRepository->tryInsertingToPasswordReset($email, $token)) {
+        if (!$this->userRepository->tryInsertingToPasswordReset($email, $token)) {
             return response()->json(['message' => 'Failed to send password reset email'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -183,9 +183,9 @@ class AuthService
      * @return UserUpdateResource|JsonResponse
      * @throws Exception
      */
-    public function updateMe(UpdateUserRequest $request): UserUpdateResource|JsonResponse
+    public function updateMe(UpdateUserRequest $request, int $userId): UserUpdateResource|JsonResponse
     {
-        $user = $this->userRepository->getUserByEmail($request->email);
+        $user = $this->userRepository->getUserById($userId);
 
         if (!$user) {
             return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);

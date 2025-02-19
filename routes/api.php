@@ -49,7 +49,7 @@ Route::middleware('auth:api')->group(function () {
     // User Routes
     Route::controller(AuthController::class)->group(function () {
         Route::get('logout', 'logout');
-        Route::patch('users/update-credentials', 'updateMe');
+        Route::patch('users/update-credentials/{id}', 'updateMe');
         Route::delete('users/me/{email}', 'deleteMe');
     });
     Route::get('users/me', [UserController::class, 'show']);
@@ -59,7 +59,7 @@ Route::middleware('auth:api')->group(function () {
 
     // Order Routes
     Route::controller(OrderController::class)->group(function () {
-        Route::post('orders', 'storeOld');
+        Route::post('orders', 'store');
         Route::get('orders/me', 'getUserOrders');
         Route::get('orders/{order}', 'show');
         Route::patch('orders/{order}/pay', 'updateOrderToPaid');
@@ -91,13 +91,13 @@ Route::middleware('auth:api')->group(function () {
 
         // Product Image Management
         Route::controller(ProductImageController::class)->group(function () {
-            Route::post('admin/products/{productId}/images', 'storeOld');
+            Route::post('admin/products/{productId}/images', 'store');
             Route::patch('admin/product-images/{imageId}', 'update');
             Route::delete('admin/product-images/{imageId}', 'destroy');
         });
 
         // Review Management
-        Route::apiResource('admin/reviews', ReviewController::class)->except(['storeOld']);
+        Route::apiResource('admin/reviews', ReviewController::class)->except(['store']);
 
         // Order Management
         Route::controller(OrderController::class)->group(function () {
@@ -140,17 +140,17 @@ Route::middleware('auth:api')->group(function () {
 //    Route::get('users/{user}', [UserController::class, 'show']);
 //
 //    # Review routes
-//    Route::post('reviews/{review}', [ReviewController::class, 'storeOld']);
+//    Route::post('reviews/{review}', [ReviewController::class, 'store']);
 //
 //    # Order routes
-//    Route::post('order', [OrderController::class, 'storeOld']);
+//    Route::post('order', [OrderController::class, 'store']);
 //    Route::get('order/{order}', [OrderController::class, 'show']);
 //    Route::patch('order/{order}/pay', [OrderController::class, 'updateOrderToPaid']);
 //    Route::get('user-order', [OrderController::class, 'getUserOrders']);
 //
 //    # Address routes
 //    Route::get('address', [AddressController::class, 'index']);
-//    Route::post('address', [AddressController::class, 'storeOld']);
+//    Route::post('address', [AddressController::class, 'store']);
 //    Route::get('address/{address}', [AddressController::class, 'show']);
 //    Route::patch('address/{address}', [AddressController::class, 'update']);
 //    Route::delete('address/{address}', [AddressController::class, 'destroy']);
@@ -167,40 +167,40 @@ Route::middleware('auth:api')->group(function () {
 //
 //        # Role routes
 //        Route::get('roles', [RoleController::class, 'index']);
-//        Route::post('roles', [RoleController::class, 'storeOld']);
+//        Route::post('roles', [RoleController::class, 'store']);
 //        Route::get('roles/{role}', [RoleController::class, 'show']);
 //        Route::patch('roles/{role}', [RoleController::class, 'update']);
 //        Route::delete('roles/{role}', [RoleController::class, 'destroy']);
 //
 //        # Permission routes
 //        Route::get('permissions', [PermissionController::class, 'index']);
-//        Route::post('permissions', [PermissionController::class, 'storeOld']);
+//        Route::post('permissions', [PermissionController::class, 'store']);
 //        Route::get('permissions/{permission}', [PermissionController::class, 'show']);
 //        Route::patch('permissions/{permission}', [PermissionController::class, 'update']);
 //        Route::delete('permissions/{permission}', [PermissionController::class, 'destroy']);
 //
 //        # Parent Category routes
 //        Route::get('parent-categories', [ParentCategoryController::class, 'index']);
-//        Route::post('parent-categories', [ParentCategoryController::class, 'storeOld']);
+//        Route::post('parent-categories', [ParentCategoryController::class, 'store']);
 //        Route::get('parent-categories/{parentCategory}', [ParentCategoryController::class, 'show']);
 //        Route::patch('parent-categories/{parentCategory}', [ParentCategoryController::class, 'update']);
 //        Route::delete('parent-categories/{parentCategory}', [ParentCategoryController::class, 'destroy']);
 //
 //        # Child Category routes
 //        Route::get('child-categories', [ChildCategoryController::class, 'index']);
-//        Route::post('child-categories', [ChildCategoryController::class, 'storeOld']);
+//        Route::post('child-categories', [ChildCategoryController::class, 'store']);
 //        Route::get('child-categories/{childCategory}', [ChildCategoryController::class, 'show']);
 //        Route::patch('child-categories/{childCategory}', [ChildCategoryController::class, 'update']);
 //        Route::delete('child-categories/{childCategory}', [ChildCategoryController::class, 'destroy']);
 //
 //        # Product routes
 //        Route::get('products', [ProductController::class, 'index']);
-//        Route::post('products', [ProductController::class, 'storeOld']);
+//        Route::post('products', [ProductController::class, 'store']);
 //        Route::patch('products/{product}', [ProductController::class, 'update']);
 //        Route::delete('products/{product}', [ProductController::class, 'destroy']);
 //
 //        # Product Images routes
-//        Route::post('productImage/{productId}', [ProductImageController::class, 'storeOld']);
+//        Route::post('productImage/{productId}', [ProductImageController::class, 'store']);
 //        Route::post('RproductImage/{imageId}', [ProductImageController::class, 'update']);
 //        Route::delete('productImage/{imageId}', [ProductImageController::class, 'destroy']);
 //

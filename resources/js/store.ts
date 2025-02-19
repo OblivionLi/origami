@@ -26,7 +26,7 @@ export const store = configureStore({
         categoryProduct: categoryProductReducer,
     },
     // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger), // Example of adding extra middleware
-    devTools: process.env.NODE_END !== 'production',
+    devTools: import.meta.env.VITE_NODE_ENV !== 'production',
 });
 
 export type RootState = ReturnType<typeof store.getState>;

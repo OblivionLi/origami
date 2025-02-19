@@ -19,10 +19,11 @@ class RoleFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->word, // Will be overridden in seeder
+            'is_admin' => $this->faker->boolean, // Will be overridden
         ];
     }
 }
