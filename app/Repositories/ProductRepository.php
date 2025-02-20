@@ -228,6 +228,8 @@ class ProductRepository
      */
     public function getProductBySlug(string $slug): ?Product
     {
-        return Product::findBySlug($slug);
+        return Product::with(['reviews' => function($query) {
+            $query->limit(5);
+        }, 'productImages'])->where('slug', $slug)->first();
     }
 }

@@ -30,12 +30,12 @@ class ReviewController extends Controller
 
     /**
      * @param ReviewStoreRequest $request
-     * @param $slug
+     * @param int $productId
      * @return JsonResponse
      */
-    public function store(ReviewStoreRequest $request, $slug): JsonResponse
+    public function store(ReviewStoreRequest $request, int $productId): JsonResponse
     {
-        return $this->reviewService->storeReview($request, $slug);
+        return $this->reviewService->storeReview($request, $productId);
     }
 
     /**

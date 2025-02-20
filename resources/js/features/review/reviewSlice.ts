@@ -113,7 +113,7 @@ export const fetchReviewsWithPagination = createAsyncThunk<
 
             const pageParam = page === null ? '' : `?page=${page}`;
 
-            const {data} = await axios.get<PaginatedReviews>(`/api/reviews/${productId}${pageParam}`, config);
+            const {data} = await axios.get<PaginatedReviews>(`/api/products/${productId}/reviews${pageParam}`, config);
 
             return data;
         } catch (error: any) {
@@ -179,7 +179,8 @@ export const createReview = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<Review>(`/api/reviews/${product_id}`, {
+            console.log('called create review');
+            const {data} = await axios.post<Review>(`/api/products/${product_id}/reviews`, {
                 user_id,
                 username,
                 rating,

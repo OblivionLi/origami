@@ -12,6 +12,8 @@ import SettingsScreen from "@/screens/public/users/SettingsScreen";
 import OrderHistoryScreen from "@/screens/public/users/OrderHistoryScreen";
 import CartScreen from "@/screens/public/shop/CartScreen";
 import AccessoriesScreen from "@/screens/public/categories/AccessoriesScreen";
+import ShowProductScreen from "@/screens/public/products/ShowProductScreen";
+import ReviewsScreen from "@/screens/public/reviews/ReviewsScreen";
 // import SettingsScreen from './screens/public/users/SettingsScreen';
 // import AdminScreen from './screens/admin/AdminScreen';
 // import ShowProductScreen from './screens/public/products/ShowProductScreen';
@@ -38,7 +40,7 @@ function Index() {
                 <Route path="/settings" element={<SettingsScreen/>}/>
 
                 {/*/!* Product *!/*/}
-                {/*<Route path="/product/:slug" component={ShowProductScreen} />*/}
+                <Route path="/product/:slug" element={<ShowProductScreen/>}/>
 
                 {/*/!* Categories *!/*/}
                 {/*<Route path="/accessories" element={<AccessoriesScreen/>}/>*/}
@@ -51,7 +53,7 @@ function Index() {
                 {/*<Route path="/special-offers/:page?" component={SpecialOffers} />*/}
 
                 {/*/!* Reviews *!/*/}
-                {/*<Route path="/reviews/product/:id" component={ReviewsScreen} exact />*/}
+                <Route path="/reviews/product/:id" element={<ReviewsScreen/>}/>
                 {/*<Route path="/reviews/product/:id/:page?" component={ReviewsScreen} />*/}
 
                 {/*/!* Cart *!/*/}

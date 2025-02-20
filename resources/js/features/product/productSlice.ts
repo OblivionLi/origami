@@ -12,11 +12,18 @@ export interface Product {
     discount?: number;
     description?: string;
     special_offer?: number | null;
-    qty?: number;
-    product_images: { id: number; path: string }[];
+    total_quantities?: number;
     total_reviews: number;
     rating: number;
     reviews: [];
+    images: [];
+}
+
+export interface ProductImage {
+    id: number;
+    product_id: number;
+    name: string;
+    path: string;
 }
 
 interface ShowcaseData {
@@ -78,7 +85,7 @@ export const fetchProducts = createAsyncThunk<
 
 export const fetchProductBySlug = createAsyncThunk<
     Product,
-    { slug: string },
+    string,
     { state: RootState, rejectValue: string }
 >(
     'product/fetchProductBySlug',
@@ -96,9 +103,9 @@ export const fetchProductBySlug = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Product>(`/api/products/${slug}`, config);
+            const {data} = await axios.get(`/api/products/${slug}`, config);
 
-            return data;
+            return data?.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -119,11 +126,11 @@ export const createProduct = createAsyncThunk<
         discount?: number,
         description?: string,
         special_offer?: number,
-        qty?: number
+        total_quantities?: number
     }, { state: RootState, rejectValue: string }
 >(
     'product/createProduct',
-    async ({name, child_category_id, product_code, price, discount, description, special_offer, qty}, thunkAPI) => {
+    async ({name, child_category_id, product_code, price, discount, description, special_offer, total_quantities}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -145,7 +152,7 @@ export const createProduct = createAsyncThunk<
                 discount,
                 description,
                 special_offer,
-                qty
+                total_quantities
             }, config);
 
             return data;
@@ -170,12 +177,12 @@ export const updateProduct = createAsyncThunk<
         discount?: number,
         description?: string,
         special_offer?: number,
-        qty?: number
+        total_quantities?: number
     },
     { state: RootState, rejectValue: string }
 >(
     'product/updateProduct',
-    async ({id, name, child_category_id, product_code, price, discount, description, special_offer, qty}, thunkAPI) => {
+    async ({id, name, child_category_id, product_code, price, discount, description, special_offer, total_quantities}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -197,7 +204,7 @@ export const updateProduct = createAsyncThunk<
                 discount,
                 description,
                 special_offer,
-                qty
+                total_quantities
             }, config);
 
             return data;

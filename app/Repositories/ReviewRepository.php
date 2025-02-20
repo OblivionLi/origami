@@ -28,15 +28,15 @@ class ReviewRepository
 
     /**
      * @param array $requestData
-     * @param string $slug
+     * @param int $productId
      * @return bool
      */
-    public function createReview(array $requestData, string $slug): bool
+    public function createReview(array $requestData, int $productId): bool
     {
         DB::beginTransaction();
 
         try {
-            $product = Product::where('slug', $slug)->firstOrFail();
+            $product = Product::find($productId);
             if (!$product) {
                 return false;
             }

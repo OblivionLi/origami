@@ -30,6 +30,7 @@ class ReviewStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id' => 'required|numeric',
             'username' => 'string|required',
             'rating' => 'required|numeric|max:5',
             'comment' => 'required',

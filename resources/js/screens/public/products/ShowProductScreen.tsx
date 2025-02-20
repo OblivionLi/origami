@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {AppDispatch, RootState} from "@/store";
+import {ASSET_URL} from "@/config";
 import {useSelector, useDispatch} from "react-redux";
 import {Link, useParams, useNavigate} from "react-router-dom";
 import {
@@ -26,7 +27,8 @@ import NavbarCategories from "@/components/NavbarCategories.js";
 import Footer from "@/components/Footer.js";
 import {fetchProductBySlug} from '@/features/product/productSlice';
 import {resetReviewState, createReview, Review} from '@/features/review/reviewSlice';
-import {StyledButton, StyledDivider, StyledRating} from "@/styles/muiStyles";
+import {StyledButton, StyledDivider3, StyledRating, StyledRatingContainer, StyledReviewText} from "@/styles/muiStyles";
+import {ProductImage} from '@/features/product/productSlice';
 
 
 // const useStyles = makeStyles((theme) => ({
@@ -71,6 +73,10 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
     const {success: successProductReview, error: errorProductReview} = reviewCreate;
 
     useEffect(() => {
+        if (!userLogin) {
+            navigate('/login');
+        }
+
         if (!productSlug) return;
 
         if (successProductReview) {
@@ -79,7 +85,7 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
             dispatch(resetReviewState());
         }
 
-        dispatch(fetchProductBySlug({slug: productSlug}));
+        dispatch(fetchProductBySlug(productSlug));
     }, [dispatch, productSlug, successProductReview]);
 
     const addToCartHandler = () => {
@@ -152,12 +158,12 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
                         </Paper>
                         <div className="show">
                             <div className="show__carousel">
-                                <Carousel>
-                                    {currentProduct?.product_images && currentProduct.product_images.map((image) => (
+                                <Carousel showArrows={true}>
+                                    {currentProduct?.images && currentProduct.images.map((image: ProductImage) => (
                                         <div key={image.id}>
                                             <img
                                                 className="show__carousel-img"
-                                                src={`http://127.0.0.1:8000/storage/${image.path}`}
+                                                src={`${ASSET_URL}/${image.path}`}
                                                 alt={`Image for product: ${currentProduct?.name}`}
                                                 title={`Image id: ${currentProduct?.name}`}
                                             />
@@ -168,7 +174,7 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
 
                             <Paper className="show__paper">
                                 <div className="show__paper--rating">
-                                    {currentProduct && currentProduct.qty! > 0 ? (
+                                    {currentProduct && currentProduct.total_quantities! > 0 ? (
                                         <p className="inStock">
                                             &#8226; Product in stock.
                                         </p>
@@ -178,16 +184,18 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
                                         </p>
                                     )}
 
-                                    <StyledRating
-                                        size="small"
-                                        name="rating"
-                                        value={Number(currentProduct?.rating ?? 0)}
-                                        // text={`${
-                                        //     currentProduct?.total_reviews
-                                        // } reviews`}
-                                        precision={0.5}
-                                        readOnly
-                                    />
+                                    <StyledRatingContainer>
+                                        <StyledRating
+                                            size="small"
+                                            name="rating"
+                                            value={Number(currentProduct?.rating ?? 0)}
+                                            precision={0.5}
+                                            readOnly
+                                        />
+                                        <StyledReviewText>
+                                            {`${currentProduct?.total_reviews} reviews`}
+                                        </StyledReviewText>
+                                    </StyledRatingContainer>
                                     <Divider/>
                                 </div>
 
@@ -212,7 +220,7 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
                                 </div>
                             </Paper>
 
-                            {currentProduct && currentProduct.qty! > 0 && (
+                            {currentProduct && currentProduct.total_quantities! > 0 && (
                                 <Paper className="show__paper">
                                     <div className="show__paper--div">
                                         <h4 className="divider">Discount:</h4>
@@ -245,7 +253,7 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
                                     <div className="show__paper--div">
                                         <h4 className="divider">Quantity:</h4>
                                         <p className="show__paper--p">
-                                            {currentProduct?.qty} left
+                                            {currentProduct?.total_quantities} left
                                         </p>
                                     </div>
 
@@ -258,7 +266,7 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
                                                     variant="contained"
                                                     type="button"
                                                     onClick={addToCartHandler}
-                                                    disabled={currentProduct?.qty === 0}
+                                                    disabled={currentProduct?.total_quantities === 0}
                                                 >
                                                     Add to Cart
                                                 </StyledButton>
@@ -449,13 +457,15 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
 
                                 {currentProduct?.reviews.length > 1 && (
                                     <StyledButton
-                                        size="small"
+                                        fullWidth
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={() => {
+                                            navigate(`/reviews/product/${currentProduct.id}`)
+                                        }}
+                                        style={{marginTop: '1.2rem'}}
                                     >
-                                        <Link
-                                            to={`/reviews/product/${currentProduct.id}`}
-                                        >
-                                            View all Reviews
-                                        </Link>
+                                        View all Reviews
                                     </StyledButton>
                                 )}
                             </Paper>
@@ -464,7 +474,7 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
                 )}
             </section>
 
-            <StyledDivider/>
+            <StyledDivider3/>
             <Footer/>
         </>
     );

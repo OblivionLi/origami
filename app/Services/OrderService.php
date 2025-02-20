@@ -76,16 +76,16 @@ class OrderService
     }
 
     /**
-     * @return OrderIndexResource|JsonResponse
+     * @return AnonymousResourceCollection|JsonResponse
      */
-    public function getUserOrders(): OrderIndexResource|JsonResponse
+    public function getUserOrders(): AnonymousResourceCollection|JsonResponse
     {
-        $order = $this->orderRepository->getUserOrderWithRelations(Auth::id());
+        $order = $this->orderRepository->getUserOrdersWithRelations(Auth::id())->get();
         if (!$order) {
             return response()->json(['message' => 'User has no orders.'], Response::HTTP_NOT_FOUND);
         }
 
-        return new OrderIndexResource($order);
+        return OrderIndexResource::collection($order);
     }
 
     /**

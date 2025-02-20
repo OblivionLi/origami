@@ -36,14 +36,19 @@ class ReviewService
 
     /**
      * @param ReviewStoreRequest $request
-     * @param string $slug
+     * @param int $productId
      * @return JsonResponse
      */
-    public function storeReview(ReviewStoreRequest $request, string $slug): JsonResponse
+    public function storeReview(ReviewStoreRequest $request, int $productId): JsonResponse
     {
-        $tryToStoreReview = $this->reviewRepository->createReview($request->validated(), $slug);
+        $tryToStoreReview = $this->reviewRepository->createReview($request->validated(), $productId);
         if (!$tryToStoreReview) {
-            return response()->json(['message' => 'Failed to create review.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json([
+                'message' => '
+                Failed to create review.
+                Verify that you did not post a review for this product already.
+                Only 1 review per customer for each product allowed.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         return response()->json(['message' => 'Review created successfully.'], Response::HTTP_CREATED);
     }

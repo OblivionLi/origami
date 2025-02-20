@@ -26,15 +26,15 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(ProductController::class)->group(function () {
     Route::get('showcase-products', 'getShowcaseProducts');
-    Route::get('products/{product}', 'show');
-    Route::get('products/accessories', 'getProductByAccessories');
-    Route::get('products/origami', 'getProductByOrigami');
-    Route::get('products/special-offers', 'getProductBySpecialOffers');
+
+//    Route::get('products/accessories', 'getProductByAccessories');
+//    Route::get('products/origami', 'getProductByOrigami');
+//    Route::get('products/special-offers', 'getProductBySpecialOffers');
 });
 
-Route::controller(ReviewController::class)->group(function () {
-    Route::get('products/{product}/reviews', 'indexWithPagination');
-});
+//Route::controller(ReviewController::class)->group(function () {
+//    Route::get('products/{product}/reviews', 'indexWithPagination');
+//});
 
 Route::controller(CheckoutController::class)->group(function () {
     Route::get('config/stripe', 'secretKey');
@@ -55,7 +55,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('users/me', [UserController::class, 'show']);
 
     // Review Routes
-    Route::post('products/{product}/reviews', [ReviewController::class, 'store']);
+    Route::controller(ReviewController::class)->group(function () {
+        Route::post('products/{product}/reviews', 'store');
+        Route::get('products/{product}/reviews', 'index');
+    });
+
+    // Product Routes
+    Route::get('products/{slug}', [ProductController::class, 'show']);
 
     // Order Routes
     Route::controller(OrderController::class)->group(function () {

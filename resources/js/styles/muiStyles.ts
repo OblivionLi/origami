@@ -7,7 +7,7 @@ import {
     FormControlLabel,
     Paper,
     Card,
-    CardMedia
+    CardMedia, Typography
 } from '@mui/material';
 import {CardElement} from "@stripe/react-stripe-js";
 import Rating from "@mui/material/Rating";
@@ -129,6 +129,9 @@ export const StyledCard = styled(Card)({
     minWidth: 345,
     boxShadow:
         "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
+
+    display: 'flex',
+    flexDirection: 'column',
 });
 
 export const StyledCardElement = styled(CardElement)({
@@ -162,7 +165,18 @@ export const FailedSpan = styled('span')({
 
 export const StyledRating = styled(Rating)({
     color: 'orange',
+});
+
+export const StyledRatingContainer = styled('div')({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px'
+});
+
+export const StyledReviewText = styled(Typography)({
     fontWeight: 'bold',
+    fontSize: '0.8rem',
+    color: 'orange',
 });
 
 export const StyledLink = styled(Link)({

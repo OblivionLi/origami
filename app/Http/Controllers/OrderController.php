@@ -65,9 +65,9 @@ class OrderController extends Controller
     }
 
     /**
-     * @return OrderIndexResource|JsonResponse
+     * @return AnonymousResourceCollection|JsonResponse
      */
-    public function getUserOrders(): OrderIndexResource|JsonResponse
+    public function getUserOrders(): AnonymousResourceCollection|JsonResponse
     {
         return $this->orderService->getUserOrders();
     }

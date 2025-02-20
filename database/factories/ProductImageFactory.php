@@ -21,7 +21,7 @@ class ProductImageFactory extends Factory
      */
     public function definition(): array
     {
-        $filename = $this->faker->uuid . '.jpg'; // Unique filename
+        $filename = $this->faker->uuid . '.png';
         return [
             'name' => $filename,
             'path' => 'productImages/' . $filename,

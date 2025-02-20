@@ -12,7 +12,7 @@ export interface Order {
     total_price?: number;
     products_discount_price?: number;
     order_id: number;
-    status: "PENDING" | "PAID" | "DELIVERED" | "FAILED";
+    status: "pending" | "paid" | "delivered" | "failed" | "cancelled";
     is_paid: number; // 0 or 1
     is_delivered: number; // 0 or 1
     paid_at: string | null;
@@ -26,6 +26,7 @@ interface OrderState {
     error: string | null;
     currentOrder: Order | null;
     success: boolean;
+    userOrders: Order[];
 }
 
 const initialState: OrderState = {
@@ -34,6 +35,7 @@ const initialState: OrderState = {
     error: null,
     currentOrder: null,
     success: false,
+    userOrders: [],
 }
 
 export const fetchOrders = createAsyncThunk<
@@ -315,8 +317,8 @@ export const listUserOrders = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Order[]>('/api/orders/me', config);
-            return data;
+            const {data} = await axios.get('/api/orders/me', config);
+            return data?.data;
         } catch (error: any) {
             const message = error.response?.data?.message || error.message;
             return thunkAPI.rejectWithValue(message);
@@ -463,14 +465,14 @@ const orderSlice = createSlice({
             })
             .addCase(listUserOrders.fulfilled, (state, action: PayloadAction<Order[]>) => {
                 state.loading = false;
-                state.order = action.payload;
+                state.userOrders = action.payload;
                 state.success = true;
             })
             .addCase(listUserOrders.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
                 state.error = action.payload ? action.payload : "Unknown Error";
-                state.order = [];
+                state.userOrders = [];
             });
 
         // add the remaining reducers

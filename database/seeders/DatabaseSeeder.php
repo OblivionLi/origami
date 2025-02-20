@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
                 ['email' => 'user@user.com'],
                 [
                     'name' => 'Test User',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('123456'),
                 ]
             );
 
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
                 ['email' => 'admin@admin.com'],
                 [
                     'name' => 'Test Admin',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('123456'),
                 ]
             );
 
@@ -122,18 +122,26 @@ class DatabaseSeeder extends Seeder
                         ]);
                         $product->save();
 
-                        $product->update(['slug' => $product->name]);
+                        $slug = str_replace(' ', '-', strtolower($product->name));
+                        $product->update(['slug' => $slug]);
                     }
                 }
             }
             $products = Product::all();
 
             // --- Product Images ---
+            $imageNames = ['image-001.png', 'image-002.png', 'image-003.png'];
+
             foreach ($products as $product) {
-                $existingProductImages = ProductImage::where('product_id', $product->id)->count();
-                if ($existingProductImages < 2) {
-                    ProductImage::factory(2 - $existingProductImages)->create([
+                $existingImageCount = ProductImage::where('product_id', $product->id)->count();
+                $imagesToAdd = min(3 - $existingImageCount, 3);
+                $chosenImages = collect($imageNames)->random($imagesToAdd);
+
+                foreach ($chosenImages as $imageName) {
+                    ProductImage::create([
                         'product_id' => $product->id,
+                        'name' => $imageName,
+                        'path' => 'productImages/' . $imageName,
                     ]);
                 }
             }

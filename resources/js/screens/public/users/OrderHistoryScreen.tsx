@@ -19,8 +19,9 @@ import NavbarCategories from "@/components/NavbarCategories.js";
 import Footer from '@/components/Footer.js';
 import {Order, listUserOrders} from '@/features/order/orderSlice';
 import {AppDispatch, RootState} from "@/store";
-import {StyledDivider, NotPaidSpan, IsPaidSpan, DeliveredSpan, FailedSpan} from "@/styles/muiStyles";
+import {StyledDivider, NotPaidSpan, IsPaidSpan, DeliveredSpan, FailedSpan, StyledDivider3} from "@/styles/muiStyles";
 import {format} from "date-fns";
+import {toUpper} from "lodash";
 
 interface OrderHistoryProps {
 }
@@ -30,8 +31,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
     const navigate = useNavigate();
 
     const userLogin = useSelector((state: RootState) => state.user.userInfo);
-    const orderUserList = useSelector((state: RootState) => state.order);
-    const {loading, error, order} = orderUserList;
+    const {loading, error, userOrders} = useSelector((state: RootState) => state.order);
 
     useEffect(() => {
         if (!userLogin) {
@@ -40,7 +40,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
         }
 
         dispatch(listUserOrders());
-    }, [dispatch, navigate]);
+    }, [dispatch, navigate, userLogin]);
 
     return (
         <>
@@ -86,7 +86,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {order.map((orderItem: Order) => (
+                                        {userOrders.map((orderItem: Order) => (
                                             <TableRow key={orderItem.id}>
                                                 <TableCell>
                                                     <Link
@@ -95,17 +95,19 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {orderItem.status === "PENDING" ? (
-                                                        <NotPaidSpan>{orderItem.status}</NotPaidSpan>
-                                                    ) : orderItem.status === "PAID" ? (
-                                                        <IsPaidSpan>{orderItem.status}</IsPaidSpan>
-                                                    ) : orderItem.status === "DELIVERED" ? (
-                                                        <DeliveredSpan>{orderItem.status}</DeliveredSpan>
+                                                    {orderItem.status === "pending" ? (
+                                                        <NotPaidSpan>{toUpper(orderItem.status)}</NotPaidSpan>
+                                                    ) : orderItem.status === "paid" ? (
+                                                        <IsPaidSpan>{toUpper(orderItem.status)}</IsPaidSpan>
+                                                    ) : orderItem.status === "cancelled" ? (
+                                                        <FailedSpan>{toUpper(orderItem.status)}</FailedSpan>
+                                                    ) : orderItem.status === "delivered" ? (
+                                                        <DeliveredSpan>{toUpper(orderItem.status)}</DeliveredSpan>
                                                     ) : (
                                                         <FailedSpan>ORDER FAILED</FailedSpan> // Keep text consistent
                                                     )}
                                                 </TableCell>
-                                                <TableCell>€ {orderItem.total_price && orderItem.total_price.toFixed(2)}</TableCell>
+                                                <TableCell>€ {orderItem.total_price}</TableCell>
                                                 <TableCell>{orderItem.is_paid ? <IsPaidSpan>Yes</IsPaidSpan> :
                                                     <NotPaidSpan>No</NotPaidSpan>}</TableCell>
                                                 <TableCell>{orderItem.is_delivered ?
@@ -126,7 +128,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    format(new Date(orderItem.created_at), 'dd/MM/yyyy HH:mm')
+                                                    {format(new Date(orderItem.created_at), 'dd/MM/yyyy HH:mm')}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -138,7 +140,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                 )}
             </section>
 
-            <StyledDivider/>
+            <StyledDivider3/>
             <Footer/>
         </>
     );

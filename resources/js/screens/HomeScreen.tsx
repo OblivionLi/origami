@@ -30,7 +30,13 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
             <Navbar/>
             <NavbarCategories/>
 
-            {loading && <Loader/>}
+            {loading && (
+                <>
+                    <div className="loaderCenter">
+                        <Loader/>
+                    </div>
+                </>
+            )}
             {error && <Message variant="error">Product showcases not loaded.</Message>}
 
             {showcase && (

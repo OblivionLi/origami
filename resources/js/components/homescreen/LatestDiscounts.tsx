@@ -10,6 +10,7 @@ import {Link} from "react-router-dom";
 import Loader from '@/components/alert/Loader';
 import {StyledDivider, StyledCard, StyledCardMedia} from '@/styles/muiStyles';
 import {Product} from '@/features/product/productSlice';
+import {ASSET_URL} from "@/config";
 
 interface LatestDiscountsProps {
     latestDiscounts: Product[];
@@ -23,7 +24,7 @@ const LatestDiscounts: React.FC<LatestDiscountsProps> = ({latestDiscounts}) => {
             </Paper>
 
             <div className="content">
-                <div className="content__products">
+                <div className="content__products" style={{display: 'flex', justifyContent: 'space-evenly', flexWrap: 'wrap', gap: '1rem'}}>
                     {latestDiscounts.length === 0 ? (
                         <Loader/>
                     ) : (
@@ -31,15 +32,19 @@ const LatestDiscounts: React.FC<LatestDiscountsProps> = ({latestDiscounts}) => {
                             <StyledCard key={product.id}>
                                 <CardActionArea>
                                     <StyledCardMedia
-                                        image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
+                                        image={`${ASSET_URL}/${product.product_images[0].path}`}
                                         title={`Image for product: ${product.name}`}
                                     />
-                                    <CardContent className="card-content-top">
+                                    <CardContent className="card-content-top" sx={{flexGrow: 1}}>
                                         <Typography
                                             gutterBottom
                                             variant="h5"
                                             component="h2"
                                             className="card-content-h2"
+                                            sx={{
+                                                height: '3em',
+                                                overflow: 'hidden'
+                                            }}
                                         >
                                             {product.name}
                                         </Typography>
@@ -47,6 +52,13 @@ const LatestDiscounts: React.FC<LatestDiscountsProps> = ({latestDiscounts}) => {
                                             variant="body2"
                                             component="p"
                                             className="card-content-p"
+                                            sx={{
+                                                height: '6em',
+                                                overflow: 'hidden',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: 'vertical'
+                                            }}
                                         >
                                             {product.description}
                                         </Typography>
