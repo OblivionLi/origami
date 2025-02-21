@@ -14,6 +14,7 @@ import CartScreen from "@/screens/public/shop/CartScreen";
 import AccessoriesScreen from "@/screens/public/categories/AccessoriesScreen";
 import ShowProductScreen from "@/screens/public/products/ShowProductScreen";
 import ReviewsScreen from "@/screens/public/reviews/ReviewsScreen";
+import ShippingScreen from "@/screens/public/shop/ShippingScreen";
 // import SettingsScreen from './screens/public/users/SettingsScreen';
 // import AdminScreen from './screens/admin/AdminScreen';
 // import ShowProductScreen from './screens/public/products/ShowProductScreen';
@@ -54,16 +55,16 @@ function Index() {
 
                 {/*/!* Reviews *!/*/}
                 <Route path="/reviews/product/:id" element={<ReviewsScreen/>}/>
-                {/*<Route path="/reviews/product/:id/:page?" component={ReviewsScreen} />*/}
+                <Route path="/reviews/product/:id/:page?" element={<ReviewsScreen/>}/>
 
                 {/*/!* Cart *!/*/}
-                <Route path="/cart/:id?" element={<CartScreen/>}/>
-                {/*<Route path="/shipping-to/:id?" component={ShippingScreen} />*/}
+                <Route path="/cart" element={<CartScreen/>}/>
+                <Route path="/shipping" element={<ShippingScreen/>} />
                 {/*<Route path="/placeorder/:id?" component={PlaceOrderScreen} />*/}
 
                 {/*/!* Order *!/*/}
                 <Route path="/order-history" element={<OrderHistoryScreen/>}/>
-                {/*<Route path="/order-history/:id/:userId?" component={ShowOrderScreen} />*/}
+                {/*<Route path="/order-history/:id/:userId?" element={<ShowOrderScreen/>} />*/}
 
                 {/*/!* Admin Section *!/*/}
                 {/*<Route path="/admin" component={AdminScreen} />*/}

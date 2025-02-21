@@ -114,7 +114,6 @@ export const fetchReviewsWithPagination = createAsyncThunk<
             const pageParam = page === null ? '' : `?page=${page}`;
 
             const {data} = await axios.get<PaginatedReviews>(`/api/products/${productId}/reviews${pageParam}`, config);
-
             return data;
         } catch (error: any) {
             const message =

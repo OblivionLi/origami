@@ -12,6 +12,7 @@ import MasterPagination from "@/components/paginations/MasterPagination";
 import Footer from '@/components/Footer.js';
 import {fetchReviewsWithPagination} from "@/features/review/reviewSlice";
 import {Review} from '@/features/review/reviewSlice'
+import {StyledDivider3} from "@/styles/muiStyles";
 
 interface ReviewsScreenProps {
 }
@@ -33,7 +34,6 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
         }
     }, [dispatch, productId, page]);
 
-
     return (
         <>
             <Navbar/>
@@ -41,7 +41,7 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
 
             <section className="ctn">
                 {loading ? (
-                    <div className="product">
+                    <div className="loaderCenter">
                         <Loader/>
                     </div>
                 ) : error ? (
@@ -68,95 +68,89 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
                             </Breadcrumbs>
                         </Paper>
 
-                        <Paper className="product__container">
-                            <h3 className="divider">Reviews</h3>
-                            <div className="review">
-                                {paginatedReviews?.data && paginatedReviews.data.map((review: Review) => (
-                                    <Paper
-                                        key={review.id}
-                                        className="product__container3"
-                                    >
-                                        <div className="review-top">
-                                            <h3>{review.user_name}</h3>
-                                            <Rating
-                                                size="small"
-                                                name="rating"
-                                                value={parseFloat(
-                                                    review.rating
-                                                )}
-                                                precision={0.5}
-                                                readOnly
-                                            />
-                                        </div>
-                                        <Divider/>
+                        <Paper className="show__container">
+                            {paginatedReviews?.data && paginatedReviews.data.map((review: Review) => (
+                                <Paper
+                                    key={review.id}
+                                    className="show__container--content"
+                                >
+                                    <div className="review-top">
+                                        <h3>{review.user_name}</h3>
+                                        <Rating
+                                            size="small"
+                                            name="rating"
+                                            value={parseFloat(
+                                                review.rating
+                                            )}
+                                            precision={0.5}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <Divider/>
 
-                                        <div className="review-bottom">
-                                            <p className="product__paper--p">
-                                                {review.user_comment}
-                                            </p>
+                                    <div className="review-bottom">
+                                        <p className="product__paper--p">
+                                            {review.user_comment}
+                                        </p>
 
-                                            <p className="review-bottom--date">
-                                                {review.created_at.substring(
-                                                    0,
-                                                    10
-                                                )}
-                                            </p>
-                                        </div>
+                                        <p className="review-bottom--date">
+                                            {review.created_at.substring(
+                                                0,
+                                                10
+                                            )}
+                                        </p>
+                                    </div>
 
-                                        {review.admin_name ||
-                                        review.admin_comment ? (
-                                            <>
-                                                <Divider/>
+                                    {review.admin_name || review.admin_comment && (
+                                        <>
+                                            <Divider/>
 
-                                                <div className="review-bottom">
-                                                    <p>
-                                                        User comment was
-                                                        edited by{" "}
-                                                        <span className="reviewEdited">
+                                            <div className="review-bottom">
+                                                <p>
+                                                    User comment was
+                                                    edited by{" "}
+                                                    <span className="reviewEdited">
                                                                 {
                                                                     review.admin_name
                                                                 }
                                                             </span>{" "}
-                                                        because of the
-                                                        following motives:{" "}
-                                                        <span className="reviewEdited">
+                                                    because of the
+                                                    following motives:{" "}
+                                                    <span className="reviewEdited">
                                                                 {
                                                                     review.admin_comment
                                                                 }
                                                             </span>
-                                                    </p>
+                                                </p>
 
-                                                    <p>
-                                                        Date of edit:{" "}
-                                                        {review.updated_at.substring(
-                                                            0,
-                                                            10
-                                                        )}
-                                                    </p>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            ""
-                                        )}
-                                    </Paper>
-                                ))}
-                            </div>
-
-                            {paginatedReviews?.data && paginatedReviews.data.length > 0 && !loading && (
-                                <div className="pagination">
-                                    <MasterPagination
-                                        baseURL={`/reviews/product/${productId}`}
-                                        page={current_page}
-                                        pages={last_page}
-                                    />
-                                </div>
-                            )}
+                                                <p>
+                                                    Date of edit:{" "}
+                                                    {review.updated_at.substring(
+                                                        0,
+                                                        10
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </>
+                                    )}
+                                </Paper>
+                            ))}
                         </Paper>
+
+                        {paginatedReviews?.data && paginatedReviews.data.length > 0 && !loading && (
+                            <div style={{display: 'flex', justifyContent: 'center'}}>
+                                <MasterPagination
+                                    baseURL={`/reviews/product/${productId}`}
+                                    page={current_page}
+                                    pages={last_page}
+                                />
+                            </div>
+                        )}
                     </>
                 )}
             </section>
 
-            <hr className="divider2"/>
+            <StyledDivider3/>
             <Footer/>
         </>
     );

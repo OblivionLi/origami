@@ -17,7 +17,7 @@ interface User {
         email?: string,
         role?: string,
         is_admin?: number,
-        address?: Address,
+        address?: Address[],
     }
 }
 
@@ -312,7 +312,7 @@ export const getUsersList = createAsyncThunk<
 
 export const getUser = createAsyncThunk<
     User,
-    string,
+    number | undefined,
     { state: RootState; rejectValue: string }
 >(
     'user/getUser',

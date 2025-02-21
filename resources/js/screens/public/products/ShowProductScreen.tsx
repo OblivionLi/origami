@@ -29,6 +29,7 @@ import {fetchProductBySlug} from '@/features/product/productSlice';
 import {resetReviewState, createReview, Review} from '@/features/review/reviewSlice';
 import {StyledButton, StyledDivider3, StyledRating, StyledRatingContainer, StyledReviewText} from "@/styles/muiStyles";
 import {ProductImage} from '@/features/product/productSlice';
+import {addToCart} from "@/features/cart/cartSlice";
 
 
 // const useStyles = makeStyles((theme) => ({
@@ -89,8 +90,9 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
     }, [dispatch, productSlug, successProductReview]);
 
     const addToCartHandler = () => {
-        if (!productSlug) return;
-        navigate(`/cart/${productSlug}?qty=${qty}`);
+        if (!currentProduct) return;
+
+        dispatch(addToCart({product: currentProduct, qty}));
 
         const Toast = Swal.mixin({
             toast: true,
@@ -108,6 +110,8 @@ const ShowProductScreen: React.FC<ShowProductScreenProps> = () => {
             icon: "success",
             title: `Added Product ${currentProduct?.name} to cart`,
         });
+
+        navigate('/cart');
     };
 
     const submitHandler = (event: React.FormEvent) => {

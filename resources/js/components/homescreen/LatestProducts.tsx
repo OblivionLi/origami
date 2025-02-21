@@ -28,11 +28,11 @@ const LatestProducts: React.FC<LatestProductsProps> = ({latestProducts}) => {
                     {!latestProducts ? (
                         <Loader/>
                     ) : (
-                        latestProducts.map((product) => (
+                        latestProducts.map((product: Product) => (
                             <StyledCard key={product.id}>
                                 <CardActionArea>
                                     <StyledCardMedia
-                                        image={`${ASSET_URL}/${product.product_images[0].path}`}
+                                        image={`${ASSET_URL}/${product?.product_images[0].path}`}
                                         title={`Image for product: ${product.name}`}
                                     />
                                     <CardContent className="card-content-top" sx={{flexGrow: 1}}>

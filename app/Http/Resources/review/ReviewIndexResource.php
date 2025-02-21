@@ -40,7 +40,7 @@ class ReviewIndexResource extends JsonResource
             'updated_at' => $this->updated_at,
 
             'product' => $this->product,
-            'user' => $this->user
+            'user' => $this->user,
         ];
     }
 }

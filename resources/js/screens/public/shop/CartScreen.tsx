@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {Link, useNavigate, useParams, useLocation} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Swal from "sweetalert2";
 import {
     Paper,
@@ -28,7 +28,7 @@ import Navbar from "@/components/Navbar.js";
 import NavbarCategories from "@/components/NavbarCategories.js";
 import Message from "@/components/alert/Message.js";
 import Footer from "@/components/Footer.js";
-import {addToCart, removeFromCart} from "@/features/cart/cartSlice";
+import {removeFromCart, updateQuantity} from "@/features/cart/cartSlice";
 import {AppDispatch, RootState} from "@/store";
 
 interface CartScreenProps {
@@ -37,12 +37,6 @@ interface CartScreenProps {
 const CartScreen: React.FC<CartScreenProps> = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const {id: productId} = useParams<{ id?: string }>();
-    const params = new URLSearchParams(location.search);
-    const qtyParam = params.get("qty");
-    const qty = qtyParam ? parseInt(qtyParam, 10) : 1;
 
     const {cartItems, loading, error} = useSelector((state: RootState) => state.cart);
     const {userInfo} = useSelector((state: RootState) => state.user);
@@ -53,21 +47,15 @@ const CartScreen: React.FC<CartScreenProps> = () => {
             return;
         }
 
-        if (productId) {
-            dispatch(addToCart({id: parseInt(productId, 10), qty}));
-        }
-
-    }, [dispatch, productId, qty, userInfo, navigate]);
+    }, [userInfo, navigate]);
 
     const removeFromCartHandler = (id: number) => {
         dispatch(removeFromCart(id));
-        // history.push("/cart");
     };
 
     const checkoutHandler = () => {
-        navigate(`/shipping-to/${userInfo?.id}`);
-
-        // history.push(`/shipping-to/${userInfo.data.user_id}`);
+        if (!userInfo) return;
+        navigate(`/shipping`);
 
         const Toast = Swal.mixin({
             toast: true,
@@ -99,7 +87,7 @@ const CartScreen: React.FC<CartScreenProps> = () => {
             <NavbarCategories/>
 
             <section className="ctn">
-                {cartItems && cartItems.length === 0 ? (
+                {cartItems.length === 0 ? (
                     <div className="cart-empty">
                         <Message variant="warning">
                             Your cart is empty <StyledLink to={`/`}>Go Back</StyledLink>
@@ -184,10 +172,8 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                                         </StyledLink>
                                                     </TableCell>
                                                     <TableCell>{item.discount || 0}%</TableCell>{" "}
-                                                    {/* Handle null discount */}
                                                     <TableCell>
                                                         <span>€{(item.price - (item.price * (item.discount || 0)) / 100).toFixed(2)}</span>{" "}
-                                                        {/* Handle null discount*/}
                                                         {"   "}
                                                         <s>€{item.price}</s>
                                                     </TableCell>
@@ -203,9 +189,8 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                                                 value={item.qty}
                                                                 onChange={(e) =>
                                                                     dispatch(
-                                                                        // @ts-ignore
-                                                                        addToCart({
-                                                                            id: item.product,
+                                                                        updateQuantity({
+                                                                            productId: item.product,
                                                                             qty: Number(e.target.value),
                                                                         })
                                                                     )
@@ -240,7 +225,7 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                         <Typography variant="h6" component="h4" className="divider">
                                             Subtotal:
                                         </Typography>
-                                        <Typography  className="show__paper--p">
+                                        <Typography className="show__paper--p">
                                             {subtotalItems} items
                                         </Typography>
                                     </div>
