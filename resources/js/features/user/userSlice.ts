@@ -3,7 +3,7 @@ import axios from 'axios';
 import {RootState} from "@/store";
 import {Address} from '@/features/address/addressSlice';
 
-interface User {
+export interface User {
     id: number | undefined;
     name: string | undefined;
     email: string | undefined;
@@ -340,6 +340,36 @@ export const getUser = createAsyncThunk<
     }
 );
 
+export const getUserAddress = createAsyncThunk<
+    User,
+    number | undefined,
+    { state: RootState; rejectValue: string }
+>(
+    'user/getUserAddress',
+    async (id, thunkAPI) => {
+        try {
+            const {userInfo} = thunkAPI.getState().user;
+
+            if (!userInfo?.data?.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+            };
+            const {data} = await axios.get<User>(`/api/users/${id}/address`, config);
+            return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
 export const editUser = createAsyncThunk<
     User,
     { id: string; name: string; email: string; role: string },
@@ -416,6 +446,9 @@ const userSlice = createSlice({
             state.error = null;
         },
         clearUserSuccess: (state) => {
+            state.success = false;
+        },
+        clearAddressSuccess: (state) => {
             state.success = false;
         }
     },
@@ -549,6 +582,20 @@ const userSlice = createSlice({
                 state.error = action.payload ? action.payload : "Unknown error";
             })
 
+            // Handle Get User Address
+            .addCase(getUserAddress.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getUserAddress.fulfilled, (state, action: PayloadAction<User>) => {
+                state.loading = false;
+                state.currentUser = action.payload;
+            })
+            .addCase(getUserAddress.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
             // Handle Edit User
             .addCase(editUser.pending, (state) => {
                 state.loading = true;
@@ -589,5 +636,5 @@ const userSlice = createSlice({
     }
 });
 
-export const {resetUserState, clearUserError, clearUserSuccess} = userSlice.actions;
+export const {resetUserState, clearUserError, clearUserSuccess, clearAddressSuccess} = userSlice.actions;
 export default userSlice.reducer;

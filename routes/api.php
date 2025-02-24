@@ -52,7 +52,11 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('users/update-credentials/{id}', 'updateMe');
         Route::delete('users/me/{email}', 'deleteMe');
     });
-    Route::get('users/me', [UserController::class, 'show']);
+
+    Route::controller(UserController::class)->group(function () {
+        Route::get('users/{user}', 'show');
+        Route::get('users/{user}/address', 'showUserAddress');
+    });
 
     // Review Routes
     Route::controller(ReviewController::class)->group(function () {
@@ -72,7 +76,13 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // Address Routes
-    Route::apiResource('addresses', AddressController::class);
+    Route::controller(AddressController::class)->group(function () {
+        Route::post('address', 'store');
+        Route::get('address/{address}', 'show');
+        Route::get('address', 'index');
+        Route::patch('address/{address}', 'update');
+        Route::delete('address/{address}', 'delete');
+    });
 
     // Admin Routes (Admin Role Required)
     Route::middleware('isAdmin')->group(function () {

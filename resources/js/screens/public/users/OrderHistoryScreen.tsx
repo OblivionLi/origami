@@ -19,7 +19,7 @@ import NavbarCategories from "@/components/NavbarCategories.js";
 import Footer from '@/components/Footer.js';
 import {Order, listUserOrders} from '@/features/order/orderSlice';
 import {AppDispatch, RootState} from "@/store";
-import {StyledDivider, NotPaidSpan, IsPaidSpan, DeliveredSpan, FailedSpan, StyledDivider3} from "@/styles/muiStyles";
+import {NotPaidSpan, IsPaidSpan, DeliveredSpan, FailedSpan, StyledDivider3} from "@/styles/muiStyles";
 import {format} from "date-fns";
 import {toUpper} from "lodash";
 
@@ -75,7 +75,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                 <Table aria-label="order history table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Order Details</TableCell>
+                                            <TableCell>Order (ID) Details</TableCell>
                                             <TableCell>Status</TableCell>
                                             <TableCell>Total to Pay</TableCell>
                                             <TableCell>Is Paid?</TableCell>
@@ -90,8 +90,8 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                             <TableRow key={orderItem.id}>
                                                 <TableCell>
                                                     <Link
-                                                        to={`/order-history/${orderItem.order_id}/${userLogin?.data?.id}`}>
-                                                        Order Details
+                                                        to={`/order-history/${orderItem.order_id}`}>
+                                                        {orderItem.order_id}
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell>
@@ -104,7 +104,7 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                                     ) : orderItem.status === "delivered" ? (
                                                         <DeliveredSpan>{toUpper(orderItem.status)}</DeliveredSpan>
                                                     ) : (
-                                                        <FailedSpan>ORDER FAILED</FailedSpan> // Keep text consistent
+                                                        <FailedSpan>ORDER FAILED</FailedSpan>
                                                     )}
                                                 </TableCell>
                                                 <TableCell>€ {orderItem.total_price}</TableCell>

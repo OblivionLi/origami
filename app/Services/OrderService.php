@@ -48,10 +48,10 @@ class OrderService
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @return OrderShowResource|JsonResponse
      */
-    public function showOrder(int $id): OrderShowResource|JsonResponse
+    public function showOrder(string $id): OrderShowResource|JsonResponse
     {
         $order = $this->orderRepository->getOrderWithRelations($id)->first();
         if (!$order) {

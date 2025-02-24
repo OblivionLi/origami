@@ -37,10 +37,10 @@ class OrderController extends Controller
     }
 
     /**
-     * @param $id
+     * @param string $id
      * @return OrderShowResource|JsonResponse
      */
-    public function show($id): OrderShowResource|JsonResponse
+    public function show(string $id): OrderShowResource|JsonResponse
     {
         return $this->orderService->showOrder($id);
     }

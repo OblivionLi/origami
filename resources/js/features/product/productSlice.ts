@@ -18,6 +18,7 @@ export interface Product {
     reviews: [];
     images: [];
     product_images: ProductImage[];
+    quantity: number;
 }
 
 export interface ProductImage {

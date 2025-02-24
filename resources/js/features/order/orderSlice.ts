@@ -1,27 +1,32 @@
 import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
+import {CartItem} from "@/features/cart/cartSlice";
+import {User} from "@/features/user/userSlice";
+import {Product} from "@/features/product/productSlice";
 
 export interface Order {
     id: number;
     user_id: number;
-    cart_items?: [];
     products_price?: number;
     shipping_price?: number;
     tax_price?: number;
     total_price?: number;
     products_discount_price?: number;
     order_id: number;
-    status: "pending" | "paid" | "delivered" | "failed" | "cancelled";
+    status: "PENDING" | "PAID" | "DELIVERED" | "FAILED" | "CANCELLED";
     is_paid: number; // 0 or 1
     is_delivered: number; // 0 or 1
     paid_at: string | null;
     delivered_at: string | null;
     created_at: string;
+    user: User;
+    products: Product[];
 }
 
 interface OrderState {
     order: Order[];
+    createdOrder: Order | null;
     loading: boolean;
     error: string | null;
     currentOrder: Order | null;
@@ -31,6 +36,7 @@ interface OrderState {
 
 const initialState: OrderState = {
     order: [],
+    createdOrder: null,
     loading: false,
     error: null,
     currentOrder: null,
@@ -73,7 +79,7 @@ export const fetchOrders = createAsyncThunk<
 
 export const fetchOrderById = createAsyncThunk<
     Order,
-    { id: number },
+    string,
     { state: RootState, rejectValue: string }
 >(
     'order/fetchOrderById',
@@ -92,7 +98,7 @@ export const fetchOrderById = createAsyncThunk<
             };
 
             const {data} = await axios.get<Order>(`/api/orders/${id}`, config);
-
+            console.log(data);
             return data;
         } catch (error: any) {
             const message =
@@ -107,8 +113,8 @@ export const fetchOrderById = createAsyncThunk<
 export const createOrder = createAsyncThunk<
     Order,
     {
-        user_id: string;
-        cart_items?: [];
+        user_id?: number;
+        cart_items?: CartItem[];
         products_price?: number,
         products_discount_price?: number,
         shipping_price?: number,
@@ -375,7 +381,7 @@ const orderSlice = createSlice({
             })
             .addCase(createOrder.fulfilled, (state, action: PayloadAction<Order>) => {
                 state.loading = false;
-                state.order.push(action.payload); // Immer allows this!
+                state.createdOrder = action.payload;
                 state.success = true;
             })
             .addCase(createOrder.rejected, (state, action) => {
@@ -394,7 +400,7 @@ const orderSlice = createSlice({
                 state.loading = false;
                 const index = state.order.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.order[index] = action.payload; // Immer allows this!
+                    state.order[index] = action.payload;
                 }
                 state.success = true;
             })
@@ -414,7 +420,7 @@ const orderSlice = createSlice({
                 state.loading = false;
                 const index = state.order.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.order[index] = action.payload; // Immer allows this!
+                    state.order[index] = action.payload;
                 }
                 state.success = true;
             })

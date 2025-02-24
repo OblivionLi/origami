@@ -162,7 +162,8 @@ export const createAddress = createAsyncThunk<
 export const updateAddress = createAsyncThunk<
     Address,
     {
-        id: number;
+        id?: number;
+        user_id: number;
         name: string;
         surname: string;
         country: string;
@@ -176,6 +177,7 @@ export const updateAddress = createAsyncThunk<
     'address/updateAddress',
     async ({
                id,
+               user_id,
                name,
                surname,
                country,
@@ -186,6 +188,10 @@ export const updateAddress = createAsyncThunk<
            }, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!id) {
+                return thunkAPI.rejectWithValue("User address missing.");
+            }
 
             if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
                 return thunkAPI.rejectWithValue("User not logged in or token missing.");
@@ -199,6 +205,7 @@ export const updateAddress = createAsyncThunk<
 
             const {data} = await axios.patch<Address>(`/api/address/${id}`,
                 {
+                    user_id,
                     name,
                     surname,
                     country,

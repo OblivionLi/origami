@@ -1,23 +1,31 @@
 import React, {useEffect, useState} from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {Link, useNavigate, useParams, useLocation} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import Swal from "sweetalert2";
 import {
     Paper,
     Typography,
     Breadcrumbs,
-    Button,
+    TableContainer,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody, Button
 } from "@mui/material";
 import NavbarCategories from "@/components/NavbarCategories.js";
 import Navbar from "@/components/Navbar.js";
 import Footer from "@/components/Footer.js";
 import Message from "@/components/alert/Message.js";
 import Loader from "@/components/alert/Loader.js";
-import {getAddress} from "./@/actions/addressActions";
-import {removeFromCart} from "./@/actions/cartActions";
-import {createOrder} from "@/actions/orderActions";
+import {removeFromCart} from "@/features/cart/cartSlice";
+import {createOrder} from "@/features/order/orderSlice";
 import {AppDispatch, RootState} from "@/store";
 import {Cart} from "@/features/cart/cartSlice";
+import {clearAddressSuccess, clearUserError, getUserAddress} from "@/features/user/userSlice";
+import {resetCheckout, setShippingCompleted} from "@/features/checkout/checkoutSlice";
+import {Address} from '@/features/address/addressSlice';
+import {StyledButton, StyledDivider3, StyledLink} from "@/styles/muiStyles";
 
 interface PlaceOrderScreenProps {
 }
@@ -25,23 +33,24 @@ interface PlaceOrderScreenProps {
 const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    const {id: userId} = useParams<{ id?: string }>();
-
-    const {userInfo} = useSelector((state: RootState) => state.user);
-    const {cartItems} = useSelector((state: RootState) => state.cart);
+    const {addressId} = useParams();
+    const addressIdNum = parseInt(addressId!, 10);
 
     const {
-        order,
+        createdOrder,
         success: orderSuccess,
         error: orderError,
         loading: orderLoading
     } = useSelector((state: RootState) => state.order);
 
     const {
-        currentAddress: address,
-        loading: addressLoading,
-        error: addressError
-    } = useSelector((state: RootState) => state.address);
+        userInfo,
+        currentUser,
+        loading: userLoading,
+        error: userError,
+    } = useSelector((state: RootState) => state.user);
+    const {cartItems} = useSelector((state: RootState) => state.cart);
+    const {shippingCompleted} = useSelector((state: RootState) => state.checkout);
 
     const addDecimals = (num: number): string => {
         return (Math.round(num * 100) / 100).toFixed(2);
@@ -75,30 +84,47 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
     };
 
     useEffect(() => {
-        if (!userInfo || (userId && userInfo?.id.toString() !== userId)) {
+        if (!userInfo) {
             navigate("/");
             return;
         }
 
+        if (!cartItems) {
+            navigate("/")
+            return;
+        }
+
+        if (!shippingCompleted || !addressIdNum) {
+            console.log('here2')
+            console.log(addressIdNum)
+            console.log(shippingCompleted)
+            navigate('/cart')
+            return;
+        }
+
+        dispatch(clearUserError());
+        dispatch(clearAddressSuccess());
+
+        dispatch(getUserAddress(userInfo?.data?.id));
+    }, [userInfo, cartItems, dispatch, navigate, shippingCompleted]);
+
+    useEffect(() => {
         if (orderSuccess) {
             cartItems.forEach((item) => {
                 dispatch(removeFromCart(item.product));
             });
 
-            order && navigate(`/order-history/${order?.id}/${userInfo?.id}`);
+            dispatch(resetCheckout())
+            navigate(`/order-history/${createdOrder?.id}`);
         }
-
-        if (userInfo) {
-            dispatch(getAddress(userInfo?.id));
-        }
-    }, [dispatch, order, userInfo, orderSuccess, navigate, userId, cartItems]);
+    }, [orderSuccess, dispatch, navigate]);
 
     const placeOrderHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
         dispatch(
             createOrder({
-                user_id: userInfo?.id,
+                user_id: userInfo?.data?.id,
                 cart_items: cart.cartItems,
                 products_price: Number(cart.itemsPrice),
                 shipping_price: Number(cart.shippingPrice),
@@ -126,6 +152,19 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
         });
     };
 
+    const userAddress: Address | undefined = currentUser?.data?.address?.find(item => item.id === addressIdNum);
+
+    const [expandedRow, setExpandedRow] = React.useState<number | null>(null);
+
+    const handleRowClick = (rowId: number) => {
+        setExpandedRow((prevExpandedRow) => (prevExpandedRow === rowId ? null : rowId));
+    };
+
+    const handleAddressChange = () => {
+        navigate('/shipping');
+
+    }
+
     return (
         <>
             <Navbar/>
@@ -140,13 +179,21 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                         <Link color="inherit" to="/cart" className="bc">
                             Cart
                         </Link>
-                        <Link
+                        <Button
                             color="inherit"
-                            to={`/shipping-to/${userInfo?.id}`}
                             className="bc"
+                            onClick={handleAddressChange}
+                            sx={{ textTransform: 'none' }}
                         >
                             Shipping
-                        </Link>
+                        </Button>
+                        {/*<Link*/}
+                        {/*    color="inherit"*/}
+                        {/*    to={`/shipping`}*/}
+                        {/*    className="bc"*/}
+                        {/*>*/}
+                        {/*    Shipping*/}
+                        {/*</Link>*/}
                         <Typography className="bc-p">Place Order</Typography>
                     </Breadcrumbs>
                 </Paper>
@@ -154,36 +201,32 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                 <Paper className="order__container">
                     <div className="order">
                         <div className="order__container--po-left">
-                            {addressLoading ? (
+                            {!userAddress ? (
                                 <div className="loaderCenter">
                                     <Loader/>
                                 </div>
-                            ) : addressError ? (
-                                <Message variant="error">{addressError}</Message>
                             ) : (
                                 <div className="order__container--po-left-detail">
                                     <h2 className="order__container--po-left-detail--title">
                                         Sending to
                                     </h2>
                                     <div className="order__container--po-left-detail--par">
-                                        {address?.[0]?.name} {address?.[0]?.surname}
+                                        {userAddress.name} {userAddress.surname}
                                     </div>
 
                                     <h2 className="order__container--po-left-detail--title">
                                         Address
                                     </h2>
                                     <div className="order__container--po-left-detail--par">
-                                        {address?.[0]?.country}, {address?.[0]?.city},{" "}
-                                        {address?.[0]?.address}, {address?.[0]?.postal_code}
+                                        {userAddress.country}, {userAddress.city},{" "}
+                                        {userAddress.address}, {userAddress.postal_code}
                                     </div>
 
                                     <h2 className="order__container--po-left-detail--title">
                                         Phone Number
                                     </h2>
                                     <div className="order__container--po-left-detail--par">
-                                        {address &&
-                                            address.data &&
-                                            address.data[0].phone_number}
+                                        {userAddress.phone_number}
                                     </div>
 
                                     <br/>
@@ -192,129 +235,113 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                         Make sure your name, address and phone
                                         number is correct. If it's not then
                                         click{" "}
-                                        <a
-                                            href={`/shipping-to/${userInfo.data.user_id}`}
-                                            className={classes.link}
+                                        <Button
+                                            component={StyledLink}
+                                            to="/shipping"
+                                            onClick={handleAddressChange}
                                         >
                                             HERE
-                                        </a>{" "}
+                                        </Button>{" "}
+                                        {/*<StyledLink*/}
+                                        {/*    to={`/shipping}`}*/}
+                                        {/*>*/}
+                                        {/*    HERE*/}
+                                        {/*</StyledLink>{" "}*/}
                                         and fix them.
                                     </Message>
                                 </div>
                             )}
 
-                            <div className="cart">
-                                <MaterialTable
-                                    title="Cart List"
-                                    components={{
-                                        Container: (props) => (
-                                            <Paper
-                                                className={
-                                                    classes.materialTable
-                                                }
-                                                {...props}
-                                            />
-                                        ),
-                                    }}
-                                    columns={[
-                                        {
-                                            title: "Name",
-                                            field: "name",
-                                            render: (cartItems) => {
-                                                {
-                                                    return (
-                                                        <Link
-                                                            to={`/product/${cartItems.slug}`}
-                                                            className={
-                                                                classes.link
-                                                            }
-                                                            target="_blank"
-                                                        >
-                                                            {cartItems.name}
-                                                        </Link>
-                                                    );
-                                                }
-                                            },
-                                        },
-                                        {
-                                            title: "Discount",
-                                            field: "discount",
-                                            render: (cartItems) => {
-                                                {
-                                                    return `${cartItems.discount} %`;
-                                                }
-                                            },
-                                        },
-                                        {
-                                            title: "Price",
-                                            field: "price",
-                                            render: (cartItems) => {
-                                                {
-                                                    return (
-                                                        <>
-                                                            <span>
-                                                                &euro;
-                                                                {(
-                                                                    cartItems.price -
-                                                                    (cartItems.price *
-                                                                        cartItems.discount) /
-                                                                    100
-                                                                ).toFixed(2)}
-                                                            </span>
-                                                            {"   "}
-                                                            <strike>
-                                                                &euro;
-                                                                {
-                                                                    cartItems.price
-                                                                }
-                                                            </strike>
-                                                        </>
-                                                    );
-                                                }
-                                            },
-                                        },
-                                        {
-                                            title: "Quantity",
-                                            field: "qty",
-                                            render: (cartItems) => {
-                                                {
-                                                    return cartItems.qty;
-                                                }
-                                            },
-                                        },
-                                    ]}
-                                    data={cartItems}
-                                    options={{
-                                        actionsColumnIndex: -1,
-                                        headerStyle: {
-                                            color: "#855C1B",
-                                            fontFamily: "Quicksand",
-                                            fontSize: "1.2rem",
-                                            backgroundColor: "#FDF7E9",
-                                        },
-                                    }}
-                                    detailPanel={(rowData) => {
-                                        return (
-                                            <div className="table-detail">
-                                                <h2 className="table-detail--title">
-                                                    Product Code
-                                                </h2>
-                                                <div className="table-detail--par">
-                                                    <p>
-                                                        {rowData.product_code}
-                                                    </p>
-                                                </div>
-                                                <h2 className="table-detail--title">
-                                                    Product Description
-                                                </h2>
-                                                <div className="table-detail--par">
-                                                    <p>{rowData.description}</p>
-                                                </div>
-                                            </div>
-                                        );
-                                    }}
-                                />
-                            </div>
+                            <TableContainer component={Paper} className="materialTable">
+                                <Table aria-label="cart table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell
+                                                sx={{
+                                                    color: "#855C1B",
+                                                    fontFamily: "Quicksand",
+                                                    fontSize: "1.2rem",
+                                                    backgroundColor: "#FDF7E9",
+                                                }}
+                                            >
+                                                Name
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{
+                                                    color: "#855C1B",
+                                                    fontFamily: "Quicksand",
+                                                    fontSize: "1.2rem",
+                                                    backgroundColor: "#FDF7E9",
+                                                }}
+                                            >
+                                                Discount
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{
+                                                    color: "#855C1B",
+                                                    fontFamily: "Quicksand",
+                                                    fontSize: "1.2rem",
+                                                    backgroundColor: "#FDF7E9",
+                                                }}
+                                            >
+                                                Price
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{
+                                                    color: "#855C1B",
+                                                    fontFamily: "Quicksand",
+                                                    fontSize: "1.2rem",
+                                                    backgroundColor: "#FDF7E9",
+                                                }}
+                                            >
+                                                Quantity
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {cartItems.map((item, index) => (
+                                            <React.Fragment key={index}>
+                                                <TableRow onClick={() => handleRowClick(index)}>
+                                                    <TableCell>
+                                                        <StyledLink to={`/product/${item.slug}`} target="_blank">
+                                                            {item.name}
+                                                        </StyledLink>
+                                                    </TableCell>
+                                                    <TableCell>{item.discount}%</TableCell>
+                                                    <TableCell>
+                                                        <span>€{(item.price - (item.price * (item.discount || 0)) / 100).toFixed(2)}</span> {"   "}
+                                                        <s>€{item.price}</s>
+                                                    </TableCell>
+                                                    <TableCell>{item.qty}</TableCell>
+                                                </TableRow>
+                                                {/* Detail Panel Row */}
+                                                {expandedRow === index && (
+                                                    <TableRow>
+                                                        <TableCell colSpan={4}> {/* Span all columns */}
+                                                            <div className="table-detail">
+                                                                <Typography variant="h6"
+                                                                            className="table-detail--title">
+                                                                    Product Code
+                                                                </Typography>
+                                                                <div className="table-detail--par">
+                                                                    <Typography>{item.product_code}</Typography>
+                                                                </div>
+                                                                <Typography variant="h6"
+                                                                            className="table-detail--title">
+                                                                    Product Description
+                                                                </Typography>
+                                                                <div className="table-detail--par">
+                                                                    <Typography>{item.description}</Typography>
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </div>
 
                         <div className="order__container--po-right">
@@ -346,7 +373,7 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                         &euro; {cart.itemsPriceDiscount}
                                     </span>
                                     {" - "}
-                                    <strike>&euro; {cart.itemsPrice}</strike>
+                                    <s>&euro; {cart.itemsPrice}</s>
                                 </div>
 
                                 <div className="show__paper--div">
@@ -388,14 +415,13 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                     <br/>
                                     <form>
                                         <div className="form__field">
-                                            <Button
+                                            <StyledButton
                                                 variant="contained"
-                                                className={classes.button}
                                                 type="button"
                                                 onClick={placeOrderHandler}
                                             >
                                                 Place Order
-                                            </Button>
+                                            </StyledButton>
                                         </div>
                                     </form>
                                 </div>
@@ -405,7 +431,7 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                 </Paper>
             </section>
 
-            <hr className="divider2"/>
+            <StyledDivider3/>
             <Footer/>
         </>
     );

@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Doctrine\DBAL\Query\QueryException;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -183,7 +185,7 @@ class UserRepository
     public function getUserWithRelations(int|string|null $userId): User|Builder|null
     {
         if ($userId) {
-            return User::with(['products', 'reviews', 'orders', 'roles', 'addresses'])->where('user_id', $userId)->first();
+            return User::with(['products', 'reviews', 'orders', 'roles', 'addresses'])->find($userId);
         }
 
         return User::with(['products', 'reviews', 'orders', 'roles', 'addresses']);
@@ -240,5 +242,14 @@ class UserRepository
     public function getUserById(int $userId): ?User
     {
         return User::find($userId)->first();
+    }
+
+    /**
+     * @param int $id
+     * @return User|null
+     */
+    public function getUserWithAddress(int $id): ?User
+    {
+        return User::with(['addresses'])->find($id);
     }
 }

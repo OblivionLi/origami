@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {AppDispatch, RootState} from "@/store";
 import {useSelector, useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import {
     Paper,
     Typography,
-    Breadcrumbs,
+    Breadcrumbs, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent,
 } from "@mui/material";
 import {Link} from "react-router-dom";
 import Navbar from "@/components/Navbar.js";
@@ -14,10 +14,10 @@ import NavbarCategories from "@/components/NavbarCategories.js";
 import Footer from "@/components/Footer.js";
 import Message from "@/components/alert/Message.js";
 import Loader from "@/components/alert/Loader.js";
-import {getUser} from "@/features/user/userSlice";
-import {createAddress} from "@/features/address/addressSlice";
+import {clearAddressSuccess, clearUserError, getUserAddress} from "@/features/user/userSlice";
+import {Address, createAddress, updateAddress} from "@/features/address/addressSlice";
 import {StyledButton, StyledDivider, StyledDivider3, StyledTextField} from "@/styles/muiStyles";
-
+import {setShippingCompleted} from "@/features/checkout/checkoutSlice";
 
 interface ShippingScreenProps {
 }
@@ -33,15 +33,21 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
     const [address, setAddress] = useState("");
     const [postalCode, setPostalCode] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
+    const [selectedAddressId, setSelectedAddressId] = useState<number | undefined>(undefined);
 
     const {
-        success,
+        success: addressSuccess,
         loading: addressLoading,
         error: addressError,
-        currentAddress
     } = useSelector((state: RootState) => state.address);
-    const {userInfo, loading: userLoading, error: userError,} = useSelector((state: RootState) => state.user);
+    const {
+        userInfo,
+        currentUser,
+        loading: userLoading,
+        error: userError,
+    } = useSelector((state: RootState) => state.user);
     const {cartItems} = useSelector((state: RootState) => state.cart);
+    const {cartCompleted} = useSelector((state: RootState) => state.checkout);
 
     useEffect(() => {
         if (!userInfo) {
@@ -54,49 +60,82 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
             return;
         }
 
-        if (!userInfo.data) {
-            dispatch(getUser(userInfo.id));
+        if (!cartCompleted) {
+            navigate('/cart')
             return;
         }
 
-        console.log('outside')
-        console.log(userInfo)
-        if (userInfo.data.address && userInfo.data.address.length > 0) {
-            console.log(userInfo)
-            const userAddress = userInfo.data.address[0];
-            setName(userAddress.name);
-            setSurname(userAddress.surname);
-            setCountry(userAddress.country);
-            setCity(userAddress.city);
-            setAddress(userAddress.address);
-            setPostalCode(userAddress.postal_code);
-            setPhoneNumber(userAddress.phone_number);
-        }
+        dispatch(clearUserError());
+        dispatch(clearAddressSuccess());
 
-        if (success) {
-            navigate(`/placeorder`);
+        dispatch(getUserAddress(userInfo?.data?.id));
+    }, [userInfo, cartItems, dispatch, navigate, cartCompleted]);
+
+    useEffect(() => {
+        if (currentUser?.data?.address && currentUser.data.address.length > 0) {
+            const addresses = currentUser.data.address;
+            if (selectedAddressId === undefined) {
+                setSelectedAddressId(addresses[0].id);
+            }
+
+            const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId);
+
+            if (selectedAddress) {
+                setName(selectedAddress.name);
+                setSurname(selectedAddress.surname);
+                setCountry(selectedAddress.country);
+                setCity(selectedAddress.city);
+                setAddress(selectedAddress.address);
+                setPostalCode(selectedAddress.postal_code);
+                setPhoneNumber(selectedAddress.phone_number);
+            }
         }
-    }, [userInfo, cartItems, success, dispatch, navigate]);
+    }, [currentUser?.data?.address, selectedAddressId]);
+
+    useEffect(() => {
+        if (addressSuccess) {
+            dispatch(setShippingCompleted(true));
+            dispatch(clearAddressSuccess());
+            navigate(`/placeorder/${selectedAddressId}`);
+        }
+    }, [addressSuccess, dispatch, navigate, selectedAddressId]);
 
     const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!userInfo?.id) {
+        if (!userInfo?.data?.id) {
             return;
         }
 
-        dispatch(
-            createAddress({
-                user_id: userInfo.id,
-                name,
-                surname,
-                country,
-                city,
-                address,
-                postal_code: postalCode,
-                phone_number: phoneNumber,
-            })
-        );
+        if (currentUser?.data?.address?.length == 0) {
+            dispatch(
+                createAddress({
+                    user_id: userInfo?.data?.id,
+                    name,
+                    surname,
+                    country,
+                    city,
+                    address,
+                    postal_code: postalCode,
+                    phone_number: phoneNumber,
+                })
+            );
+        } else {
+            const addressId: number | undefined = currentUser?.data?.address?.[0].id;
+            dispatch(
+                updateAddress({
+                    user_id: userInfo?.data?.id,
+                    id: addressId,
+                    name,
+                    surname,
+                    country,
+                    city,
+                    address,
+                    postal_code: postalCode,
+                    phone_number: phoneNumber,
+                })
+            );
+        }
 
         const Toast = Swal.mixin({
             toast: true,
@@ -147,6 +186,10 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
         )
     }
 
+    const handleAddressChange = (event: SelectChangeEvent<number>, child: ReactNode) => {
+        setSelectedAddressId(event.target.value as number);
+    };
+
     return (
         <>
             <Navbar/>
@@ -167,6 +210,26 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
 
                 <Paper className="show__container">
                     <StyledDivider>Your Address</StyledDivider>
+
+                    {currentUser?.data?.address && currentUser.data.address.length > 0 && (
+                        <FormControl fullWidth variant="outlined" sx={{mb: 2}}>
+                            <InputLabel id="address-select-label">Select Address</InputLabel>
+                            <Select
+                                labelId="address-select-label"
+                                id="address-select"
+                                value={selectedAddressId}
+                                onChange={handleAddressChange}
+                                label="Select Address"
+                            >
+                                {currentUser.data.address.map((addr: Address) => (
+                                    <MenuItem key={addr.id} value={addr.id}>
+                                        {`${addr.country}, ${addr.city}, ${addr.address}, ${addr.postal_code}, ${addr.phone_number}`}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
+
                     <form onSubmit={submitHandler}>
                         <div className="form">
                             <div className="form__field">
@@ -277,7 +340,7 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
                             type="submit"
                             fullWidth
                         >
-                            Add/Update Address
+                            Confirm Address
                         </StyledButton>
                     </form>
                 </Paper>

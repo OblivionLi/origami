@@ -15,13 +15,15 @@ use Illuminate\Support\Str;
 class OrderRepository
 {
     /**
-     * @param int|string|null $id
+     * @param string|null $id
      * @return Builder
      */
-    public function getOrderWithRelations(int|string|null $id): Builder
+    public function getOrderWithRelations(string|null $id): Builder
     {
         if ($id) {
-            return Order::with(['user', 'products', 'user.addresses'])->where('order_id', $id);
+            return Order::with(['user', 'user.addresses', 'products' => function ($query) {
+                $query->select('products.id', 'products.name', 'products.product_code', 'products.discount', 'products.price', 'order_product.qty as quantity');
+            }])->where('order_id', $id);
         }
 
         return Order::with(['user', 'products', 'user.addresses']);
@@ -155,7 +157,6 @@ class OrderRepository
     }
 
 
-
     public function getOrderRevenuesForLastMonth(): array
     {
         return Order::selectRaw('MONTH(created_at) as month, SUM(total_price) as sum')
@@ -174,8 +175,6 @@ class OrderRepository
         return Order::selectRaw('AVG(total_price) as avg')
             ->get();
     }
-
-
 
 
 }

@@ -34,7 +34,7 @@ class AddressUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|numeric',
+            'user_id' => 'required|numeric', // this is more a double validation
             'name' => 'string|required|max:50',
             'surname' => 'string|required|max:50',
             'country' => 'string|required|max:50',

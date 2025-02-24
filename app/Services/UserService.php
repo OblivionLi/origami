@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Resources\auth\UserUpdateResource;
+use App\Http\Resources\user\UserAddressShowResource;
 use App\Http\Resources\user\UserIndexResource;
 use App\Http\Resources\user\UserShowResource;
 use App\Models\User;
@@ -95,5 +96,19 @@ class UserService
         }
 
         return response()->json(['message' => 'User deleted successfully.'], Response::HTTP_OK);
+    }
+
+    /**
+     * @param int $id
+     * @return UserAddressShowResource|JsonResponse
+     */
+    public function showUserAddress(int $id)
+    {
+        $user = $this->userRepository->getUserWithAddress($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return new UserAddressShowResource($user);
     }
 }

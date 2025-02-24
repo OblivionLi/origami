@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\auth\UserUpdateResource;
+use App\Http\Resources\user\UserAddressShowResource;
 use App\Http\Resources\user\UserShowResource;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -33,6 +34,15 @@ class UserController extends Controller
     public function show(int $id): UserShowResource
     {
         return $this->userService->showUser($id);
+    }
+
+    /**
+     * @param int $id
+     * @return UserAddressShowResource|JsonResponse
+     */
+    public function showUserAddress(int $id): UserAddressShowResource|JsonResponse
+    {
+        return $this->userService->showUserAddress($id);
     }
 
     /**

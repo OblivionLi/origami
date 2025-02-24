@@ -15,6 +15,8 @@ import AccessoriesScreen from "@/screens/public/categories/AccessoriesScreen";
 import ShowProductScreen from "@/screens/public/products/ShowProductScreen";
 import ReviewsScreen from "@/screens/public/reviews/ReviewsScreen";
 import ShippingScreen from "@/screens/public/shop/ShippingScreen";
+import PlaceOrderScreen from "@/screens/public/shop/PlaceOrderScreen";
+import ShowOrderScreen from "@/screens/public/shop/ShowOrderScreen";
 // import SettingsScreen from './screens/public/users/SettingsScreen';
 // import AdminScreen from './screens/admin/AdminScreen';
 // import ShowProductScreen from './screens/public/products/ShowProductScreen';
@@ -60,11 +62,11 @@ function Index() {
                 {/*/!* Cart *!/*/}
                 <Route path="/cart" element={<CartScreen/>}/>
                 <Route path="/shipping" element={<ShippingScreen/>} />
-                {/*<Route path="/placeorder/:id?" component={PlaceOrderScreen} />*/}
+                <Route path="/placeorder/:addressId" element={<PlaceOrderScreen/>} />
 
                 {/*/!* Order *!/*/}
                 <Route path="/order-history" element={<OrderHistoryScreen/>}/>
-                {/*<Route path="/order-history/:id/:userId?" element={<ShowOrderScreen/>} />*/}
+                <Route path="/order-history/:orderId" element={<ShowOrderScreen/>} />
 
                 {/*/!* Admin Section *!/*/}
                 {/*<Route path="/admin" component={AdminScreen} />*/}

@@ -30,6 +30,7 @@ import Message from "@/components/alert/Message.js";
 import Footer from "@/components/Footer.js";
 import {removeFromCart, updateQuantity} from "@/features/cart/cartSlice";
 import {AppDispatch, RootState} from "@/store";
+import {setCartCompleted} from "@/features/checkout/checkoutSlice";
 
 interface CartScreenProps {
 }
@@ -55,6 +56,7 @@ const CartScreen: React.FC<CartScreenProps> = () => {
 
     const checkoutHandler = () => {
         if (!userInfo) return;
+        dispatch(setCartCompleted(true))
         navigate(`/shipping`);
 
         const Toast = Swal.mixin({
@@ -160,7 +162,6 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                                 >
                                                     Action
                                                 </TableCell>{" "}
-                                                {/* Add Action column */}
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
