@@ -89,4 +89,13 @@ class ChildCategoryRepository
     {
         return ChildCategory::findBySlug($slug);
     }
+
+    /**
+     * @param int $parentCategoryId
+     * @return Builder
+     */
+    public function getChildCategoryByParentCategoryId(int $parentCategoryId): Builder
+    {
+        return ChildCategory::where(['parent_category_id' => $parentCategoryId]);
+    }
 }

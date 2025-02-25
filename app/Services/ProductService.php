@@ -9,6 +9,8 @@ use App\Http\Resources\product\ProductShowResource;
 use App\Models\ChildCategory;
 use App\Models\ParentCategory;
 use App\Models\Product;
+use App\Repositories\ChildCategoryRepository;
+use App\Repositories\ParentCategoryRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -17,10 +19,18 @@ use Symfony\Component\HttpFoundation\Response;
 class ProductService
 {
     protected ProductRepository $productRepository;
+    protected ParentCategoryRepository $parentCategoryRepository;
+    protected ChildCategoryRepository $childCategoryRepository;
 
-    public function __construct(ProductRepository $productRepository)
+    public function __construct(
+        ProductRepository $productRepository,
+        ParentCategoryRepository $parentCategoryRepository,
+        ChildCategoryRepository $childCategoryRepository
+    )
     {
         $this->productRepository = $productRepository;
+        $this->parentCategoryRepository = $parentCategoryRepository;
+        $this->childCategoryRepository = $childCategoryRepository;
     }
 
     /**
@@ -99,31 +109,30 @@ class ProductService
             'mostCommented' => $this->productRepository->getMostCommentedProductsWithRelations()->get(),
         ];
 
-        return response()->json($showcase, 200);
+        return response()->json($showcase, Response::HTTP_OK);
     }
 
     /**
      * @param string $category
+     * @param int $childCategoryId
      * @return JsonResponse
      */
-    public function getProductsByCategory(string $category): JsonResponse
+    public function getProductsByCategory(string $category, int $childCategoryId): JsonResponse
     {
-        $parentCategory = ParentCategory::where('name', $category)->first();
+        $parentCategory = $this->parentCategoryRepository->getParentCategoryByName($category);
         if (!$parentCategory) {
-            return response()->json(['message' => 'Category does not exist'], 422);
+            return response()->json(['message' => 'Category not found.'], Response::HTTP_NOT_FOUND);
         }
 
-        $productsWithPag = Product::info()->where('parent_category_id', $category->id)->paginate(6);
-        $products = Product::info()->where('parent_category_id', $category->id)->get();
-        $childCat = ChildCategory::info()->where('parent_category_id', $category->id)->get();
+        $products = $this->productRepository->getProductsWithRelationsByParentCategory($parentCategory->id, $childCategoryId)->paginate(6);
+        $childCategories = $this->childCategoryRepository->getChildCategoryByParentCategoryId($parentCategory->id)->get();
 
         $data = [
-            'productsWithPag' => $productsWithPag,
             'products' => $products,
-            'childCat' => $childCat
+            'childCategories' => $childCategories
         ];
 
-        return response()->json($data, 200);
+        return response()->json($data, Response::HTTP_OK);
     }
 
     /**
@@ -131,10 +140,10 @@ class ProductService
      */
     public function getProductsBySpecialOffers(): JsonResponse
     {
-        $products = $this->productRepository->getProductsBySpecialOffers();
+        $products = $this->productRepository->getProductsBySpecialOffers()->paginate(6);
         if (!$products) {
-            return response()->json(['message' => 'Products does not exist'], 422);
+            return response()->json(['message' => 'Products does not exist'], Response::HTTP_NOT_FOUND);
         }
-        return response()->json($products, 200);
+        return response()->json(['products' => $products], Response::HTTP_OK);
     }
 }

@@ -36,7 +36,8 @@ export default defineConfig(({command, mode}) => {
             manifest: true
         },
         define: {
-            __APP_ENV__: JSON.stringify(env.APP_ENV),
+            // __APP_ENV__: JSON.stringify(env.APP_ENV),
+            'process.env': env
         }
     }
 });

@@ -1,6 +1,7 @@
 import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import {RootState} from "@/store";
 import {Product} from "@/features/product/productSlice";
+import {User} from "@/features/user/userSlice";
 
 export interface Cart {
     cartItems: CartItem[];
@@ -18,14 +19,14 @@ interface UpdateQuantityPayload {
 
 export interface CartItem {
     product: number;
-    name: string;
-    slug: string;
-    product_code: string;
-    special_offer: string;
-    discount: number | null;
-    price: number;
-    description: string;
-    total_quantities: number;
+    name?: string;
+    slug?: string;
+    product_code?: string;
+    special_offer?: number | string | null;
+    discount?: number | null;
+    price?: number;
+    description?: string;
+    total_quantities?: number;
     qty: number;
     image?: string;
 }
@@ -37,22 +38,38 @@ interface CartState {
     success: boolean;
 }
 
+const getCartItemsFromStorage = (): CartItem[] => {
+    try {
+        const cartItemsString = localStorage.getItem('cartItems');
+        if (cartItemsString) {
+            const parsedCartItemsInfo = JSON.parse(cartItemsString);
+            if (typeof parsedCartItemsInfo === 'object' && parsedCartItemsInfo !== null) {
+                return parsedCartItemsInfo as CartItem[];
+            }
+        }
+    } catch (error) {
+        console.error("Error parsing cartItems from localStorage:", error);
+        localStorage.removeItem('cartItems');
+    }
+    return [];
+};
+
 const initialState: CartState = {
-    cartItems: [],
+    cartItems: getCartItemsFromStorage(),
     loading: false,
     error: null,
     success: false,
 }
 
 export const addToCart = createAsyncThunk<
-    CartItem[],
+    CartItem,
     { product: Product, qty: number },
     { state: RootState; rejectValue: string }
 >(
     'cart/addToCart',
     async ({product, qty}, thunkAPI) => {
         try {
-            const {user: {userInfo}, cart: {cartItems}} = thunkAPI.getState(); // Get current cartItems
+            const {user: {userInfo}} = thunkAPI.getState();
 
             if (!userInfo?.data?.access_token) {
                 return thunkAPI.rejectWithValue("User not logged in.");
@@ -70,7 +87,7 @@ export const addToCart = createAsyncThunk<
                 total_quantities: product.total_quantities,
                 qty,
             };
-            return [newItem];
+            return newItem;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -103,13 +120,13 @@ export const removeFromCart = createAsyncThunk<
 export const updateQuantity = createAsyncThunk<
     UpdateQuantityPayload,
     UpdateQuantityPayload,
-    {state: RootState; rejectValue: string}
+    { state: RootState; rejectValue: string }
 >(
     'cart/updateQuantity',
     async ({productId, qty}, thunkAPI) => {
-        try{
+        try {
             return {productId, qty}
-        } catch (error: any){
+        } catch (error: any) {
             const message =
                 error.response && error.response.data.message
                     ? error.response.data.message
@@ -139,16 +156,15 @@ const cartSlice = createSlice({
             .addCase(addToCart.fulfilled, (state, action) => {
                 state.loading = false;
                 state.success = true;
-                const newItems = action.payload;
+                const newItem = action.payload;
 
-                newItems.forEach(newItem => {
-                    const existingItem = state.cartItems.find(item => item.product === newItem.product);
-                    if (existingItem) {
-                        existingItem.qty += newItem.qty;
-                    } else {
-                        state.cartItems.push(newItem);
-                    }
-                });
+                const existingItem = state.cartItems.find(item => item.product === newItem.product);
+
+                if (existingItem) {
+                    existingItem.qty += newItem.qty;
+                } else {
+                    state.cartItems.push(newItem);
+                }
                 localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
             })
             .addCase(addToCart.rejected, (state, action) => {
@@ -157,7 +173,7 @@ const cartSlice = createSlice({
                 state.success = false;
             })
             .addCase(removeFromCart.pending, (state) => {
-                state.loading = true; //might not need a loader here
+                state.loading = true;
                 state.error = null;
                 state.success = false;
             })
@@ -180,10 +196,10 @@ const cartSlice = createSlice({
                 state.loading = false;
                 state.error = null;
                 const {productId, qty} = action.payload;
-                const itemIndex = state.cartItems.findIndex(item => item.product === productId);
 
-                if (itemIndex !== -1) {
-                    state.cartItems[itemIndex].qty = qty;
+                const existingItem = state.cartItems.find(item => item.product === productId);
+                if (existingItem) {
+                    existingItem.qty = qty;
                     localStorage.setItem('cartItems', JSON.stringify(state.cartItems));
                 }
             })

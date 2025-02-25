@@ -1,7 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {Provider} from "react-redux";
-import {store} from "./store";
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import HomeScreen from '@/screens/HomeScreen';
 import LoginScreen from '@/screens/public/users/LoginScreen';
@@ -17,6 +14,8 @@ import ReviewsScreen from "@/screens/public/reviews/ReviewsScreen";
 import ShippingScreen from "@/screens/public/shop/ShippingScreen";
 import PlaceOrderScreen from "@/screens/public/shop/PlaceOrderScreen";
 import ShowOrderScreen from "@/screens/public/shop/ShowOrderScreen";
+import OrigamiScreen from "@/screens/public/categories/OrigamiScreen";
+import SpecialOffersScreen from "@/screens/public/categories/SpecialOffersScreen";
 // import SettingsScreen from './screens/public/users/SettingsScreen';
 // import AdminScreen from './screens/admin/AdminScreen';
 // import ShowProductScreen from './screens/public/products/ShowProductScreen';
@@ -42,33 +41,33 @@ function Index() {
                 <Route path="/forgot-password" element={<ForgotPasswordScreen/>}/>
                 <Route path="/settings" element={<SettingsScreen/>}/>
 
-                {/*/!* Product *!/*/}
+                {/* Product */}
                 <Route path="/product/:slug" element={<ShowProductScreen/>}/>
 
-                {/*/!* Categories *!/*/}
-                {/*<Route path="/accessories" element={<AccessoriesScreen/>}/>*/}
-                {/*<Route path="/accessories/:page?" element={<AccessoriesScreen/>}/>*/}
+                {/* Categories */}
+                <Route path="/accessories" element={<AccessoriesScreen/>}/>
+                <Route path="/accessories/:page?" element={<AccessoriesScreen/>}/>
 
-                {/*<Route path="/origami" component={OrigamiScreen} exact />*/}
-                {/*<Route path="/origami/:page?" component={OrigamiScreen} />*/}
+                <Route path="/origami" element={<OrigamiScreen/>}/>
+                <Route path="/origami/:page?" element={<OrigamiScreen/>}/>
 
-                {/*<Route path="/special-offers" component={SpecialOffers} exact />*/}
-                {/*<Route path="/special-offers/:page?" component={SpecialOffers} />*/}
+                <Route path="/special-offers" element={<SpecialOffersScreen/>}/>
+                <Route path="/special-offers/:page?" element={<SpecialOffersScreen/>}/>
 
-                {/*/!* Reviews *!/*/}
+                {/* Reviews */}
                 <Route path="/reviews/product/:id" element={<ReviewsScreen/>}/>
                 <Route path="/reviews/product/:id/:page?" element={<ReviewsScreen/>}/>
 
-                {/*/!* Cart *!/*/}
+                {/* Cart */}
                 <Route path="/cart" element={<CartScreen/>}/>
-                <Route path="/shipping" element={<ShippingScreen/>} />
-                <Route path="/placeorder/:addressId" element={<PlaceOrderScreen/>} />
+                <Route path="/shipping" element={<ShippingScreen/>}/>
+                <Route path="/placeorder/:addressId" element={<PlaceOrderScreen/>}/>
 
-                {/*/!* Order *!/*/}
+                {/* Order */}
                 <Route path="/order-history" element={<OrderHistoryScreen/>}/>
-                <Route path="/order-history/:orderId" element={<ShowOrderScreen/>} />
+                <Route path="/order-history/:orderId" element={<ShowOrderScreen/>}/>
 
-                {/*/!* Admin Section *!/*/}
+                {/* Admin Section */}
                 {/*<Route path="/admin" component={AdminScreen} />*/}
             </Routes>
         </Router>

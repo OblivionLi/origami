@@ -50,38 +50,46 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
         error: userError,
     } = useSelector((state: RootState) => state.user);
     const {cartItems} = useSelector((state: RootState) => state.cart);
-    const {shippingCompleted} = useSelector((state: RootState) => state.checkout);
+    const {shippingCompleted, cartCompleted} = useSelector((state: RootState) => state.checkout);
 
     const addDecimals = (num: number): string => {
         return (Math.round(num * 100) / 100).toFixed(2);
     };
 
-    const [newOrderId, setNewOrderId] = useState<number | null>(null);
+    const [itemsPrice, setItemsPrice] = useState("0.00");
+    const [itemsPriceDiscount, setItemsPriceDiscount] = useState("0.00");
+    const [shippingPrice, setShippingPrice] = useState("0.00");
+    const [taxPrice, setTaxPrice] = useState("0.00");
+    const [totalPrice, setTotalPrice] = useState("0.00");
 
-    const itemsPrice = addDecimals(
-        cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-    );
-    const itemsPriceDiscount = cartItems.reduce(
-        (acc, item) =>
-            acc + item.qty * (item.price - (item.price * (item.discount || 0)) / 100),
-        0
-    ).toFixed(2);
-    const shippingPrice = addDecimals(Number(itemsPrice) > 100 ? 0 : 15);
-    const taxPrice = addDecimals(Number((0.15 * Number(itemsPrice)).toFixed(2)));
-    const totalPrice = (
-        Number(itemsPriceDiscount) +
-        Number(shippingPrice) +
-        Number(taxPrice)
-    ).toFixed(2);
+    useEffect(() => {
+        if (cartItems) {
+            const calculatedItemsPrice = cartItems.reduce(
+                (acc, item) => acc + item.price! * item.qty,
+                0
+            );
+            const calculatedItemsPriceDiscount = cartItems.reduce(
+                (acc, item) =>
+                    acc +
+                    item.qty *
+                    (item.price! - (item.price! * (item.discount || 0)) / 100),
+                0
+            );
+            const calculatedShippingPrice =
+                calculatedItemsPrice > 100 ? 0 : 15;
+            const calculatedTaxPrice = 0.15 * calculatedItemsPriceDiscount;
+            const calculatedTotalPrice =
+                calculatedItemsPriceDiscount +
+                calculatedShippingPrice +
+                calculatedTaxPrice;
 
-    const cart: Cart = {
-        cartItems,
-        itemsPrice,
-        itemsPriceDiscount,
-        shippingPrice,
-        taxPrice,
-        totalPrice
-    };
+            setItemsPrice(addDecimals(calculatedItemsPrice));
+            setItemsPriceDiscount(addDecimals(calculatedItemsPriceDiscount));
+            setShippingPrice(addDecimals(calculatedShippingPrice));
+            setTaxPrice(addDecimals(calculatedTaxPrice));
+            setTotalPrice(addDecimals(calculatedTotalPrice));
+        }
+    }, [cartItems]);
 
     useEffect(() => {
         if (!userInfo) {
@@ -89,16 +97,13 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
             return;
         }
 
-        if (!cartItems) {
+        if (!cartItems || cartItems.length === 0) {
             navigate("/")
             return;
         }
 
-        if (!shippingCompleted || !addressIdNum) {
-            console.log('here2')
-            console.log(addressIdNum)
-            console.log(shippingCompleted)
-            navigate('/cart')
+        if (!addressIdNum && shippingCompleted) {
+            navigate('/shipping')
             return;
         }
 
@@ -106,25 +111,39 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
         dispatch(clearAddressSuccess());
 
         dispatch(getUserAddress(userInfo?.data?.id));
-    }, [userInfo, cartItems, dispatch, navigate, shippingCompleted]);
+    }, [userInfo, cartItems, dispatch, navigate, shippingCompleted, addressIdNum, cartCompleted]);
 
     useEffect(() => {
-        if (orderSuccess) {
+        if (orderSuccess && createdOrder) {
             cartItems.forEach((item) => {
                 dispatch(removeFromCart(item.product));
             });
 
             dispatch(resetCheckout())
-            navigate(`/order-history/${createdOrder?.id}`);
+            navigate(`/order-history/${createdOrder.id}`);
         }
-    }, [orderSuccess, dispatch, navigate]);
+    }, [orderSuccess, dispatch, navigate, createdOrder, cartItems]);
 
     const placeOrderHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!userInfo?.data?.id) {
+            console.error("User ID is missing!");
+            return;
+        }
+
+        const cart: Cart = {
+            cartItems,
+            itemsPrice,
+            itemsPriceDiscount,
+            shippingPrice,
+            taxPrice,
+            totalPrice,
+        };
+
         dispatch(
             createOrder({
-                user_id: userInfo?.data?.id,
+                user_id: userInfo.data.id,
                 cart_items: cart.cartItems,
                 products_price: Number(cart.itemsPrice),
                 shipping_price: Number(cart.shippingPrice),
@@ -160,11 +179,6 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
         setExpandedRow((prevExpandedRow) => (prevExpandedRow === rowId ? null : rowId));
     };
 
-    const handleAddressChange = () => {
-        navigate('/shipping');
-
-    }
-
     return (
         <>
             <Navbar/>
@@ -179,21 +193,9 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                         <Link color="inherit" to="/cart" className="bc">
                             Cart
                         </Link>
-                        <Button
-                            color="inherit"
-                            className="bc"
-                            onClick={handleAddressChange}
-                            sx={{ textTransform: 'none' }}
-                        >
+                        <Link color="inherit" to="/shipping" className="bc">
                             Shipping
-                        </Button>
-                        {/*<Link*/}
-                        {/*    color="inherit"*/}
-                        {/*    to={`/shipping`}*/}
-                        {/*    className="bc"*/}
-                        {/*>*/}
-                        {/*    Shipping*/}
-                        {/*</Link>*/}
+                        </Link>
                         <Typography className="bc-p">Place Order</Typography>
                     </Breadcrumbs>
                 </Paper>
@@ -235,18 +237,11 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                         Make sure your name, address and phone
                                         number is correct. If it's not then
                                         click{" "}
-                                        <Button
-                                            component={StyledLink}
-                                            to="/shipping"
-                                            onClick={handleAddressChange}
+                                        <StyledLink
+                                            to={`/shipping`}
                                         >
                                             HERE
-                                        </Button>{" "}
-                                        {/*<StyledLink*/}
-                                        {/*    to={`/shipping}`}*/}
-                                        {/*>*/}
-                                        {/*    HERE*/}
-                                        {/*</StyledLink>{" "}*/}
+                                        </StyledLink>{" "}
                                         and fix them.
                                     </Message>
                                 </div>
@@ -294,51 +289,70 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                                     backgroundColor: "#FDF7E9",
                                                 }}
                                             >
+                                                Total Price
+                                            </TableCell>
+                                            <TableCell
+                                                sx={{
+                                                    color: "#855C1B",
+                                                    fontFamily: "Quicksand",
+                                                    fontSize: "1.2rem",
+                                                    backgroundColor: "#FDF7E9",
+                                                }}
+                                            >
                                                 Quantity
                                             </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {cartItems.map((item, index) => (
-                                            <React.Fragment key={index}>
-                                                <TableRow onClick={() => handleRowClick(index)}>
-                                                    <TableCell>
-                                                        <StyledLink to={`/product/${item.slug}`} target="_blank">
-                                                            {item.name}
-                                                        </StyledLink>
-                                                    </TableCell>
-                                                    <TableCell>{item.discount}%</TableCell>
-                                                    <TableCell>
-                                                        <span>€{(item.price - (item.price * (item.discount || 0)) / 100).toFixed(2)}</span> {"   "}
-                                                        <s>€{item.price}</s>
-                                                    </TableCell>
-                                                    <TableCell>{item.qty}</TableCell>
-                                                </TableRow>
-                                                {/* Detail Panel Row */}
-                                                {expandedRow === index && (
-                                                    <TableRow>
-                                                        <TableCell colSpan={4}> {/* Span all columns */}
-                                                            <div className="table-detail">
-                                                                <Typography variant="h6"
-                                                                            className="table-detail--title">
-                                                                    Product Code
-                                                                </Typography>
-                                                                <div className="table-detail--par">
-                                                                    <Typography>{item.product_code}</Typography>
-                                                                </div>
-                                                                <Typography variant="h6"
-                                                                            className="table-detail--title">
-                                                                    Product Description
-                                                                </Typography>
-                                                                <div className="table-detail--par">
-                                                                    <Typography>{item.description}</Typography>
-                                                                </div>
-                                                            </div>
+                                        {cartItems.map((item, index) => {
+                                            const discountedPrice = item.price! - (item.price! * (item.discount || 0)) / 100;
+                                            const totalPrice = discountedPrice * item.qty;
+
+                                            return (
+                                                <React.Fragment key={index}>
+                                                    <TableRow onClick={() => handleRowClick(index)}>
+                                                        <TableCell>
+                                                            <StyledLink to={`/product/${item.slug}`} target="_blank">
+                                                                {item.name}
+                                                            </StyledLink>
                                                         </TableCell>
+                                                        <TableCell>{item.discount ? `${item.discount}%` : "-"}</TableCell>
+                                                        <TableCell>
+                                                            <span>€{discountedPrice.toFixed(2)}</span>{" "}
+                                                            {item.discount ? <s>€{item.price}</s> : null}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            €{totalPrice.toFixed(2)}
+                                                        </TableCell>
+                                                        <TableCell>{item.qty}</TableCell>
                                                     </TableRow>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
+                                                    {expandedRow === index && (
+                                                        <TableRow>
+                                                            <TableCell colSpan={12}>
+                                                                <div className="table-detail" style={{width: '100%'}}>
+                                                                    <Typography variant="h6"
+                                                                                className="table-detail--title"
+                                                                                style={{width: '100%'}}>
+                                                                        Product Code
+                                                                    </Typography>
+                                                                    <div className="table-detail--par">
+                                                                        <Typography>{item.product_code}</Typography>
+                                                                    </div>
+                                                                    <Typography variant="h6"
+                                                                                className="table-detail--title"
+                                                                                style={{width: '100%'}}>
+                                                                        Product Description
+                                                                    </Typography>
+                                                                    <div className="table-detail--par">
+                                                                        <Typography>{item.description}</Typography>
+                                                                    </div>
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )}
+                                                </React.Fragment>
+                                            );
+                                        })}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -370,16 +384,16 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                         color="inherit"
                                         className="show__paper--p"
                                     >
-                                        &euro; {cart.itemsPriceDiscount}
+                                        &euro; {itemsPriceDiscount}
                                     </span>
                                     {" - "}
-                                    <s>&euro; {cart.itemsPrice}</s>
+                                    <s>&euro; {itemsPrice}</s>
                                 </div>
 
                                 <div className="show__paper--div">
                                     <h4 className="divider">Shipping Tax:</h4>
                                     <p className="show__paper--p">
-                                        &euro; {cart.shippingPrice}
+                                        &euro; {shippingPrice}
                                     </p>
                                     <small>
                                         All orders over &euro; 100 are free for
@@ -392,7 +406,7 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                         Total Product Tax:
                                     </h4>
                                     <p className="show__paper--p">
-                                        &euro; {cart.taxPrice}
+                                        &euro; {taxPrice}
                                     </p>
                                     <small>tax formula: 0.15 * subtotal</small>
                                 </div>
@@ -402,7 +416,7 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
                                         Total with Taxes:
                                     </h4>
                                     <p className="show__paper--p">
-                                        &euro; {cart.totalPrice}
+                                        &euro; {totalPrice}
                                     </p>
                                 </div>
 

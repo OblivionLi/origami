@@ -34,7 +34,7 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
         }
 
         if (userLogin && userLogin.data && userLogin.data.id) {
-            dispatch(getUser(String(userLogin.data.id)));
+            dispatch(getUser(userLogin.data.id));
         }
     }, [dispatch, navigate, userLogin]);
 

@@ -72,19 +72,21 @@ class ProductController extends Controller
     }
 
     /**
+     * @param int $childCategoryId
      * @return JsonResponse
      */
-    public function getProductByAccessories(): JsonResponse
+    public function getProductByAccessories(int $childCategoryId): JsonResponse
     {
-        return $this->productService->getProductsByCategory('Accessories');
+        return $this->productService->getProductsByCategory('Accessories', $childCategoryId);
     }
 
     /**
+     * @param int $childCategoryId
      * @return JsonResponse
      */
-    public function getProductByOrigami(): JsonResponse
+    public function getProductByOrigami(int $childCategoryId): JsonResponse
     {
-        return $this->productService->getProductsByCategory('Origami');
+        return $this->productService->getProductsByCategory('Origami', $childCategoryId);
     }
 
     /**

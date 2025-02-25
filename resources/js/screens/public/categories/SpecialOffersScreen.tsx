@@ -1,78 +1,53 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Navbar from "../../../components/Navbar.js";
-import NavbarCategories from "../../../components/NavbarCategories.js";
-import Footer from "../../../components/Footer.js";
-import { getSpecialOffers } from "./../../../actions/categoryActions";
-import Loader from "../../../components/alert/Loader.js";
-import Message from "../../../components/alert/Message.js";
+import React, {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import Navbar from "@/components/Navbar.js";
+import NavbarCategories from "@/components/NavbarCategories.js";
+import Footer from "@/components/Footer.js";
+import Loader from "@/components/alert/Loader.js";
+import Message from "@/components/alert/Message.js";
 import {
     Breadcrumbs,
     Paper,
     Typography,
-    Card,
     CardActionArea,
-    CardMedia,
     CardContent,
     CardActions,
     Box,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-import SpecialOffersPaginate from "./../../../components/paginations/SpecialOffersPaginate";
-import Rating from "@material-ui/lab/Rating";
+} from "@mui/material";
+import {Link, useParams} from "react-router-dom";
+import {AppDispatch, RootState} from "@/store";
+import {fetchProductsBySpecialOffers} from "@/features/categories/categorySlice";
+import {StyledCard, StyledCardMedia, StyledDivider3, StyledRating, StyledReviewText} from "@/styles/muiStyles";
+import MasterPagination from "@/components/paginations/MasterPagination";
+import {ASSET_URL} from "@/config";
+import {Product} from "@/features/categories/categorySlice";
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
-        marginBottom: "20px",
-        borderBottom: "1px solid #855C1B",
-        paddingBottom: "10px",
-        width: "30%",
+interface SpecialOffersProps {
+}
 
-        [theme.breakpoints.down("sm")]: {
-            width: "90%",
-            margin: "0 auto 20px auto",
-        },
-    },
+const SpecialOffers: React.FC<SpecialOffersProps> = () => {
+    const dispatch = useDispatch<AppDispatch>();
 
-    card: {
-        maxWidth: 345,
-        minWidth: 345,
-        boxShadow:
-            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
-    },
+    const {loading, error, products, meta} = useSelector((state: RootState) => state.categoryProduct);
 
-    media: {
-        height: 345,
-        width: "100%",
-    },
-}));
+    const {page: pageParam = '1'} = useParams();
+    const page = parseInt(pageParam, 10);
 
-const SpecialOffers = ({ match }) => {
-    const classes = useStyles();
-
-    const dispatch = useDispatch();
-
-    const specialOfferList = useSelector((state) => state.specialOfferList);
-    const { loading, error, offers } = specialOfferList;
-    const { data } = offers;
-
-    const page = match.params.page || 1;
-    let current_page = offers && offers.current_page;
-    let last_page = offers && offers.last_page;
+    const current_page = meta?.current_page ?? 1;
+    const last_page = meta?.last_page ?? 1;
 
     useEffect(() => {
-        dispatch(getSpecialOffers(page));
+        dispatch(fetchProductsBySpecialOffers({page}));
     }, [dispatch, page]);
 
     return (
         <>
-            <Navbar />
-            <NavbarCategories />
+            <Navbar/>
+            <NavbarCategories/>
             <section className="ctn">
                 {loading ? (
                     <div className="loaderCenter">
-                        <Loader />
+                        <Loader/>
                     </div>
                 ) : error ? (
                     <Message variant="error">{error}</Message>
@@ -92,18 +67,12 @@ const SpecialOffers = ({ match }) => {
                         <div className="category">
                             <div className="category--products">
                                 <div className="category--products-items">
-                                    {data &&
-                                        data.map((product) => (
-                                            <Card
-                                                className={classes.card}
-                                                key={product.id}
-                                            >
+                                    {products &&
+                                        products.map((product: Product) => (
+                                            <StyledCard key={product.id}>
                                                 <CardActionArea>
-                                                    <CardMedia
-                                                        className={
-                                                            classes.media
-                                                        }
-                                                        image={`http://127.0.0.1:8000/storage/${product.product_images[0].path}`}
+                                                    <StyledCardMedia
+                                                        image={`${ASSET_URL}/${product.product_images[0].path}`}
                                                         title={`Image for product: ${product.name}`}
                                                     />
                                                     <CardContent className="card-content-top">
@@ -135,37 +104,34 @@ const SpecialOffers = ({ match }) => {
                                                     <Box
                                                         component="fieldset"
                                                         borderColor="transparent"
-                                                        className={classes.box}
                                                     >
-                                                        <Rating
+                                                        <StyledRating
                                                             size="small"
                                                             name="rating"
                                                             value={parseFloat(
                                                                 product.rating
                                                             )}
-                                                            text={`${product.total_reviews} reviews`}
                                                             precision={0.5}
-                                                            className={
-                                                                classes.rating
-                                                            }
                                                             readOnly
                                                         />
+                                                        <StyledReviewText>
+                                                            {`${product.total_reviews} reviews`}
+                                                        </StyledReviewText>
                                                     </Box>
                                                     <span className="card-content--span">
                                                         &euro;{product.price}
                                                     </span>
                                                 </CardActions>
-                                            </Card>
+                                            </StyledCard>
                                         ))}
                                 </div>
 
                                 <div className="category--products-pag">
-                                    {data && data.length > 0 && (
-                                        <SpecialOffersPaginate
-                                            page={current_page}
-                                            pages={last_page}
-                                        />
-                                    )}
+                                    <MasterPagination
+                                        baseURL={`/special-offers`}
+                                        page={current_page}
+                                        pages={last_page}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -173,8 +139,8 @@ const SpecialOffers = ({ match }) => {
                 )}
             </section>
 
-            <hr className="divider2" />
-            <Footer />
+            <StyledDivider3/>
+            <Footer/>
         </>
     );
 };

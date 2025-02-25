@@ -1,11 +1,9 @@
 import React, {useState, useEffect} from "react";
-import {AppDispatch, RootState} from "@/store";
-import {Link, useParams, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import Loader from "@/components/alert/Loader.js";
-import NavbarCategories from "@/components/NavbarCategories.js";
 import Navbar from "@/components/Navbar.js";
+import NavbarCategories from "@/components/NavbarCategories.js";
 import Footer from "@/components/Footer.js";
+import Loader from "@/components/alert/Loader.js";
 import Message from "@/components/alert/Message.js";
 import {
     Typography,
@@ -14,21 +12,21 @@ import {
     CardActions,
     Box, Paper, Breadcrumbs,
 } from "@mui/material";
+import {Link, useNavigate, useParams} from "react-router-dom";
+import {AppDispatch, RootState} from "@/store";
 import {
-    StyledCard,
-    StyledCardMedia,
-    StyledDivider3,
-    StyledRating,
-    StyledReviewText
-} from "@/styles/muiStyles";
-import {Product, ChildCategory, fetchProductsByAccessoriesCategory} from "@/features/categories/categorySlice";
+    ChildCategory,
+    fetchProductsByOrigamiCategory,
+    Product
+} from "@/features/categories/categorySlice";
+import {StyledCard, StyledCardMedia, StyledRating, StyledReviewText} from "@/styles/muiStyles";
 import {ASSET_URL} from "@/config";
 import MasterPagination from "@/components/paginations/MasterPagination";
 
-interface AccessoriesScreenProps {
+interface OrigamiScreenProps {
 }
 
-const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
+const OrigamiScreen: React.FC<OrigamiScreenProps> = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
@@ -44,7 +42,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
     const last_page = meta?.last_page ?? 1;
 
     useEffect(() => {
-        dispatch(fetchProductsByAccessoriesCategory({page, childCategoryId}));
+        dispatch(fetchProductsByOrigamiCategory({page, childCategoryId}));
     }, [dispatch, page, childCategoryId]);
 
     const handleCategory = (id: number, slug: string) => {
@@ -52,7 +50,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
         setChildCategorySlug(slug);
 
         if (page !== 1) {
-            navigate('/accessories/1');
+            navigate('/origami/1');
         }
     };
 
@@ -61,7 +59,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
         setChildCategorySlug("");
 
         if (page !== 1) {
-            navigate('/accessories')
+            navigate('/origami')
         }
     }
 
@@ -84,7 +82,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
                                     Homescreen
                                 </Link>
                                 <Typography className="bc-p">
-                                    Accessories
+                                    Origami Collection
                                 </Typography>
                                 {childCategorySlug && (
                                     <Typography className="bc-p">
@@ -134,6 +132,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
                                             </li>
                                         ))}
                                 </ul>
+
                                 <p className="info">
                                     If a category has 0 products, then all
                                     products will be displayed.
@@ -143,9 +142,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
                                 <div className="category--products-items">
                                     {products &&
                                         products.map((product: Product) => (
-                                                <StyledCard
-                                                    key={product.id}
-                                                >
+                                                <StyledCard key={product.id}>
                                                     <CardActionArea>
                                                         <StyledCardMedia
                                                             image={`${ASSET_URL}/${product.product_images[0].path}`}
@@ -208,7 +205,7 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
 
                                 <div className="category--products-pag">
                                     <MasterPagination
-                                        baseURL={`/accessories`}
+                                        baseURL={`/origami`}
                                         page={current_page}
                                         pages={last_page}
                                     />
@@ -219,10 +216,10 @@ const AccessoriesScreen: React.FC<AccessoriesScreenProps> = () => {
                 )}
             </section>
 
-            <StyledDivider3/>
+            <hr className="divider2"/>
             <Footer/>
         </>
     );
 };
 
-export default AccessoriesScreen;
+export default OrigamiScreen;

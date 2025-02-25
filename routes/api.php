@@ -58,6 +58,12 @@ Route::middleware('auth:api')->group(function () {
         Route::get('users/{user}/address', 'showUserAddress');
     });
 
+    // Checkout Routes
+    Route::controller(CheckoutController::class)->group(function () {
+        Route::post('payment_intents', 'createPayIntent');
+    });
+
+
     // Review Routes
     Route::controller(ReviewController::class)->group(function () {
         Route::post('products/{product}/reviews', 'store');
@@ -65,7 +71,12 @@ Route::middleware('auth:api')->group(function () {
     });
 
     // Product Routes
-    Route::get('products/{slug}', [ProductController::class, 'show']);
+    Route::controller(ProductController::class)->group(function () {
+        Route::get('products/accessories/{childCategoryId}', 'getProductByAccessories');
+        Route::get('products/origami/{childCategoryId}', 'getProductByOrigami');
+        Route::get('products/special-offers', 'getProductBySpecialOffers');
+        Route::get('products/{slug}', 'show');
+    });
 
     // Order Routes
     Route::controller(OrderController::class)->group(function () {

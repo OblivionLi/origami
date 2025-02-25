@@ -21,17 +21,12 @@ import {Elements} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
 import CheckoutFormScreen from "../stripe/CheckoutFormScreen.js";
 import {AppDispatch, RootState} from "@/store";
-import {StyledButton, StyledDivider3, StyledLink} from "@/styles/muiStyles";
+import {StyledButton, StyledDivider, StyledDivider3, StyledLink} from "@/styles/muiStyles";
 import {clearAddressSuccess, clearUserError, getUserAddress} from "@/features/user/userSlice";
 import {fetchOrderById} from "@/features/order/orderSlice";
 import {Product} from "@/features/product/productSlice";
-//
-// const PUBLIC_KEY =
-//     "pk_test_51J7JDFH7KVlnwo43991XXPrSOWpQYenCEMAY6S1dT5eP6WLOWP7W4z6O9nEhtr1rbmpASbvA8r4lKMr3da5sN0nd00VuikAH3F";
 
-const PUBLIC_KEY =
-    "";
-
+const PUBLIC_KEY = import.meta.env.VITE_STRIPE_KEY;
 // const stripePromise = loadStripe(PUBLIC_KEY);
 
 interface ShowOrderScreen {
@@ -75,8 +70,8 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
 
     useEffect(() => {
         if (order && userInfo) {
-            const isAdmin = userInfo?.data?.is_admin === 1;
-            if (order.user_id === userInfo.data?.id) {
+            const isAdmin = userInfo?.data?.is_admin == 1;
+            if (order?.data?.user_id == userInfo.data?.id && isAdmin) {
                 setPerms(true);
             } else {
                 setPerms(false);
@@ -85,16 +80,15 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
     }, [order, userInfo]);
 
     useEffect(() => {
-        if (order?.products) {
-            setProducts(order.products);
+        if (order?.data?.products) {
+            setProducts(order.data.products);
         }
     }, [order]);
 
+    const {loading: loadingPay, success: successPay} = useSelector((state: RootState) => state.order);
+
     // const orderDeliver = useSelector((state) => state.orderDeliver);
     // const {loading: loadingDeliver, success: successDeliver} = orderDeliver;
-    //
-    // const orderPay = useSelector((state) => state.orderPay);
-    // const {loading: loadingPay, success: successPay} = orderPay;
 
 
     // useEffect(() => {
@@ -128,14 +122,6 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
         // history.push(`/order-history/${orderId}`);
     };
 
-    if (!perms) {
-        return (
-            <div className="loaderCenter">
-                <Typography variant="h6">You do not have permission to view this order.</Typography>
-            </div>
-        )
-    }
-
     return (
         <>
             <Navbar/>
@@ -167,7 +153,14 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
                         </div>
                     ) : error ? (
                         <Message variant="error">{error}</Message>
-                    ) : order ? (  // Check if order exists
+
+                    ) : !perms ? (
+                        <>
+                            <div className="loaderCenter">
+                                <Typography variant="h6">You do not have permission to view this order.</Typography>
+                            </div>
+                        </>
+                    ) : order ? (
                         <div className="order">
                             <div className="order__container--po-left">
                                 <div className="order__container--po-left-detail">
@@ -272,25 +265,51 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
 
                             <div className="order__container--po-right">
                                 <Paper className="show__paper--alternate">
-                                    <h3 className="divider">Order Summary</h3>
+                                    <StyledDivider>Order Summary</StyledDivider>
 
-                                    <br/>
+                                    <div className="show__paper--div">
+                                        <h4 className="divider">
+                                            Subtotal:
+                                        </h4>
+                                        <p className="show__paper--p">
+                                            € {order.data.products_discount_price}
+                                        </p>
+                                    </div>
+
+                                    <div className="show__paper--div">
+                                        <h4 className="divider">
+                                            Tax Price:
+                                        </h4>
+                                        <p className="show__paper--p">
+                                            + € {order.data.tax_price}
+                                        </p>
+                                    </div>
+
+                                    <div className="show__paper--div">
+                                        <h4 className="divider">
+                                            Shipping Price:
+                                        </h4>
+                                        <p className="show__paper--p">
+                                            + € {order.data.shipping_price}
+                                        </p>
+                                    </div>
 
                                     <div className="show__paper--div">
                                         <h4 className="divider">
                                             Total to Pay:
                                         </h4>
                                         <p className="show__paper--p">
-                                            € {order.total_price}
+                                            = € {order.data.total_price}
                                         </p>
                                     </div>
+
 
                                     <div className="show__paper--div">
                                         <h4 className="divider">Status</h4>
                                         <Message
-                                            variant={order.status === "PENDING" ? "warning" : "success"}
+                                            variant={order.data.status === "PENDING" ? "warning" : "success"}
                                         >
-                                            {order.status}
+                                            {order.data.status}
                                         </Message>
                                     </div>
 
@@ -321,17 +340,15 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
 
                                     {/*<div className="show__paper--div">*/}
                                     {/*    {order.data.is_paid == 0 && (*/}
-                                    {/*        <div className={classes.checkout}>*/}
+                                    {/*        <div>*/}
                                     {/*            {loadingPay && <Loader/>}*/}
                                     {/*            <Elements*/}
                                     {/*                stripe={stripePromise}*/}
                                     {/*            >*/}
                                     {/*                <CheckoutFormScreen*/}
-                                    {/*                    orderId={orderId}*/}
-                                    {/*                    totalPrice={*/}
-                                    {/*                        order.data*/}
-                                    {/*                            .total_price*/}
-                                    {/*                    }*/}
+                                    {/*                    orderId={order.data.order_id}*/}
+                                    {/*                    addressId={order.data.order_id}*/}
+                                    {/*                    totalPrice={order.data.total_price}*/}
                                     {/*                />*/}
                                     {/*            </Elements>*/}
                                     {/*        </div>*/}
@@ -341,7 +358,7 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
                             </div>
                         </div>
                     ) : (
-                        <Message variant="info">Order not found.</Message>  // Handle case where order is null
+                        <Message variant="info">Order not found.</Message>
                     )}
                 </Paper>
             </section>

@@ -89,4 +89,13 @@ class ParentCategoryRepository
     {
         return ParentCategory::with(['childCategories', 'products'])->findBySlug($slug);
     }
+
+    /**
+     * @param string $name
+     * @return ParentCategory|null
+     */
+    public function getParentCategoryByName(string $name): ?ParentCategory
+    {
+        return ParentCategory::where("name", $name)->first();
+    }
 }

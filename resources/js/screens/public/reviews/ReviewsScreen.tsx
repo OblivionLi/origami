@@ -24,7 +24,6 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
 
     const reviewListPag = useSelector((state: RootState) => state.review);
     const {loading, error, paginatedReviews} = reviewListPag;
-
     const current_page = paginatedReviews?.meta?.current_page ?? 1;
     const last_page = paginatedReviews?.meta?.last_page ?? 1;
 

@@ -33,7 +33,7 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
     const [address, setAddress] = useState("");
     const [postalCode, setPostalCode] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [selectedAddressId, setSelectedAddressId] = useState<number | undefined>(undefined);
+    const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
 
     const {
         success: addressSuccess,
@@ -55,7 +55,7 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
             return;
         }
 
-        if (!cartItems) {
+        if (!cartItems || cartItems.length === 0) {
             navigate("/")
             return;
         }
@@ -74,21 +74,21 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
     useEffect(() => {
         if (currentUser?.data?.address && currentUser.data.address.length > 0) {
             const addresses = currentUser.data.address;
-            if (selectedAddressId === undefined) {
-                setSelectedAddressId(addresses[0].id);
+
+            const defaultAddress = addresses[0];
+            const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId) || defaultAddress;
+
+            if (selectedAddressId === null) {
+                setSelectedAddressId(selectedAddress.id);
             }
 
-            const selectedAddress = addresses.find((addr) => addr.id === selectedAddressId);
-
-            if (selectedAddress) {
-                setName(selectedAddress.name);
-                setSurname(selectedAddress.surname);
-                setCountry(selectedAddress.country);
-                setCity(selectedAddress.city);
-                setAddress(selectedAddress.address);
-                setPostalCode(selectedAddress.postal_code);
-                setPhoneNumber(selectedAddress.phone_number);
-            }
+            setName(selectedAddress.name || "");
+            setSurname(selectedAddress.surname || "");
+            setCountry(selectedAddress.country || "");
+            setCity(selectedAddress.city || "");
+            setAddress(selectedAddress.address || "");
+            setPostalCode(selectedAddress.postal_code || "");
+            setPhoneNumber(selectedAddress.phone_number || "");
         }
     }, [currentUser?.data?.address, selectedAddressId]);
 
@@ -121,11 +121,10 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
                 })
             );
         } else {
-            const addressId: number | undefined = currentUser?.data?.address?.[0].id;
             dispatch(
                 updateAddress({
                     user_id: userInfo?.data?.id,
-                    id: addressId,
+                    id: selectedAddressId!,
                     name,
                     surname,
                     country,
@@ -166,27 +165,17 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
             </>
         );
     }
-    if (userError) {
+    if (userError || addressError) {
         return (
             <>
                 <Navbar/>
                 <NavbarCategories/>
-                <Message variant="error">{userError}</Message>
-            </>
-
-        )
-    }
-    if (addressError) {
-        return (
-            <>
-                <Navbar/>
-                <NavbarCategories/>
-                <Message variant="error">{addressError}</Message>
+                <Message variant="error">{userError || addressError}</Message>
             </>
         )
     }
 
-    const handleAddressChange = (event: SelectChangeEvent<number>, child: ReactNode) => {
+    const handleAddressChange = (event: SelectChangeEvent<number>) => {
         setSelectedAddressId(event.target.value as number);
     };
 
@@ -217,7 +206,7 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
                             <Select
                                 labelId="address-select-label"
                                 id="address-select"
-                                value={selectedAddressId}
+                                value={selectedAddressId || ""}
                                 onChange={handleAddressChange}
                                 label="Select Address"
                             >

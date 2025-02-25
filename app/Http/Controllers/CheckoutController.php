@@ -34,10 +34,10 @@ class CheckoutController extends Controller
      */
     public function createPayIntent(CheckoutRequest $request): JsonResponse
     {
-        Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe::setApiKey(env('VITE_STRIPE_SECRET'));
 
         $payment_intent = PaymentIntent::create([
-            'description' => config('stripe.STRIPE_DESCRIPTION'),
+            'description' => config('stripe.VITE_STRIPE_DESCRIPTION'),
             'amount' => $request->amount * 100,
             'currency' => 'eur',
             'payment_method_types' => ['card'],

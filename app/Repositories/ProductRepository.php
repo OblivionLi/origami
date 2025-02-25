@@ -25,6 +25,24 @@ class ProductRepository
     }
 
     /**
+     * @param int $parentCategoryId
+     * @param int $childCategoryId
+     * @return Builder
+     */
+    public function getProductsWithRelationsByParentCategory(int $parentCategoryId, int $childCategoryId): Builder
+    {
+        $products = Product::with(['parentCategory', 'childCategory', 'productImages'])
+            ->where('parent_category_id', $parentCategoryId);
+
+        // HACK:: if child category id is 0 or `<` 0 then the response should include all products
+        if ($childCategoryId > 0) {
+            $products->where('child_category_id', $childCategoryId);
+        }
+
+        return $products;
+    }
+
+    /**
      * @param array $requestData
      * @return Product|null
      */
@@ -215,11 +233,11 @@ class ProductRepository
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return Builder
      */
-    public function getProductsBySpecialOffers(): LengthAwarePaginator
+    public function getProductsBySpecialOffers(): Builder
     {
-        return Product::with(['parentCategory', 'childCategory', 'productImages'])->where('special_offer', 1)->paginate(6);
+        return Product::with(['parentCategory', 'childCategory', 'productImages'])->where('special_offer', 1);
     }
 
     /**

@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import {
     StyledButton,
-    StyledDivider,
+    StyledDivider, StyledDivider2,
     StyledDivider3,
     StyledLink
 } from "@/styles/muiStyles";
@@ -77,11 +77,11 @@ const CartScreen: React.FC<CartScreenProps> = () => {
         });
     };
 
-    const subtotalItems = cartItems.reduce((acc, item) => acc + Number(item.qty), 0);
-    const totalWithDiscount = cartItems.reduce(
+    const subtotalItems = cartItems?.reduce((acc, item) => acc + Number(item.qty), 0) || 0;
+    const totalWithDiscount = cartItems?.reduce(
         (acc, item) =>
-            acc + item.qty * (item.price - (item.price * (item.discount || 0)) / 100), 0).toFixed(2);
-    const totalPriceWithoutDiscount = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0).toFixed(2);
+            acc + item.qty * (item.price! - (item.price! * (item.discount || 0)) / 100), 0).toFixed(2) || "0.00";
+    const totalPriceWithoutDiscount = cartItems?.reduce((acc, item) => acc + item.qty * item.price!, 0).toFixed(2) || "0.00";
 
     return (
         <>
@@ -89,7 +89,7 @@ const CartScreen: React.FC<CartScreenProps> = () => {
             <NavbarCategories/>
 
             <section className="ctn">
-                {cartItems.length === 0 ? (
+                {cartItems?.length === 0 ? (
                     <div className="cart-empty">
                         <Message variant="warning">
                             Your cart is empty <StyledLink to={`/`}>Go Back</StyledLink>
@@ -150,6 +150,16 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                                         backgroundColor: "#FDF7E9",
                                                     }}
                                                 >
+                                                    Total Price
+                                                </TableCell>
+                                                <TableCell
+                                                    sx={{
+                                                        color: "#855C1B",
+                                                        fontFamily: "Quicksand",
+                                                        fontSize: "1.2rem",
+                                                        backgroundColor: "#FDF7E9",
+                                                    }}
+                                                >
                                                     Quantity
                                                 </TableCell>
                                                 <TableCell
@@ -161,62 +171,69 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                                     }}
                                                 >
                                                     Action
-                                                </TableCell>{" "}
+                                                </TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {cartItems.map((item) => (
-                                                <TableRow key={item.product}>
-                                                    <TableCell>
-                                                        <StyledLink to={`/product/${item.slug}`}>
-                                                            {item.name}
-                                                        </StyledLink>
-                                                    </TableCell>
-                                                    <TableCell>{item.discount || 0}%</TableCell>{" "}
-                                                    <TableCell>
-                                                        <span>€{(item.price - (item.price * (item.discount || 0)) / 100).toFixed(2)}</span>{" "}
-                                                        {"   "}
-                                                        <s>€{item.price}</s>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <FormControl
-                                                            required
-                                                            variant="outlined"
-                                                            size="small"
-                                                        >
-                                                            <Select
-                                                                labelId={`quantity-label-${item.product}`}
-                                                                id={`quantity-select-${item.product}`}
-                                                                value={item.qty}
-                                                                onChange={(e) =>
-                                                                    dispatch(
-                                                                        updateQuantity({
-                                                                            productId: item.product,
-                                                                            qty: Number(e.target.value),
-                                                                        })
-                                                                    )
-                                                                }
+                                            {cartItems?.map((item) => {
+                                                const discountedPrice = item.price! - (item.price! * (item.discount || 0)) / 100;
+                                                const totalPrice = discountedPrice * item.qty;
+
+                                                return (
+                                                    <TableRow key={item.product}>
+                                                        <TableCell>
+                                                            <StyledLink to={`/product/${item.slug}`}>
+                                                                {item.name}
+                                                            </StyledLink>
+                                                        </TableCell>
+                                                        <TableCell>{item.discount ? `${item.discount}%` : "-"}</TableCell>
+                                                        <TableCell>
+                                                            <span>€{discountedPrice.toFixed(2)}</span>{" "}
+                                                            {item.discount ? <s>€{item.price}</s> : null}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            €{totalPrice.toFixed(2)}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <FormControl
+                                                                required
+                                                                variant="outlined"
+                                                                size="small"
                                                             >
-                                                                {[...Array(item.total_quantities).keys()].map(
-                                                                    (x) => (
-                                                                        <MenuItem key={x + 1} value={x + 1}>
-                                                                            {x + 1}
-                                                                        </MenuItem>
-                                                                    )
-                                                                )}
-                                                            </Select>
-                                                        </FormControl>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            onClick={() => removeFromCartHandler(item.product)}
-                                                        >
-                                                            <DeleteIcon/>
-                                                        </IconButton>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
+                                                                <Select
+                                                                    labelId={`quantity-label-${item.product}`}
+                                                                    id={`quantity-select-${item.product}`}
+                                                                    value={item.qty}
+                                                                    onChange={(e) =>
+                                                                        dispatch(
+                                                                            updateQuantity({
+                                                                                productId: item.product,
+                                                                                qty: Number(e.target.value),
+                                                                            })
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {[...Array(item.total_quantities).keys()].map(
+                                                                        (x) => (
+                                                                            <MenuItem key={x + 1} value={x + 1}>
+                                                                                {x + 1}
+                                                                            </MenuItem>
+                                                                        )
+                                                                    )}
+                                                                </Select>
+                                                            </FormControl>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <IconButton
+                                                                aria-label="delete"
+                                                                onClick={() => removeFromCartHandler(item.product)}
+                                                            >
+                                                                <DeleteIcon/>
+                                                            </IconButton>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -240,8 +257,6 @@ const CartScreen: React.FC<CartScreenProps> = () => {
                                             <s>€{totalPriceWithoutDiscount}</s>
                                         </Typography>
                                     </div>
-
-                                    <StyledDivider/>
 
                                     <div className="show-tabel-form">
                                         <form>

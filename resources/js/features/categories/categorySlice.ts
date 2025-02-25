@@ -1,10 +1,12 @@
 import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
+import {ProductImage} from "@/features/product/productSlice";
 
-interface Product {
+export interface Product {
     id: number;
     name: string;
+    parent_category_id?: number;
     child_category_id?: number;
     product_code?: string;
     price?: number;
@@ -12,10 +14,60 @@ interface Product {
     description?: string;
     special_offer?: number | null;
     qty?: number;
+    user_id?: number;
+    slug: string;
+    product_images: ProductImage[];
+    rating: string;
+    total_reviews: number;
+}
+
+export interface ChildCategory {
+    id: number;
+    name: string;
+    slug: string;
+    quantity: number;
+    parent_category_id: number;
+}
+
+export interface PaginationLinks {
+    first: string | null;
+    last: string | null;
+    prev: string | null;
+    next: string | null;
+}
+
+export interface PaginationMeta {
+    current_page: number;
+    last_page: number;
+    path: string;
+    per_page: number;
+    total: number;
+}
+
+export interface PaginatedProducts {
+    products: {
+        data: Product[];
+        links: PaginationLinks;
+        current_page: number;
+        from: number | null;
+        last_page: number;
+        path: string;
+        per_page: number;
+        to: number | null;
+        total: number;
+        first_page_url?: string;
+        last_page_url?: string;
+        next_page_url?: string | null;
+        prev_page_url?: string | null;
+    };
+    childCategories: ChildCategory[];
 }
 
 interface ProductState {
-    product: Product[];
+    products: Product[];
+    childCategories: ChildCategory[];
+    links: PaginationLinks | null;
+    meta: PaginationMeta | null;
     loading: boolean;
     error: string | null;
     currentProduct: Product | null;
@@ -23,7 +75,10 @@ interface ProductState {
 }
 
 const initialState: ProductState = {
-    product: [],
+    products: [],
+    childCategories: [],
+    links: null,
+    meta: null,
     loading: false,
     error: null,
     currentProduct: null,
@@ -31,12 +86,12 @@ const initialState: ProductState = {
 }
 
 export const fetchProductsByOrigamiCategory = createAsyncThunk<
-    Product[],
-    { page: number },
+    PaginatedProducts,
+    { page: number, childCategoryId: number | null},
     { state: RootState, rejectValue: string }
 >(
     'category/fetchProductsByOrigamiCategory',
-    async ({page}, thunkAPI) => {
+    async ({page, childCategoryId}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -47,10 +102,17 @@ export const fetchProductsByOrigamiCategory = createAsyncThunk<
             const config = {
                 headers: {
                     Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+                params: {
+                    page: page
                 }
             };
 
-            const {data} = await axios.get<Product[]>('/api/products/origami', config);
+            if (!childCategoryId) {
+                childCategoryId = -1;
+            }
+
+            const {data} = await axios.get<PaginatedProducts>(`/api/products/origami/${childCategoryId}`, config);
 
             return data;
         } catch (error: any) {
@@ -64,12 +126,12 @@ export const fetchProductsByOrigamiCategory = createAsyncThunk<
 );
 
 export const fetchProductsByAccessoriesCategory = createAsyncThunk<
-    Product[],
-    { page: number },
+    PaginatedProducts,
+    { page: number, childCategoryId: number | null},
     { state: RootState, rejectValue: string }
 >(
     'category/fetchProductsByAccessoriesCategory',
-    async ({page}, thunkAPI) => {
+    async ({page, childCategoryId}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -80,11 +142,17 @@ export const fetchProductsByAccessoriesCategory = createAsyncThunk<
             const config = {
                 headers: {
                     Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+                params: {
+                    page: page
                 }
             };
 
-            const {data} = await axios.get<Product[]>('/api/products/accessories', config);
+            if (!childCategoryId) {
+                childCategoryId = -1;
+            }
 
+            const {data} = await axios.get<PaginatedProducts>(`/api/products/accessories/${childCategoryId}`, config);
             return data;
         } catch (error: any) {
             const message =
@@ -97,12 +165,12 @@ export const fetchProductsByAccessoriesCategory = createAsyncThunk<
 );
 
 export const fetchProductsBySpecialOffers = createAsyncThunk<
-    Product[],
-    void,
+    PaginatedProducts,
+    {page: number},
     { state: RootState, rejectValue: string }
 >(
     'category/fetchProductsBySpecialOffers',
-    async (_, thunkAPI) => {
+    async ({page}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -113,11 +181,13 @@ export const fetchProductsBySpecialOffers = createAsyncThunk<
             const config = {
                 headers: {
                     Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+                params: {
+                    page: page
                 }
             };
 
-            const {data} = await axios.get<Product[]>('/api/products/special-offers', config);
-
+            const {data} = await axios.get<PaginatedProducts>(`/api/products/special-offers`, config);
             return data;
         } catch (error: any) {
             const message =
@@ -142,47 +212,51 @@ const categoryProductSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Handle fetchProductsByOrigamiCategory
-            .addCase(fetchProductsByOrigamiCategory.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchProductsByOrigamiCategory.fulfilled, (state, action: PayloadAction<Product[]>) => {
-                state.loading = false;
-                state.product = action.payload;
-            })
-            .addCase(fetchProductsByOrigamiCategory.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-            })
+            .addMatcher(
+                (action) => [
+                    fetchProductsByOrigamiCategory.pending.type,
+                    fetchProductsByAccessoriesCategory.pending.type,
+                    fetchProductsBySpecialOffers.pending.type
+                ].includes(action.type),
+                (state) => {
+                    state.loading = true;
+                    state.error = null;
+                }
+            )
+            .addMatcher(
+                (action) => [
+                    fetchProductsByOrigamiCategory.rejected.type,
+                    fetchProductsByAccessoriesCategory.rejected.type,
+                    fetchProductsBySpecialOffers.rejected.type
+                ].includes(action.type),
+                (state, action) => {
+                    state.loading = false;
+                    state.error = action.payload ? action.payload : "Unknown error";
+                }
+            )
 
-            // Handle fetchProductsByAccessoriesCategory
-            .addCase(fetchProductsByAccessoriesCategory.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchProductsByAccessoriesCategory.fulfilled, (state, action: PayloadAction<Product[]>) => {
-                state.loading = false;
-                state.product = action.payload;
-            })
-            .addCase(fetchProductsByAccessoriesCategory.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-            })
-
-            // Handle fetchProductsBySpecialOffers
-            .addCase(fetchProductsBySpecialOffers.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchProductsBySpecialOffers.fulfilled, (state, action: PayloadAction<Product[]>) => {
-                state.loading = false;
-                state.product = action.payload;
-            })
-            .addCase(fetchProductsBySpecialOffers.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-            })
+            // Handle fulfilled actions
+            .addMatcher(
+                (action) => [
+                    fetchProductsByOrigamiCategory.fulfilled.type,
+                    fetchProductsByAccessoriesCategory.fulfilled.type,
+                    fetchProductsBySpecialOffers.fulfilled.type
+                ].includes(action.type),
+                (state, action: PayloadAction<PaginatedProducts>) => {
+                    state.loading = false;
+                    state.products = action.payload.products.data;
+                    state.childCategories = action.payload.childCategories;
+                    state.links = action.payload.products.links;
+                    state.meta = {
+                        current_page: action.payload.products.current_page,
+                        last_page: action.payload.products.last_page,
+                        path: action.payload.products.path,
+                        per_page: action.payload.products.per_page,
+                        total: action.payload.products.total,
+                    };
+                    state.success = true;
+                }
+            );
     },
 });
 

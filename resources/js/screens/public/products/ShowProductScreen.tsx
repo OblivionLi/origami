@@ -31,28 +31,6 @@ import {StyledButton, StyledDivider3, StyledRating, StyledRatingContainer, Style
 import {ProductImage} from '@/features/product/productSlice';
 import {addToCart} from "@/features/cart/cartSlice";
 
-
-// const useStyles = makeStyles((theme) => ({
-//
-//     link2: {
-//         color: "wheat",
-//
-//         "&:hover": {
-//             color: "wheat",
-//             textDecoration: "none",
-//         },
-//     },
-//
-//     link: {
-//         color: "#855C1B",
-//         fontWeight: "600",
-//
-//         "&:hover": {
-//             color: "#388667",
-//         },
-//     },
-// }));
-
 interface ShowProductScreenProps {
 }
 
