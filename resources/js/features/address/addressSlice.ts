@@ -63,13 +63,13 @@ export const fetchAddresses = createAsyncThunk<
     }
 );
 
-export const fetchAddressById = createAsyncThunk<
+export const fetchOrderAddressById = createAsyncThunk<
     Address,
     { id: number },
     { state: RootState; rejectValue: string }>
 (
-    'address/fetchAddressById',
-    async (id, thunkAPI) => {
+    'address/fetchOrderAddressById',
+    async ({id}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -83,9 +83,8 @@ export const fetchAddressById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Address>(`/api/address/${id}`, config);
-
-            return data;
+            const {data} = await axios.get(`/api/address/${id}/order`, config);
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -289,16 +288,16 @@ const addressSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
-            // Handle fetchAddressById
-            .addCase(fetchAddressById.pending, (state) => {
+            // Handle fetchOrderAddressById
+            .addCase(fetchOrderAddressById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAddressById.fulfilled, (state, action: PayloadAction<Address>) => {
+            .addCase(fetchOrderAddressById.fulfilled, (state, action: PayloadAction<Address>) => {
                 state.loading = false;
                 state.currentAddress = action.payload;
             })
-            .addCase(fetchAddressById.rejected, (state, action) => {
+            .addCase(fetchOrderAddressById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })

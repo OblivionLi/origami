@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\address\AddressStoreRequest;
 use App\Http\Requests\address\AddressUpdateRequest;
+use App\Http\Resources\address\AddressShowResource;
 use App\Services\AddressService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -36,11 +37,20 @@ class AddressController extends Controller
 
     /**
      * @param $id
-     * @return JsonResponse|AnonymousResourceCollection
+     * @return JsonResponse|AddressShowResource
      */
-    public function show($id): JsonResponse|AnonymousResourceCollection
+    public function show($id): JsonResponse|AddressShowResource
     {
         return $this->addressService->showAddress($id);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse|AddressShowResource
+     */
+    public function showOrderAddress($id): JsonResponse|AddressShowResource
+    {
+        return $this->addressService->showOrderAddress($id);
     }
 
     /**

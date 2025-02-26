@@ -1,19 +1,13 @@
 <?php
 
-namespace App\Http\Requests\checkout;
+namespace App\Http\Requests\order;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * @property-read double $amount
- * @property-read int $addressId
- */
-class CheckoutRequest extends FormRequest
+class OrderUpdateStatusRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -28,8 +22,7 @@ class CheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'numeric|required|min:0.1',
-            'addressId' => 'required|integer|exists:addresses,id'
+            'status' => 'required|string'
         ];
     }
 }

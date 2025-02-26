@@ -12,6 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @property-read int $id
  * @property-read int $order_id
+ * @property-read int $address_id
  * @property-read string $status
  * @property-read Carbon $paid_at
  * @property-read boolean $is_delivered
@@ -40,6 +41,7 @@ class OrderIndexResource extends JsonResource
         return [
             'id' => $this->id,
             'order_id' => $this->order_id,
+            'address_id' => $this->address_id,
             'status' => $this->status,
             'products_price' => $this->products_price,
             'products_discount_price' => $this->products_discount_price,

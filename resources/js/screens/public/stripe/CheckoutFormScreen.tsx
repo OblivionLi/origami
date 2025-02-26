@@ -8,15 +8,16 @@ import {payOrder} from "@/features/order/orderSlice";
 import {getUser} from "@/features/user/userSlice";
 import {useNavigate} from "react-router-dom";
 import {StyledButton, StyledCardElement} from "@/styles/muiStyles";
-import Loader from '@/components/alert/Loader';
 import Message from '@/components/alert/Message'
+import {fetchOrderAddressById} from "@/features/address/addressSlice";
 
 interface CheckoutFormScreenProps {
-    orderId: string | number;
-    totalPrice: number;
+    orderId: string;
+    addressId: number;
+    totalPrice: number | undefined;
 }
 
-const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPrice}) => {
+const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, addressId, totalPrice}) => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
@@ -25,18 +26,25 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
 
     const [isProcessing, setProcessingTo] = useState(false);
 
+    const {currentAddress, loading: loadingAddress, success: successAddress, error: errorAddress} = useSelector((state: RootState) => state.address);
     const userLogin = useSelector((state: RootState) => state.user.userInfo);
-    const {loading: loadingPay, success: successPay, error: errorPay} = useSelector((state: RootState) => state.order);
+    const {loading, successPay, errorPay} = useSelector((state: RootState) => state.order);
 
     useEffect(() => {
         if (!userLogin) {
             navigate("/login", {replace: true});
         }
 
-        if (userLogin && userLogin.data && userLogin.data.id) {
+        if (userLogin?.data?.id) {
             dispatch(getUser(userLogin.data.id));
         }
     }, [dispatch, navigate, userLogin]);
+
+    useEffect(() => {
+        if (!successAddress) {
+            dispatch(fetchOrderAddressById({id: addressId}));
+        }
+    }, [successAddress, dispatch]);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -45,22 +53,27 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
             return;
         }
 
+        if (!currentAddress) {
+            Swal.fire({
+                icon: "error",
+                title: "Address Error",
+                text: "Shipping address information is missing",
+            });
+            return;
+        }
+
         setProcessingTo(true);
 
-        let userName = `${userLogin?.data?.name} ${userLogin?.data?.address?.surname}`;
-
-        const countryInitials = userLogin?.data?.address?.country?.toUpperCase().substring(0, 2) ?? "";
-        const city = userLogin?.data?.address?.city ?? "";
-        const addressLine1 = userLogin?.data?.address ?? "";
-        const email = userLogin?.data?.email ?? "";
-        const name = userName ?? "";
-        const phone = userLogin?.data?.address?.phone_number ?? "";
+        const name = `${currentAddress.name} ${currentAddress.surname}`;
+        const countryInitials = currentAddress.country.toUpperCase().substring(0, 2);
+        const email = userLogin?.data?.email || "";
 
         try {
             const {data: intentData} = await axios.post(
                 "/api/payment_intents",
                 {
                     amount: totalPrice,
+                    addressId: addressId
                 },
                 {
                     headers: {
@@ -69,7 +82,7 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
                 }
             );
 
-            const intent = intentData.client_secret;
+            const intent = intentData.clientSecret;
 
             // create payment method
             const {error: backendError, paymentMethod} =
@@ -78,19 +91,20 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
                     card: elements.getElement(CardElement)!,
                     billing_details: {
                         address: {
-                            city: city?.toString(),
-                            country: countryInitials?.toString(),
-                            line1: addressLine1?.toString(),
+                            city: currentAddress.city,
+                            country: countryInitials,
+                            line1: currentAddress.address,
+                            postal_code: currentAddress.postal_code,
                         },
-                        email: email?.toString(),
-                        name: name?.toString(),
-                        phone: phone?.toString(),
+                        email: email,
+                        name: name,
+                        phone: currentAddress.phone_number,
                     },
                 });
 
 
             if (backendError) {
-                // console.error("Error creating payment method:", backendError);
+                console.error("Error creating payment method:", backendError);
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
@@ -117,7 +131,7 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
             }
 
             if (paymentIntent && paymentIntent.status === "succeeded") {
-                await dispatch(payOrder({id: Number(orderId)}));
+                await dispatch(payOrder({id: orderId}));
 
                 setProcessingTo(false);
                 Swal.fire({
@@ -128,7 +142,7 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
                     timer: 2500,
                     width: "65rem",
                 });
-                navigate(`/order/${orderId}`);
+                navigate(`/order-history/${orderId}`);
 
             } else {
                 Swal.fire({
@@ -151,7 +165,6 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
 
     return (
         <>
-            {loadingPay && (<Loader/>)}
             {errorPay && (<Message variant="error">{errorPay}</Message>)}
             {successPay ? (
                 <div>
@@ -166,6 +179,17 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
                 </div>
             ) : (
                 <form onSubmit={handleSubmit}>
+                    {currentAddress && (
+                        <div className="address-summary mb-4">
+                            <h4>Shipping to:</h4>
+                            <p>{currentAddress.name} {currentAddress.surname}</p>
+                            <p>{currentAddress.address}</p>
+                            <p>{currentAddress.city}, {currentAddress.postal_code}</p>
+                            <p>{currentAddress.country}</p>
+                            <p>Phone: {currentAddress.phone_number}</p>
+                        </div>
+                    )}
+
                     <label
                         htmlFor="card-element"
                         className="divider checkout-label"
@@ -177,7 +201,7 @@ const CheckoutFormScreen: React.FC<CheckoutFormScreenProps> = ({orderId, totalPr
                         variant="contained"
                         color="secondary"
                         type="submit"
-                        disabled={isProcessing}
+                        disabled={isProcessing || !currentAddress}
                     >
                         {isProcessing ? "Processing..." : `Pay €${totalPrice}`}
                     </StyledButton>

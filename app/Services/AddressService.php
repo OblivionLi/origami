@@ -69,6 +69,25 @@ class AddressService
     }
 
     /**
+     * @param int $id
+     * @return JsonResponse|AddressShowResource
+     */
+    public function showOrderAddress(int $id): JsonResponse|AddressShowResource
+    {
+        try {
+            $address = $this->addressRepository->getAddressById($id);
+            if (!$address) {
+                return response()->json(['message' => 'Address not found.'], Response::HTTP_NOT_FOUND);
+            }
+
+            return new AddressShowResource($address);
+        } catch (Exception $e) {
+            Log::error("Error trying to find address by id: " . $e->getMessage());
+            return response()->json(['message' => 'Error trying to find address by id'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * @param AddressUpdateRequest $request
      * @param int $id
      * @return JsonResponse

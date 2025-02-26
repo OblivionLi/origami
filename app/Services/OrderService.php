@@ -90,13 +90,13 @@ class OrderService
 
     /**
      * @param string $status
-     * @param int $id
+     * @param string $id
      * @return OrderShowResource|JsonResponse
      */
-    public function updateOrderStatus(string $status, int $id): OrderShowResource|JsonResponse
+    public function updateOrderStatus(string $status, string $id): OrderShowResource|JsonResponse
     {
         $status = strtoupper($status);
-        if ($status != 'PAID' || $status != 'DELIVERED') {
+        if ($status != 'PAID' && $status != 'DELIVERED') {
             return response()->json(['message' => 'Invalid status.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

@@ -55,16 +55,6 @@ const ShippingScreen: React.FC<ShippingScreenProps> = () => {
             return;
         }
 
-        if (!cartItems || cartItems.length === 0) {
-            navigate("/")
-            return;
-        }
-
-        if (!cartCompleted) {
-            navigate('/cart')
-            return;
-        }
-
         dispatch(clearUserError());
         dispatch(clearAddressSuccess());
 

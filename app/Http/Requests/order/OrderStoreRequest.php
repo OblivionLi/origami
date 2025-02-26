@@ -32,6 +32,7 @@ class OrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'address_id' => 'required|exists:addresses,id',
             'products_price' => 'required|numeric',
             'products_discount_price' => 'required|numeric',
             'shipping_price' => 'required|numeric',

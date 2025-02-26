@@ -8,12 +8,13 @@ import {Product} from "@/features/product/productSlice";
 export interface Order {
     id: number;
     user_id: number;
+    address_id: number;
     products_price?: number;
     shipping_price?: number;
     tax_price?: number;
     total_price?: number;
     products_discount_price?: number;
-    order_id: number;
+    order_id: string;
     status: "PENDING" | "PAID" | "DELIVERED" | "FAILED" | "CANCELLED";
     is_paid: number; // 0 or 1
     is_delivered: number; // 0 or 1
@@ -31,6 +32,8 @@ interface OrderState {
     error: string | null;
     currentOrder: Order | null;
     success: boolean;
+    successPay: boolean;
+    errorPay: string | null;
     userOrders: Order[];
 }
 
@@ -41,6 +44,8 @@ const initialState: OrderState = {
     error: null,
     currentOrder: null,
     success: false,
+    successPay: false,
+    errorPay: null,
     userOrders: [],
 }
 
@@ -97,9 +102,8 @@ export const fetchOrderById = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Order>(`/api/orders/${id}`, config);
-            console.log(data);
-            return data;
+            const {data} = await axios.get(`/api/orders/${id}`, config);
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -114,6 +118,7 @@ export const createOrder = createAsyncThunk<
     Order,
     {
         user_id?: number;
+        address_id?: number;
         cart_items?: CartItem[];
         products_price?: number,
         products_discount_price?: number,
@@ -125,6 +130,7 @@ export const createOrder = createAsyncThunk<
     'order/createOrder',
     async ({
                user_id,
+               address_id,
                cart_items,
                products_price,
                products_discount_price,
@@ -148,6 +154,7 @@ export const createOrder = createAsyncThunk<
             const {data} = await axios.post<Order>(`/api/orders`,
                 {
                     user_id,
+                    address_id,
                     cart_items,
                     products_price,
                     products_discount_price,
@@ -170,7 +177,7 @@ export const createOrder = createAsyncThunk<
 export const payOrder = createAsyncThunk<
     Order,
     {
-        id: number;
+        id: string;
     },
     { state: RootState, rejectValue: string }
 >(
@@ -189,7 +196,11 @@ export const payOrder = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Order>(`/api/orders/${id}/pay`, {}, config);
+            const status: string = "PAID";
+
+            const {data} = await axios.patch<Order>(`/api/orders/${id}/pay`, {
+                status
+            }, config);
 
             return data;
         } catch (error: any) {
@@ -205,7 +216,7 @@ export const payOrder = createAsyncThunk<
 export const deliverOrder = createAsyncThunk<
     Order,
     {
-        id: number;
+        id: string;
     },
     { state: RootState, rejectValue: string }
 >(
@@ -224,7 +235,11 @@ export const deliverOrder = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Order>(`/api/orders/${id}/deliver`, {}, config);
+            const status: string = "DELIVERED";
+
+            const {data} = await axios.patch<Order>(`/api/orders/${id}/deliver`, {
+                status
+            }, config);
 
             return data;
         } catch (error: any) {
@@ -393,8 +408,8 @@ const orderSlice = createSlice({
             // Handle payOrder
             .addCase(payOrder.pending, (state) => {
                 state.loading = true;
-                state.error = null;
-                state.success = false;
+                state.errorPay = null;
+                state.successPay = false;
             })
             .addCase(payOrder.fulfilled, (state, action: PayloadAction<Order>) => {
                 state.loading = false;
@@ -402,12 +417,12 @@ const orderSlice = createSlice({
                 if (index !== -1) {
                     state.order[index] = action.payload;
                 }
-                state.success = true;
+                state.successPay = true;
             })
             .addCase(payOrder.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload ? action.payload : "Unknown error";
-                state.success = false;
+                state.errorPay = action.payload ? action.payload : "Unknown error";
+                state.successPay = false;
             })
 
             // Handle deliverOrder

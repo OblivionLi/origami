@@ -83,13 +83,15 @@ Route::middleware('auth:api')->group(function () {
         Route::post('orders', 'store');
         Route::get('orders/me', 'getUserOrders');
         Route::get('orders/{order}', 'show');
-        Route::patch('orders/{order}/pay', 'updateOrderToPaid');
+        Route::patch('orders/{order}/pay', 'updateOrderStatus');
+        Route::patch('orders/{order}/deliver', 'updateOrderStatus');
     });
 
     // Address Routes
     Route::controller(AddressController::class)->group(function () {
         Route::post('address', 'store');
         Route::get('address/{address}', 'show');
+        Route::get('address/{address}/order', 'showOrderAddress');
         Route::get('address', 'index');
         Route::patch('address/{address}', 'update');
         Route::delete('address/{address}', 'delete');

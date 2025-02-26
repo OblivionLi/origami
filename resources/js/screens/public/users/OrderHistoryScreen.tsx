@@ -95,13 +95,13 @@ const OrderHistoryScreen: React.FC<OrderHistoryProps> = () => {
                                                     </Link>
                                                 </TableCell>
                                                 <TableCell>
-                                                    {orderItem.status === "pending" ? (
+                                                    {orderItem.status === "PENDING" ? (
                                                         <NotPaidSpan>{toUpper(orderItem.status)}</NotPaidSpan>
-                                                    ) : orderItem.status === "paid" ? (
+                                                    ) : orderItem.status === "PAID" ? (
                                                         <IsPaidSpan>{toUpper(orderItem.status)}</IsPaidSpan>
-                                                    ) : orderItem.status === "cancelled" ? (
+                                                    ) : orderItem.status === "CANCELLED" ? (
                                                         <FailedSpan>{toUpper(orderItem.status)}</FailedSpan>
-                                                    ) : orderItem.status === "delivered" ? (
+                                                    ) : orderItem.status === "DELIVERED" ? (
                                                         <DeliveredSpan>{toUpper(orderItem.status)}</DeliveredSpan>
                                                     ) : (
                                                         <FailedSpan>ORDER FAILED</FailedSpan>

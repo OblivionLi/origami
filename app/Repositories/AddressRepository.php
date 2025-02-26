@@ -119,4 +119,13 @@ class AddressRepository
     {
         return Address::with(['user'])->where('user_id', $id)->first();
     }
+
+    /**
+     * @param int $id
+     * @return Address|null
+     */
+    public function getAddressById(int $id): ?Address
+    {
+        return Address::find($id)->first();
+    }
 }

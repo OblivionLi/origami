@@ -22,7 +22,7 @@ class OrderRepository
     {
         if ($id) {
             return Order::with(['user', 'user.addresses', 'products' => function ($query) {
-                $query->select('products.id', 'products.name', 'products.product_code', 'products.discount', 'products.price', 'order_product.qty as quantity');
+                $query->select('products.id', 'products.name', 'products.slug', 'products.product_code', 'products.discount', 'products.price', 'order_product.qty as quantity');
             }])->where('order_id', $id);
         }
 
@@ -51,6 +51,7 @@ class OrderRepository
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_id' => $unique_order_id,
+                'address_id' => $requestData['address_id'],
                 'status' => 'PENDING',
                 'products_price' => $requestData['products_price'],
                 'products_discount_price' => $requestData['products_discount_price'],
@@ -115,20 +116,28 @@ class OrderRepository
 
     /**
      * @param string $status
-     * @param int $id
+     * @param string $id
      * @return Order|null
      */
-    public function updateOrderStatus(string $status, int $id): Order|null
+    public function updateOrderStatus(string $status, string $id): Order|null
     {
         try {
-            $order = $this->getOrderWithRelations($id)->firstOrFail();
+            $order = Order::where('order_id', $id)->first();
             if (!$order) {
                 Log::warning('Order with id ' . $id . ' not found');
                 return null;
             }
 
-            $order->is_paid = true;
-            $order->paid_at = Carbon::now();
+            if ($status === 'PAID') {
+                $order->is_paid = true;
+                $order->paid_at = Carbon::now();
+            }
+
+            if ($status === 'DELIVERED') {
+                $order->is_delivered = true;
+                $order->delivered_at = Carbon::now();
+            }
+
             $order->status = $status;
 
             $order->save();

@@ -97,16 +97,6 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
             return;
         }
 
-        if (!cartItems || cartItems.length === 0) {
-            navigate("/")
-            return;
-        }
-
-        if (!addressIdNum && shippingCompleted) {
-            navigate('/shipping')
-            return;
-        }
-
         dispatch(clearUserError());
         dispatch(clearAddressSuccess());
 
@@ -144,6 +134,7 @@ const PlaceOrderScreen: React.FC<PlaceOrderScreenProps> = () => {
         dispatch(
             createOrder({
                 user_id: userInfo.data.id,
+                address_id: addressIdNum,
                 cart_items: cart.cartItems,
                 products_price: Number(cart.itemsPrice),
                 shipping_price: Number(cart.shippingPrice),

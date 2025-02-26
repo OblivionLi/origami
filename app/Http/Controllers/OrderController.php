@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\order\OrderStoreRequest;
+use App\Http\Requests\order\OrderUpdateStatusRequest;
 use App\Http\Resources\order\OrderIndexResource;
 use App\Http\Resources\order\OrderShowResource;
 use App\Services\OrderService;
@@ -55,13 +56,13 @@ class OrderController extends Controller
     }
 
     /**
-     * @param string $status
-     * @param int $id
+     * @param string $id
+     * @param OrderUpdateStatusRequest $request
      * @return OrderShowResource|JsonResponse
      */
-    public function updateOrderStatus(string $status, int $id): OrderShowResource|JsonResponse
+    public function updateOrderStatus(string $id, OrderUpdateStatusRequest $request): OrderShowResource|JsonResponse
     {
-        return $this->orderService->updateOrderStatus($status, $id);
+        return $this->orderService->updateOrderStatus($request->validated()['status'], $id);
     }
 
     /**

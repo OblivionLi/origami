@@ -18,6 +18,7 @@ class Order extends Model
         'id',
         'user_id',
         'order_id',
+        'address_id',
         'status',
         'products_price',
         'products_discount_price',

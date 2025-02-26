@@ -13,6 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read int $id
  * @property-read int $user_id
  * @property-read int $order_id
+ * @property-read int $address_id
  * @property-read string $status
  * @property-read Carbon $paid_at
  * @property-read boolean $is_delivered
@@ -41,6 +42,7 @@ class OrderShowResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'address_id' => $this->address_id,
             'order_id' => $this->order_id,
             'status' => $this->status,
             'products_price' => $this->products_price,
