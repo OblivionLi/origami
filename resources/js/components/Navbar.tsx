@@ -38,7 +38,7 @@ const Navbar: React.FC<NavbarProps> = () => {
         navigate("/", {replace: true});
     };
 
-    const isAdmin = userLogin?.data?.is_admin === 1 || userLogin?.is_admin === 1;
+    const isAdmin = userLogin?.data?.is_admin == 1;
 
     return (
         <>

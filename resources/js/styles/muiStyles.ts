@@ -7,11 +7,169 @@ import {
     FormControlLabel,
     Paper,
     Card,
-    CardMedia, Typography
+    CardMedia,
+    Typography,
+    AppBar,
+    IconButton,
+    Drawer,
+    Toolbar
 } from '@mui/material';
 import {CardElement} from "@stripe/react-stripe-js";
 import Rating from "@mui/material/Rating";
 import {Link} from 'react-router-dom';
+
+const drawerWidth = 280;
+
+export const Root = styled("div")({
+    display: "flex",
+});
+
+export const StyledAppBar = styled(AppBar, {
+    shouldForwardProp: (prop) => prop !== "open",
+})<{ open?: boolean }>(({theme, open}) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    backgroundColor: "#FDF7E9",
+    color: "#855C1B",
+    boxShadow:
+        "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(["width", "margin"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+export const MenuPanel = styled(Typography)({
+    fontFamily: "Quicksand",
+    letterSpacing: "2px",
+});
+
+export const MenuButton = styled(IconButton)(({theme}) => ({
+    marginRight: 36,
+}));
+
+export const NavbarBtn = styled(Button)(({theme}) => ({
+    fontFamily: "Quicksand",
+    backgroundColor: "#855C1B",
+    color: "#FDF7E9",
+
+    "&:hover": {
+        backgroundColor: "#388667",
+        color: "#FDF7E9",
+    },
+}));
+
+export const Hide = styled("div")({
+    display: "none",
+});
+
+export const StyledDrawer = styled(Drawer, {
+    shouldForwardProp: (prop) => prop !== "open",
+})(({theme, open}) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: "nowrap",
+    "& .MuiDrawer-paper": {
+        width: drawerWidth,
+        transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        backgroundColor: "#FDF7E9",
+        boxShadow:
+            "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
+        ...(!open && {
+            transition: theme.transitions.create("width", {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            overflowX: "hidden",
+            width: theme.spacing(7) + 1,
+            [theme.breakpoints.up("sm")]: {
+                width: theme.spacing(9) + 1,
+            },
+            backgroundColor: "#FDF7E9",
+            boxShadow:
+                "0px 3px 3px -2px rgb(190 142 76), 0px 3px 4px 0px rgb(190 142 76), 0px 1px 8px 0px rgb(190 142 76)",
+        }),
+    }
+
+}));
+
+export const StyledToolbar = styled("div")(({theme}) => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: theme.spacing(0, 1),
+    ...theme.mixins.toolbar,
+}));
+
+export const Content = styled("main")(({theme}) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+}));
+
+export const Icons = styled("div")(({theme}) => ({
+    height: "24px",
+    width: "24px",
+    color: "#855C1B",
+
+    "&:hover": {
+        color: "#388667",
+    },
+}));
+
+export const Rel = styled("div")({
+    margin: "0 35px",
+});
+
+export const AdminLink = styled(Link)({
+    color: '#000',
+    textDecoration: 'none',
+    '&:hover': {
+        textDecoration: 'underline',
+    }
+});
+
+export const NavLinks = styled("a")({
+    color: '#000',
+    textDecoration: 'none',
+    '&:hover': {
+        textDecoration: 'underline',
+    }
+});
+
+export const ToolbarNav = styled(Toolbar)({
+
+});
+
+export const ToolbarNavLeft = styled('div')({
+
+
+});
+
+export const ToolbarNavRight = styled('div')({
+
+});
+
+export const ToolbarNavRightLinks = styled('ul')({
+
+});
+
+export const ToolbarNavRightItem = styled('li')({
+
+});
+
+export const  ReportsMenu = styled('div')({
+
+});
 
 export const StyledDivider = styled(Divider)({
     marginBottom: "20px",

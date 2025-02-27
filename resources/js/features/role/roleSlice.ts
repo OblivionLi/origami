@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Role {
+export interface Role {
     id: number;
     name: string;
 }
@@ -43,9 +43,9 @@ export const fetchRoles = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Role[]>('/api/roles', config);
+            const {data} = await axios.get('/api/admin/roles', config);
 
-            return data;
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message

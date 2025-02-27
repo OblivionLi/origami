@@ -17,6 +17,7 @@ import ShowOrderScreen from "@/screens/public/shop/ShowOrderScreen";
 import OrigamiScreen from "@/screens/public/categories/OrigamiScreen";
 import SpecialOffersScreen from "@/screens/public/categories/SpecialOffersScreen";
 import CheckoutRoute from "@/components/CheckoutRoute";
+import AdminScreen from "@/screens/admin/AdminScreen";
 
 function Index() {
     return (
@@ -73,8 +74,7 @@ function Index() {
                 <Route path="/order-history" element={<OrderHistoryScreen/>}/>
 
                 {/* Admin Section */}
-                {/*<Route path="/admin" component={AdminScreen} />*/}
-
+                <Route path="/admin/*" element={<AdminScreen/>} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

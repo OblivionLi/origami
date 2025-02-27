@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Http\Requests\auth\RegisterUserRequest;
+use App\Models\Permission;
 use App\Models\User;
 use Carbon\Carbon;
 use Doctrine\DBAL\Query\QueryException;
@@ -219,12 +220,15 @@ class UserRepository
         DB::beginTransaction();
 
         try {
-            $user->update([
-                'name' => $requestData['name'],
-                'email' => $requestData['email']
-            ]);
+            $updateData = ['name' => $requestData['name']];
 
-            $user->roles()->sync($requestData['role']);
+            if (!empty($requestData['email'])) {
+                $updateData['email'] = $requestData['email'];
+            }
+
+            $user->update($updateData);
+
+            $user->roles()->sync($requestData['roles']);
 
             DB::commit();
             return true;
@@ -244,6 +248,26 @@ class UserRepository
         return User::find($userId)->first();
     }
 
+    public function doesEmailExist(string $email): bool
+    {
+        $data = User::where('email', $email)->first();
+        return $data ?? false;
+    }
+
+    /**
+     * @param int $userId
+     * @return Builder
+     */
+    public function getUserPermissions(int $userId): Builder
+    {
+        return Permission::select('permissions.name')
+            ->join('role_permission', 'permissions.id', '=', 'role_permission.permission_id')
+            ->join('roles', 'role_permission.role_id', '=', 'roles.id')
+            ->join('user_role', 'roles.id', '=', 'user_role.role_id')
+            ->where('user_role.user_id', $userId)
+            ->distinct();
+    }
+
     /**
      * @param int $id
      * @return User|null
@@ -251,5 +275,18 @@ class UserRepository
     public function getUserWithAddress(int $id): ?User
     {
         return User::with(['addresses'])->find($id);
+    }
+
+    /**
+     * @return Builder
+     */
+    public function getAdminUsersList(): Builder
+    {
+        return User::query()
+            ->select(['id', 'name', 'email', 'created_at', 'updated_at'])
+            ->with([
+                'roles:id,name',
+                'addresses:id,user_id,name,surname,country,city,address,postal_code,phone_number'
+            ]);
     }
 }

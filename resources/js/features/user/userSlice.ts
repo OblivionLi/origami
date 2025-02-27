@@ -2,6 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 import {Address} from '@/features/address/addressSlice';
+import {Role} from "@/features/role/roleSlice";
 
 export interface User {
     id: number | undefined;
@@ -21,12 +22,29 @@ export interface User {
     }
 }
 
+export interface UserList {
+    id: number;
+    name: string;
+    email: string;
+    created_at: string;
+    updated_at: string;
+    roles: Role[];
+    addresses: Address[];
+}
+
+export interface RolesPermissions {
+    permissions: string[],
+}
+
 interface UserState {
     userInfo: User | null;
     loading: boolean;
     error: string | null;
     users: User[];
+    adminUsersList: UserList[];
     currentUser: User | null;
+    userPermissions: RolesPermissions | null;
+    editUserSuccess: boolean;
     success: boolean;
     registerSuccess: boolean;
     forgotPasswordSuccess: boolean;
@@ -55,7 +73,10 @@ const initialState: UserState = {
     loading: false,
     error: null,
     users: [],
+    userPermissions: null,
+    adminUsersList: [],
     currentUser: null,
+    editUserSuccess: false,
     success: false,
     registerSuccess: false,
     forgotPasswordSuccess: false,
@@ -281,7 +302,7 @@ export const updateCredentials = createAsyncThunk<
 );
 
 export const getUsersList = createAsyncThunk<
-    User[],
+    UserList[],
     void,
     { state: RootState; rejectValue: string }
 >(
@@ -298,8 +319,8 @@ export const getUsersList = createAsyncThunk<
                     Authorization: `Bearer ${userInfo.data.access_token}`,
                 },
             };
-            const {data} = await axios.get<User[]>('/api/users', config);
-            return data;
+            const {data} = await axios.get('/api/admin/users', config);
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data
@@ -329,6 +350,36 @@ export const getUser = createAsyncThunk<
                 },
             };
             const {data} = await axios.get<User>(`/api/users/${id}`, config);
+            return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const getUserRolesPermissions = createAsyncThunk<
+    RolesPermissions,
+    { id: number | undefined },
+    { state: RootState; rejectValue: string }
+>(
+    'user/getUserRolesPermissions',
+    async ({id}, thunkAPI) => {
+        try {
+            const {userInfo} = thunkAPI.getState().user;
+
+            if (!userInfo?.data?.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                },
+            };
+            const {data} = await axios.get(`/api/admin/users/${id}/permissions`, config);
             return data;
         } catch (error: any) {
             const message =
@@ -372,11 +423,11 @@ export const getUserAddress = createAsyncThunk<
 
 export const editUser = createAsyncThunk<
     User,
-    { id: string; name: string; email: string; role: string },
+    { id: number | undefined; name: string | undefined; email: string | undefined; roles: number[] | undefined },
     { state: RootState; rejectValue: string }
 >(
     'user/editUser',
-    async ({id, name, email, role}, thunkAPI) => {
+    async ({id, name, email, roles}, thunkAPI) => {
         try {
             const {userInfo} = thunkAPI.getState().user;
 
@@ -390,8 +441,8 @@ export const editUser = createAsyncThunk<
                 },
             };
             const {data} = await axios.patch<User>(
-                `/api/users/${id}`,
-                {name, email, role},
+                `/api/admin/users/${id}`,
+                {name, email, roles},
                 config
             );
             return data;
@@ -450,6 +501,9 @@ const userSlice = createSlice({
         },
         clearAddressSuccess: (state) => {
             state.success = false;
+        },
+        resetEditUserSuccess: (state) => {
+            state.editUserSuccess = false;
         }
     },
     extraReducers: (builder) => {
@@ -559,13 +613,27 @@ const userSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(getUsersList.fulfilled, (state, action: PayloadAction<User[]>) => {
+            .addCase(getUsersList.fulfilled, (state, action: PayloadAction<UserList[]>) => {
                 state.loading = false;
-                state.users = action.payload;
+                state.adminUsersList = action.payload;
             })
             .addCase(getUsersList.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
+            })
+
+            // Handle Get Users Permissions
+            .addCase(getUserRolesPermissions.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getUserRolesPermissions.fulfilled, (state, action: PayloadAction<RolesPermissions>) => {
+                state.loading = false;
+                state.userPermissions = action.payload;
+            })
+            .addCase(getUserRolesPermissions.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Unknown error";
             })
 
             // Handle Get User
@@ -600,17 +668,16 @@ const userSlice = createSlice({
             .addCase(editUser.pending, (state) => {
                 state.loading = true;
                 state.error = null;
+                state.editUserSuccess = false;
             })
             .addCase(editUser.fulfilled, (state, action: PayloadAction<User>) => {
                 state.loading = false;
+                state.editUserSuccess = true;
                 if (state.users) {
                     const index = state.users.findIndex((u) => u.id === action.payload.id);
                     if (index !== -1) {
                         state.users[index] = action.payload;
                     }
-                }
-                if (state.userInfo && state.userInfo.id === action.payload.id) {
-                    state.userInfo = {...state.userInfo, ...action.payload};
                 }
             })
             .addCase(editUser.rejected, (state, action) => {
@@ -636,5 +703,5 @@ const userSlice = createSlice({
     }
 });
 
-export const {resetUserState, clearUserError, clearUserSuccess, clearAddressSuccess} = userSlice.actions;
+export const {resetUserState, clearUserError, clearUserSuccess, clearAddressSuccess, resetEditUserSuccess} = userSlice.actions;
 export default userSlice.reducer;

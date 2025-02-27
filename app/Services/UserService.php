@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Http\Requests\user\UserEditRequest;
 use App\Http\Resources\auth\UserUpdateResource;
 use App\Http\Resources\user\UserAddressShowResource;
+use App\Http\Resources\user\UserAdminIndexResource;
 use App\Http\Resources\user\UserIndexResource;
 use App\Http\Resources\user\UserShowResource;
 use App\Models\User;
@@ -46,29 +48,27 @@ class UserService
     }
 
     /**
-     * @param Request $request
+     * @param array $requestData
      * @param int $id
      * @return UserUpdateResource|JsonResponse
      */
-    public function updateUser(Request $request, int $id): UserUpdateResource|JsonResponse
+    public function updateUser(array $requestData, int $id): UserUpdateResource|JsonResponse
     {
-        $user = User::find($id);
+        $user = $this->userRepository->getUserById($id);
         if (!$user) {
             return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
         }
 
-        $request->validate([
-            'name' => 'string',
-            'email' => [
-                Rule::unique('users')->ignore($user->id),
-            ],
-            'password' => 'confirmed'
-        ]);
+        if ($user->email != $requestData['email']) {
+            if ($this->userRepository->doesEmailExist($requestData['email'])) {
+                return response()->json(['message' => 'Email already exist.'], Response::HTTP_NOT_FOUND);
+            }
+        }
 
         $preparedRequestData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
+            'name' => $requestData['name'],
+            'email' => $requestData['email'] != $user->email ? $requestData['email'] : '',
+            'roles' => $requestData['roles'],
         ];
 
         $tryToUpdateUser = $this->userRepository->updateUser($preparedRequestData, $user);
@@ -102,7 +102,7 @@ class UserService
      * @param int $id
      * @return UserAddressShowResource|JsonResponse
      */
-    public function showUserAddress(int $id)
+    public function showUserAddress(int $id): UserAddressShowResource|JsonResponse
     {
         $user = $this->userRepository->getUserWithAddress($id);
         if (!$user) {
@@ -110,5 +110,32 @@ class UserService
         }
 
         return new UserAddressShowResource($user);
+    }
+
+    /**
+     * @param int $userId
+     * @return JsonResponse
+     */
+    public function getUserRolesPermissions(int $userId): JsonResponse
+    {
+        $permissions = $this->userRepository->getUserPermissions($userId)->pluck('name');
+        if (!$permissions) {
+            return response()->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json($permissions, Response::HTTP_OK);
+    }
+
+    /**
+     * @return JsonResponse|AnonymousResourceCollection
+     */
+    public function getAdminUsersList(): JsonResponse|AnonymousResourceCollection
+    {
+        $users = $this->userRepository->getAdminUsersList()->get();
+        if ($users->isEmpty()) {
+            return response()->json(['message' => 'Could not fetch users.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return UserAdminIndexResource::collection($users);
     }
 }

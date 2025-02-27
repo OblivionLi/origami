@@ -103,10 +103,16 @@ Route::middleware('auth:api')->group(function () {
         Route::get('admin/dashboard/order-charts', [OrderController::class, 'orderCharts']);
 
         // User Management
-        Route::apiResource('admin/users', UserController::class)->except(['show']);
+        Route::controller(UserController::class)->group(function () {
+            Route::get('admin/users/{user}/permissions', 'getUserRolesPermissions');
+            Route::get('admin/users', 'indexAdmin');
+            Route::patch('admin/users/{user}', 'update');
+        });
 
         // Role Management
-        Route::apiResource('admin/roles', RoleController::class);
+        Route::controller(RoleController::class)->group(function () {
+            Route::get('admin/roles', 'index');
+        });
 
         // Permission Management
         Route::apiResource('admin/permissions', PermissionController::class);

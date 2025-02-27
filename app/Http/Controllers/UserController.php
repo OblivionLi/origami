@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\user\UserEditRequest;
+use App\Http\Requests\user\UserRolesPermissionsRequest;
 use App\Http\Resources\auth\UserUpdateResource;
 use App\Http\Resources\user\UserAddressShowResource;
 use App\Http\Resources\user\UserShowResource;
@@ -28,6 +30,14 @@ class UserController extends Controller
     }
 
     /**
+     * @return JsonResponse|AnonymousResourceCollection
+     */
+    public function indexAdmin(): JsonResponse|AnonymousResourceCollection
+    {
+        return $this->userService->getAdminUsersList();
+    }
+
+    /**
      * @param int $id
      * @return UserShowResource
      */
@@ -46,13 +56,22 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param int $userId
+     * @return JsonResponse
+     */
+    public function getUserRolesPermissions(int $userId): JsonResponse
+    {
+        return $this->userService->getUserRolesPermissions($userId);
+    }
+
+    /**
+     * @param UserEditRequest $request
      * @param int $id
      * @return UserUpdateResource|JsonResponse
      */
-    public function update(Request $request, int $id): UserUpdateResource|JsonResponse
+    public function update(UserEditRequest $request, int $id): UserUpdateResource|JsonResponse
     {
-        return $this->userService->updateUser($request, $id);
+        return $this->userService->updateUser($request->validated(), $id);
     }
 
     /**
