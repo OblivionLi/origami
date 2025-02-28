@@ -17,6 +17,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read Carbon $updated_at
  * @property-read Collection<Permission> $permissions
  * @property-read Collection<User> $users
+ * @property-read int $users_count
  */
 class RoleIndexResource extends JsonResource
 {
@@ -34,6 +35,7 @@ class RoleIndexResource extends JsonResource
             'is_admin' => $this->is_admin,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'users_count' => $this->users_count,
 
             'permissions' => $this->whenLoaded('permissions'),
             'users' => $this->whenLoaded('users')

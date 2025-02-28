@@ -25,7 +25,7 @@ const UpdateUserScreen: React.FC<UpdateUserScreenProps> = ({onClose, userData}) 
     const [email, setEmail] = useState<string | undefined>("");
     const [selectedRoleIds, setSelectedRoleIds] = useState<number[] | undefined>([]);
 
-    const {role: roles, success, loading} = useSelector((state: RootState) => state.role)
+    const {roles, success, loading} = useSelector((state: RootState) => state.role)
     const {editUserSuccess, loading: loadingUpdate} = useSelector((state: RootState) => state.user)
 
     useEffect(() => {
@@ -44,7 +44,7 @@ const UpdateUserScreen: React.FC<UpdateUserScreenProps> = ({onClose, userData}) 
         dispatch(fetchRoles());
     }, [dispatch]);
 
-    const handleRoleChange= useCallback((roleId: number) => {
+    const handleRoleChange = useCallback((roleId: number) => {
         setSelectedRoleIds((prevSelectedRoleIds) => {
             if (prevSelectedRoleIds?.includes(roleId)) {
                 return prevSelectedRoleIds?.filter((id) => id !== roleId);

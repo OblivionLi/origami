@@ -112,10 +112,18 @@ Route::middleware('auth:api')->group(function () {
         // Role Management
         Route::controller(RoleController::class)->group(function () {
             Route::get('admin/roles', 'index');
+            Route::post('admin/roles', 'store');
+            Route::patch('admin/roles/{role}', 'update');
+            Route::delete('admin/roles/{role}', 'destroy');
         });
 
         // Permission Management
-        Route::apiResource('admin/permissions', PermissionController::class);
+        Route::controller(PermissionController::class)->group(function () {
+            Route::get('admin/permissions', 'index');
+            Route::post('admin/permissions', 'store');
+            Route::patch('admin/permissions/{permission}', 'update');
+            Route::delete('admin/permissions/{permission}', 'destroy');
+        });
 
         // Category Management
         Route::apiResource('admin/parent-categories', ParentCategoryController::class);

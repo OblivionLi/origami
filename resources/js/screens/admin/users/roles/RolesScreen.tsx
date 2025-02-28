@@ -1,47 +1,51 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Dialog, DialogActions, Paper, Button, Box, Typography, MenuItem, ListItemIcon} from "@mui/material";
-import Message from "@/components/alert/Message.js";
-import Loader from "@/components/alert/Loader.js";
+import {Dialog, DialogActions, Paper, Box, Typography, MenuItem, ListItemIcon, Chip} from "@mui/material";
 import Swal from "sweetalert2";
+import Loader from "@/components/alert/Loader.js";
+import Message from "@/components/alert/Message.js";
 import {AppDispatch, RootState} from "@/store";
+import {getUserRolesPermissions} from "@/features/user/userSlice";
 import {useNavigate} from "react-router-dom";
-import {getUserRolesPermissions, getUsersList, resetEditUserSuccess, User, UserList} from "@/features/user/userSlice";
+import {deleteRole, fetchRoles, resetAddRoleSuccess, resetEditRoleSuccess, Role} from "@/features/role/roleSlice";
 import {StyledButton, StyledDivider} from "@/styles/muiStyles";
 import {MaterialReactTable, MRT_ColumnDef, useMaterialReactTable} from "material-react-table";
-import {Role} from "@/features/role/roleSlice";
 import {format} from "date-fns";
-import {Address} from "@/features/address/addressSlice";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import UpdateUserScreen from "@/screens/admin/users/UpdateUserScreen";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {Permission} from "@/features/permission/permissionSlice";
+import AddRoleScreen from "@/screens/admin/users/roles/AddRoleScreen";
+import UpdateRoleScreen from "@/screens/admin/users/roles/UpdateRoleScreen";
 
-interface UsersScreenProps {
+interface RolesScreenProps {
 }
 
-const UsersScreen: React.FC<UsersScreenProps> = () => {
+const RolesScreen: React.FC<RolesScreenProps> = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
     const [isAdmin, setIsAdmin] = useState(false);
+    const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [userToBeEdited, setUserToBeEdited] = useState<UserList | null>(null);
+    const [roleToBeEdited, setRoleToBeEdited] = useState<Role | null>(null);
 
     const {
         userInfo,
         userPermissions,
-        success,
-        loading,
-        error: errorUsers,
-        adminUsersList
     } = useSelector((state: RootState) => state.user);
+
+    const {
+        roles,
+        loading,
+        error,
+    } = useSelector((state: RootState) => state.role);
 
     useEffect(() => {
         if (!userInfo || userInfo?.data?.is_admin != 1) {
             navigate("/login");
         } else {
             setIsAdmin(true);
-            dispatch(getUsersList());
+            dispatch(fetchRoles());
         }
     }, [dispatch, userInfo, navigate]);
 
@@ -52,7 +56,7 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
     }, [dispatch, userPermissions]);
 
     useEffect(() => {
-        if (userPermissions && !userPermissions?.includes('admin_view_users')) {
+        if (userPermissions && !userPermissions?.includes('admin_view_roles')) {
             Swal.fire(
                 "Sorry!",
                 `You don't have access to this action.`,
@@ -63,9 +67,26 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
         }
     }, [dispatch, userPermissions]);
 
-    const handleEditDialogOpen = useCallback((user: any) => {
-        if (userPermissions?.includes("admin_edit_users")) {
-            setUserToBeEdited(user);
+    const handleAddDialogClose = useCallback(() => {
+        setOpenAddDialog(false);
+        dispatch(resetAddRoleSuccess());
+    }, []);
+
+    const handleAddDialogOpen = useCallback(() => {
+        if (userPermissions?.includes("admin_create_roles")) {
+            setOpenAddDialog(true);
+        } else {
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
+        }
+    }, [userPermissions]);
+
+    const handleEditDialogOpen = useCallback((role: any) => {
+        if (userPermissions?.includes("admin_edit_roles")) {
+            setRoleToBeEdited(role);
             setOpenEditDialog(true);
         } else {
             Swal.fire(
@@ -78,12 +99,12 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
 
     const handleEditDialogClose = useCallback(() => {
         setOpenEditDialog(false);
-        setUserToBeEdited(null);
-        dispatch(resetEditUserSuccess());
+        setRoleToBeEdited(null);
+        dispatch(resetEditRoleSuccess());
     }, []);
 
-    const deleteUserHandler = (id: number) => {
-        if (!userPermissions?.includes("admin_delete_users")) {
+    const deleteRoleHandler = (id: number) => {
+        if (!userPermissions?.includes("admin_delete_roles")) {
             Swal.fire(
                 "Sorry!",
                 `You don't have access to this action.`,
@@ -91,9 +112,10 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
             );
             return;
         }
+
         Swal.fire({
             title: "Are you sure?",
-            text: `You can't recover this user after deletion!`,
+            text: `You can't recover this role after deletion!`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, delete it!",
@@ -102,56 +124,51 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
             reverseButtons: true,
         }).then((result) => {
             if (result.value) {
-                // dispatch(deleteUser(id));
+                dispatch(deleteRole({id}));
                 Swal.fire(
                     "Deleted!",
-                    "The user with the id " + id + " has been deleted.",
+                    "The role with the id " + id + " has been deleted.",
                     "success"
                 );
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 Swal.fire(
                     "Cancelled",
-                    `The selected user is safe, don't worry :)`,
+                    `The selected role is safe, don't worry :)`,
                     "error"
                 );
             }
         });
-    }
+    };
 
-    const columns = useMemo<MRT_ColumnDef<User, unknown>[]>(
+    const columns = useMemo<MRT_ColumnDef<Role, unknown>[]>(
         () => [
             {
                 accessorKey: 'name',
-                header: 'Username',
+                header: 'Name',
                 size: 150,
             },
             {
-                accessorKey: 'email',
-                header: 'Email',
-                size: 150,
-            },
-            {
-                accessorKey: 'roles',
-                header: 'Roles',
+                accessorKey: 'is_admin',
+                header: 'Is Admin?',
                 size: 150,
                 Cell: ({cell}) => {
-                    const roles = cell.getValue<Role[]>();
+                    const isAdmin = cell.getValue<number>();
 
-                    if (!roles || roles.length == 0) {
-                        return <span>N/A</span>;
+                    if (!isAdmin) {
+                        return <span>No</span>;
                     }
 
-                    if (roles.length == 1) {
-                        return <span>{roles[0].name}</span>;
-                    }
-
-                    const roleNames = roles.map((role) => role.name).join(', ');
-                    return <span>{roleNames}</span>
+                    return <span>Yes</span>
                 }
             },
             {
+                accessorKey: 'users_count',
+                header: 'Users Count',
+                size: 150,
+            },
+            {
                 accessorKey: 'created_at',
-                header: 'Date Joined',
+                header: 'Created At',
                 size: 150,
                 Cell: ({cell}) => {
                     const createdAt = cell.getValue<string>();
@@ -183,36 +200,65 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
 
     const table = useMaterialReactTable({
         columns,
-        data: adminUsersList || [],
+        data: roles || [],
         enableRowActions: true,
         enableExpanding: true,
+        positionActionsColumn: 'last',
+        renderTopToolbarCustomActions: () => (
+            <StyledButton
+                variant="contained"
+                onClick={handleAddDialogOpen}
+                sx={{ marginLeft: '10px' }}
+            >
+                Add Role
+            </StyledButton>
+        ),
         renderDetailPanel: ({row}) => (
             <Box
                 sx={{
-                    alignItems: 'center',
                     display: 'flex',
-                    justifyContent: 'space-around',
-                    left: '30px',
+                    flexDirection: 'column',
                     maxWidth: '1000px',
-                    position: 'sticky',
                     width: '100%',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    backgroundColor: '#f5f5f5',
+                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'
                 }}
             >
-                <Typography variant="h4">Addresses:</Typography>
-                {row.original.addresses.length > 0 ? (
-                    row.original.addresses.map((address: Address, index: number) => (
-                        <Box key={address.id} sx={{marginBottom: '8px'}}>
-                            <Typography variant="h6">Address {index + 1}</Typography>
-                            <Typography>Name: {address.name} {address.surname}</Typography>
-                            <Typography>Country: {address.country}</Typography>
-                            <Typography>City: {address.city}</Typography>
-                            <Typography>Address: {address.address}</Typography>
-                            <Typography>Postal Code: {address.postal_code}</Typography>
-                            <Typography>Phone Number: {address.phone_number}</Typography>
-                        </Box>
-                    ))
+                <Typography
+                    variant="h5"
+                    sx={{
+                        marginBottom: '16px',
+                        fontWeight: 'bold',
+                        borderBottom: '2px solid #855C1B',
+                        paddingBottom: '8px'
+                    }}
+                >
+                    Permissions:
+                </Typography>
+                {row.original.permissions?.length > 0 ? (
+                    <Box sx={{display: 'flex', flexWrap: 'wrap', gap: '12px'}}>
+                        {row.original.permissions.map((permission: Permission) => (
+                            <Chip
+                                key={permission.id}
+                                label={permission.name}
+                                sx={{
+                                    backgroundColor: '#FDF7E9',
+                                    color: '#855C1B',
+                                    fontWeight: '500',
+                                    padding: '8px 4px',
+                                    '&:hover': {
+                                        backgroundColor: '#f0e6d2'
+                                    }
+                                }}
+                            />
+                        ))}
+                    </Box>
                 ) : (
-                    <Typography>No addresses found.</Typography>
+                    <Typography sx={{fontStyle: 'italic', color: '#666'}}>
+                        No permissions found.
+                    </Typography>
                 )}
             </Box>
         ),
@@ -233,7 +279,7 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
             <MenuItem
                 key={1}
                 onClick={() => {
-                    deleteUserHandler(row.original.id!)
+                    deleteRoleHandler(row.original.id!)
                     closeMenu();
                 }}
                 sx={{m: 0}}
@@ -254,11 +300,11 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
                 </div>
             ) : (
                 <>
-                    <StyledDivider>Users</StyledDivider>
+                    <StyledDivider>Roles</StyledDivider>
                     {loading ? (
                         <Loader/>
-                    ) : errorUsers ? (
-                        <Message variant="error">{errorUsers}</Message>
+                    ) : error ? (
+                        <Message variant="error">{error}</Message>
                     ) : (
                         <MaterialReactTable table={table}/>
                     )}
@@ -270,14 +316,36 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
                         fullWidth
                         disableScrollLock={true}
                     >
-                        <UpdateUserScreen
+                        <UpdateRoleScreen
                             onClose={handleEditDialogClose}
-                            userData={userToBeEdited}
+                            roleData={roleToBeEdited}
                         />
 
                         <DialogActions>
                             <StyledButton
                                 onClick={handleEditDialogClose}
+                                variant="contained"
+                                color="secondary"
+                            >
+                                Cancel
+                            </StyledButton>
+                        </DialogActions>
+                    </Dialog>
+
+                    <Dialog
+                        open={openAddDialog}
+                        aria-labelledby="draggable-dialog-title"
+                        onClose={handleAddDialogClose}
+                        fullWidth
+                        disableScrollLock={true}
+                    >
+                        <AddRoleScreen
+                            onClose={handleAddDialogClose}
+                        />
+
+                        <DialogActions>
+                            <StyledButton
+                                onClick={handleAddDialogClose}
                                 variant="contained"
                                 color="secondary"
                             >
@@ -291,4 +359,4 @@ const UsersScreen: React.FC<UsersScreenProps> = () => {
     );
 };
 
-export default UsersScreen;
+export default RolesScreen;

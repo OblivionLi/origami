@@ -55,6 +55,8 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import UsersScreen from "@/screens/admin/users/UsersScreen";
+import RolesScreen from "@/screens/admin/users/roles/RolesScreen";
+import PermissionsScreen from "@/screens/admin/users/permissions/PermissionsScreen";
 
 interface AdminScreenProps {
 }
@@ -64,7 +66,6 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
     const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
-    // const [open2, setOpen2] = useState(false);
     const [openUserMenu, setOpenUserMenu] = useState(false);
     const [openCategoryMenu, setOpenCategoryMenu] = useState(false);
     const [openNavUserMenu, setOpenNavUserMenu] = useState<null | HTMLElement>(null);
@@ -92,10 +93,6 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
     function handleCategoryMenu() {
         setOpenCategoryMenu(!openCategoryMenu);
     }
-
-    // function handleClick() {
-    //     setOpen2(!open2);
-    // }
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -294,13 +291,6 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
 
                             <Divider/>
 
-                            {/*<ListItem component={AdminLink} to="/admin/users">*/}
-                            {/*    <ListItemIcon>*/}
-                            {/*        <GroupIcon sx={iconStyle}/>*/}
-                            {/*    </ListItemIcon>*/}
-                            {/*    <ListItemText primary="Users"/>*/}
-                            {/*</ListItem>*/}
-
                             <ListItemButton
                                 onClick={() => handleListItemClick("users")}
                             >
@@ -310,7 +300,7 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                                 <ListItemText primary="Users"/>
                             </ListItemButton>
 
-                            <ListItem onClick={handleUserMenu}>
+                            <ListItem onClick={handleUserMenu} style={{cursor: "pointer"}}>
                                 <ListItemIcon>
                                     <GroupAddIcon sx={iconStyle}/>
                                 </ListItemIcon>
@@ -330,18 +320,24 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                             >
                                 <Divider/>
                                 <List sx={{margin: "0 35px"}}>
-                                    <ListItem component={AdminLink} to="/admin/users/roles">
+
+                                    <ListItemButton
+                                        onClick={() => handleListItemClick("users/roles")}
+                                    >
                                         <ListItemIcon>
-                                            <LocalOfferIcon sx={iconStyle}/>
+                                            <GroupIcon sx={iconStyle}/>
                                         </ListItemIcon>
                                         <ListItemText primary="Roles"/>
-                                    </ListItem>
-                                    <ListItem component={AdminLink} to="/admin/users/permissions">
+                                    </ListItemButton>
+
+                                    <ListItemButton
+                                        onClick={() => handleListItemClick("users/permissions")}
+                                    >
                                         <ListItemIcon>
-                                            <RemoveCircleIcon sx={iconStyle}/>
+                                            <GroupIcon sx={iconStyle}/>
                                         </ListItemIcon>
                                         <ListItemText primary="Permissions"/>
-                                    </ListItem>
+                                    </ListItemButton>
                                 </List>
                             </Collapse>
 
@@ -360,15 +356,15 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                         <Routes>
                             {/*<Route path="/admin" element={<DashboardScreen />} />*/}
                             <Route path="/users" element={<UsersScreen/>}/>
-                            {/*<Route path="/admin/users/roles" element={<RolesScreen />} />*/}
-                            {/*<Route path="/admin/users/permissions" element={<PermissionsScreen />} />*/}
+                            <Route path="/users/roles" element={<RolesScreen/>}/>
+                            <Route path="/users/permissions" element={<PermissionsScreen/>}/>
                             {/*<Route path="/admin/parent-categories" element={<ParentCategoriesScreen />} />*/}
                             {/*<Route path="/admin/child-categories" element={<ChildCategoriesScreen />} />*/}
                             {/*<Route path="/admin/products" element={<ProductsScreen />} />*/}
                             {/*<Route path="/admin/products/reviews" element={<ReviewsScreen />} />*/}
                             {/*<Route path="/admin/orders" element={<OrderScreen />} />*/}
 
-                            <Route path="*" element={<Navigate to="/admin" replace />} />
+                            <Route path="*" element={<Navigate to="/admin" replace/>}/>
                         </Routes>
                     </Content>
                 </Root>

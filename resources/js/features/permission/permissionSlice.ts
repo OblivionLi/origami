@@ -2,24 +2,30 @@ import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
 
-interface Permission {
+export interface Permission {
     id: number;
     name: string;
+    created_at: string;
+    updated_at: string;
 }
 
 interface PermissionState {
-    permission: Permission[];
+    permissions: Permission[];
     loading: boolean;
     error: string | null;
     currentPermission: Permission | null;
+    editPermissionSuccess: boolean;
+    addPermissionSuccess: boolean;
     success: boolean;
 }
 
 const initialState: PermissionState = {
-    permission: [],
+    permissions: [],
     loading: false,
     error: null,
     currentPermission: null,
+    editPermissionSuccess: false,
+    addPermissionSuccess: false,
     success: false,
 }
 
@@ -43,9 +49,8 @@ export const fetchPermissions = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.get<Permission[]>('/api/permissions', config);
-
-            return data;
+            const {data} = await axios.get('/api/admin/permissions', config);
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -91,7 +96,7 @@ export const fetchPermissionById = createAsyncThunk<
 
 export const createPermission = createAsyncThunk<
     Permission,
-    { name: string },
+    { name: string | undefined },
     { state: RootState, rejectValue: string }
 >(
     'permission/createPermission',
@@ -109,7 +114,7 @@ export const createPermission = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<Permission>(`/api/permissions`, {name}, config);
+            const {data} = await axios.post<Permission>(`/api/admin/permissions`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -124,7 +129,7 @@ export const createPermission = createAsyncThunk<
 
 export const updatePermission = createAsyncThunk<
     Permission,
-    { id: number, name: string },
+    { id: number | undefined, name: string | undefined },
     { state: RootState, rejectValue: string }
 >(
     'permission/updatePermission',
@@ -142,7 +147,7 @@ export const updatePermission = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Permission>(`/api/permissions/${id}`, {name}, config);
+            const {data} = await axios.patch<Permission>(`/api/admin/permissions/${id}`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -197,6 +202,12 @@ const permissionSlice = createSlice({
         },
         clearCurrentPermission: (state) => {
             state.currentPermission = null;
+        },
+        resetAddPermissionSuccess: (state) => {
+            state.addPermissionSuccess = false;
+        },
+        resetEditPermissionSuccess: (state) => {
+            state.editPermissionSuccess = false;
         }
     },
     extraReducers: (builder) => {
@@ -208,7 +219,7 @@ const permissionSlice = createSlice({
             })
             .addCase(fetchPermissions.fulfilled, (state, action: PayloadAction<Permission[]>) => {
                 state.loading = false;
-                state.permission = action.payload;
+                state.permissions = action.payload;
             })
             .addCase(fetchPermissions.rejected, (state, action) => {
                 state.loading = false;
@@ -233,37 +244,37 @@ const permissionSlice = createSlice({
             .addCase(createPermission.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.success = false;
+                state.addPermissionSuccess = false;
             })
             .addCase(createPermission.fulfilled, (state, action: PayloadAction<Permission>) => {
                 state.loading = false;
-                state.permission.push(action.payload); // Immer allows this!
-                state.success = true;
+                state.permissions.push(action.payload);
+                state.addPermissionSuccess = true;
             })
             .addCase(createPermission.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
-                state.success = false;
+                state.addPermissionSuccess = false;
             })
 
             // Handle updatePermission
             .addCase(updatePermission.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.success = false;
+                state.editPermissionSuccess = false;
             })
             .addCase(updatePermission.fulfilled, (state, action: PayloadAction<Permission>) => {
                 state.loading = false;
-                const index = state.permission.findIndex((a) => a.id === action.payload.id);
+                const index = state.permissions.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.permission[index] = action.payload; // Immer allows this!
+                    state.permissions[index] = action.payload;
                 }
-                state.success = true;
+                state.editPermissionSuccess = true;
             })
             .addCase(updatePermission.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
-                state.success = false;
+                state.editPermissionSuccess = false;
             })
 
             // Handle deletePermission
@@ -275,7 +286,7 @@ const permissionSlice = createSlice({
             })
             .addCase(deletePermission.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.permission = state.permission.filter((a) => a.id !== action.payload); // OK with Immer
+                state.permissions = state.permissions.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
 
             })
@@ -287,5 +298,5 @@ const permissionSlice = createSlice({
     },
 });
 
-export const {resetPermissionState, clearCurrentPermission} = permissionSlice.actions;
+export const {resetPermissionState, clearCurrentPermission, resetAddPermissionSuccess, resetEditPermissionSuccess} = permissionSlice.actions;
 export default permissionSlice.reducer;

@@ -64,11 +64,18 @@ class RoleRepository
      */
     public function getRoleWithRelations(?int $id = null): Role|Builder|null
     {
+        $query = Role::query()
+            ->select(['id', 'name', 'is_admin', 'created_at', 'updated_at'])
+            ->with([
+                'permissions:id,name',
+            ])
+            ->withCount('users');
+
         if ($id) {
-            return Role::with(['users:name,email', 'permissions:id,name'])->find($id);
+            return $query->with(['users:name,email'])->find($id);
         }
 
-        return Role::with(['users:name,email', 'permissions:id,name']);
+        return $query;
     }
 
     /**
@@ -90,7 +97,7 @@ class RoleRepository
 
             $role->save();
 
-//            $role->permissions()->sync($request->perms); // ??
+            $role->permissions()->sync($requestData['perms']);
 
             DB::commit();
             return $role;

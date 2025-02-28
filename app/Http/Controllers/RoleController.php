@@ -36,29 +36,29 @@ class RoleController extends Controller
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return RoleShowResource|JsonResponse
      */
-    public function show($id): RoleShowResource|JsonResponse
+    public function show(int $id): RoleShowResource|JsonResponse
     {
         return $this->roleService->showRole($id);
     }
 
     /**
      * @param RoleUpdateRequest $request
-     * @param $id
+     * @param int $id
      * @return JsonResponse
      */
-    public function update(RoleUpdateRequest $request, $id): JsonResponse
+    public function update(RoleUpdateRequest $request, int $id): JsonResponse
     {
         return $this->roleService->updateRole($request, $id);
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         return $this->roleService->destroyRole($id);
     }

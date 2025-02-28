@@ -36,29 +36,29 @@ class PermissionController extends Controller
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return PermissionShowResource|JsonResponse
      */
-    public function show($id): PermissionShowResource|JsonResponse
+    public function show(int $id): PermissionShowResource|JsonResponse
     {
         return $this->permissionService->showPermission($id);
     }
 
     /**
      * @param PermissionUpdateRequest $request
-     * @param $id
+     * @param int $id
      * @return JsonResponse
      */
-    public function update(PermissionUpdateRequest $request, $id): JsonResponse
+    public function update(PermissionUpdateRequest $request, int $id): JsonResponse
     {
         return $this->permissionService->updatePermission($request, $id);
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy($id): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
         return $this->permissionService->destroyPermission($id);
     }

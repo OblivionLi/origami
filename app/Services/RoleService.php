@@ -64,7 +64,6 @@ class RoleService
      */
     public function updateRole(RoleUpdateRequest $request, int $id): JsonResponse
     {
-        // TODO:: check $request->perms ????
         $tryToUpdateRole = $this->roleRepository->updateRole($request->validated(), $id);
         if (!$tryToUpdateRole) {
             return response()->json(['message' => 'Failed to update role.'], Response::HTTP_UNPROCESSABLE_ENTITY);

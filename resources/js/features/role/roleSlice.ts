@@ -1,26 +1,36 @@
 import {createSlice, createAsyncThunk, PayloadAction} from "@reduxjs/toolkit";
 import axios from 'axios';
 import {RootState} from "@/store";
+import {Permission} from "@/features/permission/permissionSlice";
 
 export interface Role {
     id: number;
     name: string;
+    is_admin: number;
+    users_count: number;
+    permissions: Permission[];
+    created_at: string;
+    updated_at: string;
 }
 
 interface RoleState {
-    role: Role[];
+    roles: Role[];
     loading: boolean;
     error: string | null;
     currentRole: Role | null;
     success: boolean;
+    editRoleSuccess: boolean;
+    addRoleSuccess: boolean;
 }
 
 const initialState: RoleState = {
-    role: [],
+    roles: [],
     loading: false,
     error: null,
     currentRole: null,
     success: false,
+    editRoleSuccess: false,
+    addRoleSuccess: false,
 }
 
 export const fetchRoles = createAsyncThunk<
@@ -44,7 +54,7 @@ export const fetchRoles = createAsyncThunk<
             };
 
             const {data} = await axios.get('/api/admin/roles', config);
-
+            console.log(data);
             return data.data;
         } catch (error: any) {
             const message =
@@ -91,7 +101,7 @@ export const fetchRoleById = createAsyncThunk<
 
 export const createRole = createAsyncThunk<
     Role,
-    { name: string },
+    { name: string | undefined },
     { state: RootState, rejectValue: string }
 >(
     'role/createRole',
@@ -109,7 +119,7 @@ export const createRole = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.post<Role>(`/api/roles`, {name}, config);
+            const {data} = await axios.post<Role>(`/api/admin/roles`, {name}, config);
 
             return data;
         } catch (error: any) {
@@ -124,7 +134,7 @@ export const createRole = createAsyncThunk<
 
 export const updateRole = createAsyncThunk<
     Role,
-    { id: number, name: string, is_admin: number, perms: [] },
+    { id: number | undefined, name: string | undefined, is_admin: number | undefined, perms: number[] | undefined },
     { state: RootState, rejectValue: string }
 >(
     'role/updateRole',
@@ -142,7 +152,14 @@ export const updateRole = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Role>(`/api/roles/${id}`, {name, is_admin, perms}, config);
+            const {data} = await axios.patch<Role>(`/api/admin/roles/${id}`,
+                {
+                    name,
+                    is_admin,
+                    perms
+                },
+                config
+            );
 
             return data;
         } catch (error: any) {
@@ -175,7 +192,7 @@ export const deleteRole = createAsyncThunk<
                 }
             };
 
-            await axios.delete(`/api/roles/${id}`, config);
+            await axios.delete(`/api/admin/roles/${id}`, config);
 
             return id;
         } catch (error: any) {
@@ -197,6 +214,12 @@ const roleSlice = createSlice({
         },
         clearCurrentRole: (state) => {
             state.currentRole = null;
+        },
+        resetEditRoleSuccess: (state) => {
+            state.editRoleSuccess = false;
+        },
+        resetAddRoleSuccess: (state) => {
+            state.addRoleSuccess = false;
         }
     },
     extraReducers: (builder) => {
@@ -208,7 +231,7 @@ const roleSlice = createSlice({
             })
             .addCase(fetchRoles.fulfilled, (state, action: PayloadAction<Role[]>) => {
                 state.loading = false;
-                state.role = action.payload;
+                state.roles = action.payload;
             })
             .addCase(fetchRoles.rejected, (state, action) => {
                 state.loading = false;
@@ -233,37 +256,37 @@ const roleSlice = createSlice({
             .addCase(createRole.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.success = false;
+                state.addRoleSuccess = false;
             })
             .addCase(createRole.fulfilled, (state, action: PayloadAction<Role>) => {
                 state.loading = false;
-                state.role.push(action.payload); // Immer allows this!
-                state.success = true;
+                state.roles.push(action.payload);
+                state.addRoleSuccess = true;
             })
             .addCase(createRole.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
-                state.success = false;
+                state.addRoleSuccess = false;
             })
 
             // Handle updateRole
             .addCase(updateRole.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.success = false;
+                state.editRoleSuccess = false;
             })
             .addCase(updateRole.fulfilled, (state, action: PayloadAction<Role>) => {
                 state.loading = false;
-                const index = state.role.findIndex((a) => a.id === action.payload.id);
+                const index = state.roles.findIndex((a) => a.id === action.payload.id);
                 if (index !== -1) {
-                    state.role[index] = action.payload; // Immer allows this!
+                    state.roles[index] = action.payload;
                 }
-                state.success = true;
+                state.editRoleSuccess = true;
             })
             .addCase(updateRole.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
-                state.success = false;
+                state.editRoleSuccess = false;
             })
 
             // Handle deleteRole
@@ -275,7 +298,7 @@ const roleSlice = createSlice({
             })
             .addCase(deleteRole.fulfilled, (state, action: PayloadAction<number>) => {
                 state.loading = false;
-                state.role = state.role.filter((a) => a.id !== action.payload); // OK with Immer
+                state.roles = state.roles.filter((a) => a.id !== action.payload); // OK with Immer
                 state.success = true;
 
             })
@@ -287,5 +310,5 @@ const roleSlice = createSlice({
     },
 });
 
-export const {resetRoleState, clearCurrentRole} = roleSlice.actions;
+export const {resetRoleState, clearCurrentRole, resetEditRoleSuccess, resetAddRoleSuccess} = roleSlice.actions;
 export default roleSlice.reducer;

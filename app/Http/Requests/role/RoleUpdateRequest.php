@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property-read string $name
  * @property-read bool $is_admin
+ * @property-read array $perms
  */
 class RoleUpdateRequest extends FormRequest
 {
@@ -29,7 +30,8 @@ class RoleUpdateRequest extends FormRequest
     {
         return [
             'name' => 'string|required|max:30',
-            'is_admin' => 'boolean'
+            'is_admin' => 'boolean',
+            'perms' => 'array'
         ];
     }
 }

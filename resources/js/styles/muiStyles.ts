@@ -147,28 +147,29 @@ export const NavLinks = styled("a")({
 });
 
 export const ToolbarNav = styled(Toolbar)({
-
+    display: "flex",
+    justifyContent: "space-between"
 });
 
 export const ToolbarNavLeft = styled('div')({
-
-
+    display: "flex",
+    alignItems: "center"
 });
 
 export const ToolbarNavRight = styled('div')({
-
+    display: "flex",
+    alignItems: "center"
 });
 
 export const ToolbarNavRightLinks = styled('ul')({
-
+    display: "flex",
+    listStyle: "none",
+    padding: 0,
+    margin: 0
 });
 
 export const ToolbarNavRightItem = styled('li')({
-
-});
-
-export const  ReportsMenu = styled('div')({
-
+    marginLeft: "10px"
 });
 
 export const StyledDivider = styled(Divider)({
