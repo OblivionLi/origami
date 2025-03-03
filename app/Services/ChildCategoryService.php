@@ -27,7 +27,7 @@ class ChildCategoryService
      */
     public function getChildCategoriesWithRelations(): JsonResponse|AnonymousResourceCollection
     {
-        $childCategories = $this->childCategoryRepository->getChildCategoryWithRelations()->get();
+        $childCategories = $this->childCategoryRepository->getAdminChildCategoryList()->get();
         if ($childCategories->isEmpty()) {
             return response()->json(['Could not fetch child categories with relations.'], Response::HTTP_NOT_FOUND);
         }
@@ -69,12 +69,12 @@ class ChildCategoryService
 
     /**
      * @param ChildCategoryUpdateRequest $request
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function updateChildCategory(ChildCategoryUpdateRequest $request, string $slug): JsonResponse
+    public function updateChildCategory(ChildCategoryUpdateRequest $request, int $id): JsonResponse
     {
-        $childCategory = $this->childCategoryRepository->updateChildCategory($request->validated(), $slug);
+        $childCategory = $this->childCategoryRepository->updateChildCategory($request->validated(), $id);
         if (!$childCategory) {
             return response()->json(['message' => 'Failed to update child category.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -83,12 +83,12 @@ class ChildCategoryService
     }
 
     /**
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function deleteChildCategory(string $slug): JsonResponse
+    public function deleteChildCategory(int $id): JsonResponse
     {
-        $tryToDeleteChildCategory = $this->childCategoryRepository->deleteChildCategory($slug);
+        $tryToDeleteChildCategory = $this->childCategoryRepository->deleteChildCategory($id);
         if (!$tryToDeleteChildCategory) {
             return response()->json(['message' => 'Failed to delete child category.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

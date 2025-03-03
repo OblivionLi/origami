@@ -54,7 +54,6 @@ export const fetchRoles = createAsyncThunk<
             };
 
             const {data} = await axios.get('/api/admin/roles', config);
-            console.log(data);
             return data.data;
         } catch (error: any) {
             const message =

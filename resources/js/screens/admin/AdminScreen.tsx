@@ -57,6 +57,8 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import UsersScreen from "@/screens/admin/users/UsersScreen";
 import RolesScreen from "@/screens/admin/users/roles/RolesScreen";
 import PermissionsScreen from "@/screens/admin/users/permissions/PermissionsScreen";
+import ParentCategoriesScreen from "@/screens/admin/categories/parent/ParentCategoriesScreen";
+import ChildCategoriesScreen from "@/screens/admin/categories/child/ChildCategoriesScreen";
 
 interface AdminScreenProps {
 }
@@ -252,7 +254,7 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                                 <ListItemText primary="Reviews"/>
                             </ListItem>
 
-                            <ListItem onClick={handleCategoryMenu}>
+                            <ListItem onClick={handleCategoryMenu} style={{cursor: "pointer"}}>
                                 <ListItemIcon>
                                     <CategoryIcon sx={iconStyle}/>
                                 </ListItemIcon>
@@ -273,19 +275,23 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                             >
                                 <Divider/>
                                 <List sx={{margin: "0 35px"}}>
-                                    <ListItem component={AdminLink} to="/admin/parent-categories">
+                                    <ListItemButton
+                                        onClick={() => handleListItemClick("parent-categories")}
+                                    >
                                         <ListItemIcon>
                                             <FileCopySharpIcon sx={iconStyle}/>
                                         </ListItemIcon>
-                                        <ListItemText primary="Parent"/>
+                                        <ListItemText primary="Parent Categories"/>
+                                    </ListItemButton>
 
-                                    </ListItem>
-                                    <ListItem component={AdminLink} to="/admin/child-categories">
+                                    <ListItemButton
+                                        onClick={() => handleListItemClick("child-categories")}
+                                    >
                                         <ListItemIcon>
                                             <InsertDriveFileSharpIcon sx={iconStyle}/>
                                         </ListItemIcon>
-                                        <ListItemText primary="Child"/>
-                                    </ListItem>
+                                        <ListItemText primary="Child Categories"/>
+                                    </ListItemButton>
                                 </List>
                             </Collapse>
 
@@ -325,7 +331,7 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                                         onClick={() => handleListItemClick("users/roles")}
                                     >
                                         <ListItemIcon>
-                                            <GroupIcon sx={iconStyle}/>
+                                            <LocalOfferIcon sx={iconStyle}/>
                                         </ListItemIcon>
                                         <ListItemText primary="Roles"/>
                                     </ListItemButton>
@@ -334,7 +340,7 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                                         onClick={() => handleListItemClick("users/permissions")}
                                     >
                                         <ListItemIcon>
-                                            <GroupIcon sx={iconStyle}/>
+                                            <RemoveCircleIcon sx={iconStyle}/>
                                         </ListItemIcon>
                                         <ListItemText primary="Permissions"/>
                                     </ListItemButton>
@@ -358,8 +364,8 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                             <Route path="/users" element={<UsersScreen/>}/>
                             <Route path="/users/roles" element={<RolesScreen/>}/>
                             <Route path="/users/permissions" element={<PermissionsScreen/>}/>
-                            {/*<Route path="/admin/parent-categories" element={<ParentCategoriesScreen />} />*/}
-                            {/*<Route path="/admin/child-categories" element={<ChildCategoriesScreen />} />*/}
+                            <Route path="/parent-categories" element={<ParentCategoriesScreen />} />
+                            <Route path="/child-categories" element={<ChildCategoriesScreen />} />
                             {/*<Route path="/admin/products" element={<ProductsScreen />} />*/}
                             {/*<Route path="/admin/products/reviews" element={<ReviewsScreen />} />*/}
                             {/*<Route path="/admin/orders" element={<OrderScreen />} />*/}

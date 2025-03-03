@@ -17,7 +17,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property-read Carbon $created_at
  * @property-read Carbon $updated_at
  * @property-read Collection<Product> $products
- * @property-read Collection<ParentCategory> $parentCategories
+ * @property-read ParentCategory $parentCategory
  */
 class ChildCategoryIndexResource extends JsonResource
 {
@@ -37,9 +37,7 @@ class ChildCategoryIndexResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'products' => $this->whenLoaded('products'),
-            'parentCat' => $this->whenLoaded('parentCategories', function () {
-                return $this->parentCategories->pluck('name');
-            }),
+            'parentCategory' => $this->whenLoaded('parentCategory'),
         ];
     }
 }

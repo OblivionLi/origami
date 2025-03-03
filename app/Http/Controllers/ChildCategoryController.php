@@ -46,20 +46,20 @@ class ChildCategoryController extends Controller
 
     /**
      * @param ChildCategoryUpdateRequest $request
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function update(ChildCategoryUpdateRequest $request, string $slug): JsonResponse
+    public function update(ChildCategoryUpdateRequest $request, int $id): JsonResponse
     {
-        return $this->childCategoryService->updateChildCategory($request, $slug);
+        return $this->childCategoryService->updateChildCategory($request, $id);
     }
 
     /**
-     * @param $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy($slug): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        return $this->childCategoryService->deleteChildCategory($slug);
+        return $this->childCategoryService->deleteChildCategory($id);
     }
 }

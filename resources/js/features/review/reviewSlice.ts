@@ -46,6 +46,7 @@ interface ReviewState {
     loading: boolean;
     error: string | null;
     currentReview: Review | null;
+    editReviewSuccess: boolean;
     success: boolean;
 }
 
@@ -55,6 +56,7 @@ const initialState: ReviewState = {
     loading: false,
     error: null,
     currentReview: null,
+    editReviewSuccess: false,
     success: false,
 }
 
@@ -79,8 +81,39 @@ export const fetchReviews = createAsyncThunk<
             };
 
             const {data} = await axios.get<Review[]>('/api/reviews', config);
-
             return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const fetchAdminReviewsList = createAsyncThunk<
+    Review[],
+    void,
+    { state: RootState, rejectValue: string }
+>(
+    'review/fetchAdminReviewList',
+    async (_, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
+            const {data} = await axios.get('/api/admin/reviews', config);
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -217,7 +250,7 @@ export const updateReview = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.patch<Review>(`/api/reviews/${id}`, {
+            const {data} = await axios.patch<Review>(`/api/admin/reviews/${id}`, {
                 id,
                 user_comment,
                 admin_comment
@@ -254,7 +287,7 @@ export const deleteReview = createAsyncThunk<
                 }
             };
 
-            await axios.delete(`/api/reviews/${id}`, config);
+            await axios.delete(`/api/admin/reviews/${id}`, config);
 
             return id;
         } catch (error: any) {
@@ -276,6 +309,9 @@ const reviewSlice = createSlice({
         },
         clearCurrentReview: (state) => {
             state.currentReview = null;
+        },
+        resetEditReviewSuccess: (state) => {
+            state.editReviewSuccess = false;
         }
     },
     extraReducers: (builder) => {
@@ -291,6 +327,21 @@ const reviewSlice = createSlice({
                 state.paginatedReviews = null;
             })
             .addCase(fetchReviews.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
+            // Handle fetchAdminReviewList
+            .addCase(fetchAdminReviewsList.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAdminReviewsList.fulfilled, (state, action: PayloadAction<Review[]>) => {
+                state.loading = false;
+                state.reviews = action.payload;
+                state.paginatedReviews = null;
+            })
+            .addCase(fetchAdminReviewsList.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })
@@ -348,11 +399,11 @@ const reviewSlice = createSlice({
             .addCase(updateReview.pending, (state) => {
                 state.loading = true;
                 state.error = null;
-                state.success = false;
+                state.editReviewSuccess = false;
             })
             .addCase(updateReview.fulfilled, (state, action: PayloadAction<Review>) => {
                 state.loading = false;
-                state.success = true;
+                state.editReviewSuccess = true;
                 if (state.reviews) {
                     const index = state.reviews.findIndex((review) => review.id === action.payload.id);
                     if (index !== -1) {
@@ -369,7 +420,7 @@ const reviewSlice = createSlice({
             .addCase(updateReview.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
-                state.success = false;
+                state.editReviewSuccess = false;
             })
 
             // Handle deleteReview
@@ -396,5 +447,5 @@ const reviewSlice = createSlice({
     },
 });
 
-export const {resetReviewState, clearCurrentReview} = reviewSlice.actions;
+export const {resetReviewState, clearCurrentReview, resetEditReviewSuccess} = reviewSlice.actions;
 export default reviewSlice.reducer;

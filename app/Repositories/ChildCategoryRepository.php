@@ -9,9 +9,22 @@ use Illuminate\Support\Facades\Log;
 
 class ChildCategoryRepository
 {
+    /**
+     * @return Builder
+     */
     public function getChildCategoryWithRelations(): Builder
     {
         return ChildCategory::with(['parentCategory', 'products']);
+    }
+
+    /**
+     * @return Builder
+     */
+    public function getAdminChildCategoryList(): Builder
+    {
+        return ChildCategory::query()
+            ->select(['id', 'name', 'slug', 'quantity', 'created_at', 'updated_at', 'parent_category_id'])
+            ->with('parentCategory');
     }
 
     /**
@@ -23,7 +36,7 @@ class ChildCategoryRepository
         try {
             ChildCategory::create([
                 'name' => $requestData['name'],
-                'parent_category_id' => $requestData['parent_category_id'],
+                'parent_category_id' => $requestData['parentCategoryId'],
                 'quantity' => 0
             ]);
 
@@ -36,20 +49,20 @@ class ChildCategoryRepository
 
     /**
      * @param array $requestData
-     * @param string $slug
+     * @param int $id
      * @return ChildCategory|null
      */
-    public function updateChildCategory(array $requestData, string $slug): ?ChildCategory
+    public function updateChildCategory(array $requestData, int $id): ?ChildCategory
     {
         try {
-            $childCategory = ChildCategory::findBySlug($slug);
+            $childCategory = ChildCategory::find($id);
             if (!$childCategory) {
                 return null;
             }
 
             $childCategory->slug = null;
             $childCategory->name = $requestData['name'];
-            $childCategory->parent_category_id = $requestData['parent_category_id'];
+            $childCategory->parent_category_id = $requestData['parentCategoryId'];
 
             $childCategory->save();
 
@@ -61,13 +74,13 @@ class ChildCategoryRepository
     }
 
     /**
-     * @param string $slug
+     * @param int $id
      * @return bool
      */
-    public function deleteChildCategory(string $slug): bool
+    public function deleteChildCategory(int $id): bool
     {
         try {
-            $childCategory = ChildCategory::findBySlug($slug);
+            $childCategory = ChildCategory::find($id);
             if (!$childCategory) {
                 return false;
             }

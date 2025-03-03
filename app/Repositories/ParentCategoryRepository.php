@@ -18,6 +18,19 @@ class ParentCategoryRepository
     }
 
     /**
+     * @return Builder
+     */
+    public function getAdminParentCategoryList(): Builder
+    {
+        return ParentCategory::query()
+            ->select(['id', 'name', 'created_at', 'updated_at'])
+            ->with([
+                'childCategories:id,name,parent_category_id'
+            ])
+            ->withCount('products');
+    }
+
+    /**
      * @param array $requestData
      * @return bool
      */
@@ -25,7 +38,7 @@ class ParentCategoryRepository
     {
         try {
             ParentCategory::create([
-               'name' => $requestData['name'],
+                'name' => $requestData['name'],
             ]);
 
             return true;
@@ -37,13 +50,13 @@ class ParentCategoryRepository
 
     /**
      * @param array $requestData
-     * @param string $slug
+     * @param int $id
      * @return ParentCategory|null
      */
-    public function updateParentCategory(array $requestData, string $slug): ?ParentCategory
+    public function updateParentCategory(array $requestData, $id): ?ParentCategory
     {
         try {
-            $parentCategory = ParentCategory::findBySlug($slug);
+            $parentCategory = ParentCategory::find($id);
             if (!$parentCategory) {
                 return null;
             }
@@ -61,13 +74,13 @@ class ParentCategoryRepository
     }
 
     /**
-     * @param string $slug
+     * @param int $id
      * @return bool
      */
-    public function deleteParentCategory(string $slug): bool
+    public function deleteParentCategory(int $id): bool
     {
         try {
-            $parentCategory = ParentCategory::findBySlug($slug);
+            $parentCategory = ParentCategory::find($id);
             if (!$parentCategory) {
                 return false;
             }

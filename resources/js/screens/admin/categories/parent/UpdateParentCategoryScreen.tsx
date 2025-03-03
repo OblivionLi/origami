@@ -7,55 +7,55 @@ import {
     DialogTitle,
 } from "@mui/material";
 import Swal from "sweetalert2";
-import {fetchPermissions, Permission, updatePermission} from "@/features/permission/permissionSlice";
+import {fetchParentCategories, ParentCategory, updateParentCategory} from "@/features/categories/parentCategorySlice";
 import {AppDispatch, RootState} from "@/store";
 import {StyledButton} from "@/styles/muiStyles";
 
-interface UpdatePermissionScreenProps {
+interface UpdateParentCategoryScreenProps {
     onClose: () => void;
-    permissionData: Permission | null;
+    parentCategoryData: ParentCategory | null;
 }
 
-const UpdatePermissionScreen: React.FC<UpdatePermissionScreenProps> = ({onClose, permissionData}) => {
+const UpdateParentCategoryScreen: React.FC<UpdateParentCategoryScreenProps> = ({onClose, parentCategoryData}) => {
     const dispatch = useDispatch<AppDispatch>();
 
     const [name, setName] = useState<string | undefined>("");
-
-    const {editPermissionSuccess} = useSelector((state: RootState) => state.permission);
+    const {editParentCategorySuccess} = useSelector((state: RootState) => state.parentCategory);
 
     useEffect(() => {
-        if (!permissionData) {
+        if (!parentCategoryData) {
             onClose();
         }
 
-        setName(permissionData?.name);
+        setName(parentCategoryData?.name);
 
-    }, [permissionData]);
+    }, [parentCategoryData]);
+
 
     const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
-        dispatch(updatePermission({id: permissionData?.id, name}));
+        dispatch(updateParentCategory({id: parentCategoryData?.id, name}));
     };
 
     useEffect(() => {
-        if (editPermissionSuccess) {
+        if (editParentCategorySuccess) {
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: `Permission updated successfully`,
+                title: `Parent Category updated successfully`,
                 showConfirmButton: false,
                 timer: 2500,
                 width: "65rem",
             });
             onClose();
-            dispatch(fetchPermissions());
+            dispatch(fetchParentCategories());
         }
-    }, [editPermissionSuccess, onClose, dispatch]);
+    }, [editParentCategorySuccess, onClose, dispatch]);
 
     return (
         <>
-            <DialogTitle id="draggable-dialog-title">Update Permission</DialogTitle>
+            <DialogTitle id="draggable-dialog-title">Update Parent Category</DialogTitle>
             <Divider/>
             <DialogContent>
                 <form onSubmit={submitHandler}>
@@ -80,7 +80,7 @@ const UpdatePermissionScreen: React.FC<UpdatePermissionScreenProps> = ({onClose,
                         type="submit"
                         fullWidth
                     >
-                        Update Permission
+                        Update Parent Category
                     </StyledButton>
                 </form>
             </DialogContent>
@@ -88,4 +88,4 @@ const UpdatePermissionScreen: React.FC<UpdatePermissionScreenProps> = ({onClose,
     );
 };
 
-export default UpdatePermissionScreen;
+export default UpdateParentCategoryScreen;

@@ -1,105 +1,73 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Dialog, DialogActions, Paper, Button } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import React, {useCallback, useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {Dialog, DialogActions, Paper, Button} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import MaterialTable from "material-table";
 import Moment from "react-moment";
 import Swal from "sweetalert2";
-import { getReviewsList, deleteReview } from "./../../../actions/reviewActions";
+import {getReviewsList, deleteReview} from "./../../../actions/reviewActions";
 import UpdateReviewScreen from "./UpdateReviewScreen";
 import Loader from "../../../components/alert/Loader.js";
 import Message from "../../../components/alert/Message.js";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {AppDispatch, RootState} from "@/store";
+import {fetchReviews, Review} from "@/features/review/reviewSlice";
+import {fetchChildCategories} from "@/features/categories/childCategorySlice";
+import {getUserRolesPermissions} from "@/features/user/userSlice";
 
-const useStyles = makeStyles((theme) => ({
-    divider: {
-        marginBottom: "20px",
-        borderBottom: "1px solid #855C1B",
-        paddingBottom: "10px",
-        width: "30%",
+interface ReviewsScreenProps {
+}
 
-        [theme.breakpoints.down("sm")]: {
-            width: "90%",
-            margin: "0 auto 20px auto",
-        },
-
-        color: "#855C1B",
-        fontFamily: "Quicksand",
-    },
-
-    materialTable: {
-        fontFamily: "Quicksand",
-        fontWeight: "bold",
-        color: "#388667",
-    },
-
-    button: {
-        fontFamily: "Quicksand",
-        backgroundColor: "#388667",
-
-        "&:hover": {
-            backgroundColor: "#855C1B",
-        },
-    },
-
-    link: {
-        color: "#855C1B",
-
-        "&:hover": {
-            color: "#388667",
-        },
-    },
-}));
-
-const ReviewsScreen = ({ history }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
-
-    const user_perms = [];
+const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
     const [isAdmin, setIsAdmin] = useState(false);
-    const [reviewId, setReviewId] = useState(null);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [requestData, setRequestData] = useState(new Date());
+    const [reviewToBeEdited, setReviewToBeEdited] = useState<Review | null>(null);
 
-    const userLogin = useSelector((state) => state.userLogin);
-    const { userInfo } = userLogin;
+    const {
+        userInfo,
+        userPermissions,
+    } = useSelector((state: RootState) => state.user);
 
-    const reviewList = useSelector((state) => state.reviewList);
-    const { loading, error, reviews } = reviewList;
-
-    const reviewDelete = useSelector((state) => state.reviewDelete);
-    const { loading: loadingDelete, success } = reviewDelete;
+    const {
+        reviews,
+        loading,
+        error
+    } = useSelector((state: RootState) => state.review);
 
     useEffect(() => {
-        if (!userInfo || userInfo == null || userInfo.data.is_admin != 1) {
-            history.push("/login");
+        if (!userInfo || userInfo?.data?.is_admin != 1) {
+            navigate("/login");
         } else {
-            if (!user_perms.includes("admin_view_reviews")) {
-                history.push("/admin");
-
-                Swal.fire(
-                    "Sorry!",
-                    `You don't have access to this action.`,
-                    "warning"
-                );
-            } else {
-                setIsAdmin(true);
-                dispatch(getReviewsList());
-            }
+            setIsAdmin(true);
+            dispatch(fetchReviews());
         }
-    }, [dispatch, userInfo, requestData]);
+    }, [dispatch, userInfo, navigate]);
 
-    if (!Array.isArray(user_perms) || !user_perms.length) {
-        userInfo.data.details[0].permissions.map((perm) =>
-            user_perms.push(perm.name)
-        );
-    }
+    useEffect(() => {
+        if (!userPermissions || userPermissions?.length === 0) {
+            dispatch(getUserRolesPermissions({id: userInfo?.data?.id}));
+        }
+    }, [dispatch, userPermissions]);
 
-    const handleEditDialogOpen = (id) => {
-        if (user_perms.includes("admin_edit_reviews")) {
+    useEffect(() => {
+        if (userPermissions && !userPermissions?.includes('admin_view_reviews')) {
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
+
+            navigate('/admin');
+        }
+    }, [dispatch, userPermissions]);
+
+    const handleEditDialogOpen = useCallback((review: any) => {
+        if (userPermissions?.includes("admin_edit_reviews")) {
+            setReviewToBeEdited(review);
             setOpenEditDialog(true);
-            setReviewId(id);
         } else {
             Swal.fire(
                 "Sorry!",
@@ -107,60 +75,62 @@ const ReviewsScreen = ({ history }) => {
                 "warning"
             );
         }
-    };
+    }, [userPermissions]);
 
-    const handleEditDialogClose = (e) => {
+    const handleEditDialogClose = useCallback(() => {
         setOpenEditDialog(false);
-    };
+        setReviewToBeEdited(null);
+        dispatch(resetEditReviewSuccess());
+    }, []);
 
-    const deleteReviewHandler = (id) => {
-        if (user_perms.includes("admin_delete_reviews")) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: `You can't recover this review after deletion!`,
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel!",
-                cancelButtonColor: "#d33",
-                reverseButtons: true,
-            }).then((result) => {
-                if (result.value) {
-                    dispatch(deleteReview(id));
-                    setRequestData(new Date());
-                    Swal.fire(
-                        "Deleted!",
-                        "The review with the id " + id + " has been deleted.",
-                        "success"
-                    );
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    Swal.fire(
-                        "Cancelled",
-                        `The selected review is safe, don't worry :)`,
-                        "error"
-                    );
-                }
-            });
-        } else {
+    const deleteReviewHandler = (id: number) => {
+        if (!userPermissions?.includes("admin_delete_reviews")) {
             Swal.fire(
                 "Sorry!",
                 `You don't have access to this action.`,
                 "warning"
             );
+            return;
         }
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: `You can't recover this review after deletion!`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            cancelButtonColor: "#d33",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.value) {
+                dispatch(deleteReview(id));
+                Swal.fire(
+                    "Deleted!",
+                    "The review with the id " + id + " has been deleted.",
+                    "success"
+                );
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire(
+                    "Cancelled",
+                    `The selected review is safe, don't worry :)`,
+                    "error"
+                );
+            }
+        });
     };
 
     return (
         <Paper className="admin-content">
             {!isAdmin ? (
                 <div className="admin-loader">
-                    <Loader />
+                    <Loader/>
                 </div>
             ) : (
                 <>
                     <h2 className={classes.divider}>Reviews</h2>
                     {loading ? (
-                        <Loader />
+                        <Loader/>
                     ) : error ? (
                         <Message variant="error">{error}</Message>
                     ) : (

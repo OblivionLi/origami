@@ -125,9 +125,23 @@ Route::middleware('auth:api')->group(function () {
             Route::delete('admin/permissions/{permission}', 'destroy');
         });
 
-        // Category Management
-        Route::apiResource('admin/parent-categories', ParentCategoryController::class);
-        Route::apiResource('admin/child-categories', ChildCategoryController::class);
+        // Parent Category Management
+        Route::controller(ParentCategoryController::class)->group(function () {
+            Route::get('admin/parent-categories', 'index');
+            Route::post('admin/parent-categories', 'store');
+            Route::patch('admin/parent-categories/{category}', 'update');
+            Route::delete('admin/parent-categories/{category}', 'destroy');
+
+        });
+
+        // Child Category Management
+        Route::controller(ChildCategoryController::class)->group(function () {
+            Route::get('admin/child-categories', 'index');
+            Route::post('admin/child-categories', 'store');
+            Route::patch('admin/child-categories/{category}', 'update');
+            Route::delete('admin/child-categories/{category}', 'destroy');
+
+        });
 
         // Product Management
         Route::apiResource('admin/products', ProductController::class)->except(['show']);

@@ -29,7 +29,7 @@ class ChildCategoryStoreRequest extends FormRequest
     {
         return [
             'name' => 'string|required|max:30',
-            'parent_category_id' => 'required'
+            'parentCategoryId' => 'required'
         ];
     }
 }

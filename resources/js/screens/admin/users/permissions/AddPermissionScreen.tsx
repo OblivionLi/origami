@@ -25,14 +25,6 @@ const AddPermissionScreen: React.FC<AddPermissionScreenProps> = ({onClose}) => {
         e.preventDefault();
 
         dispatch(createPermission({name}));
-        Swal.fire({
-            position: "center",
-            icon: "success",
-            title: `Permission created successfully`,
-            showConfirmButton: false,
-            timer: 2500,
-            width: "65rem",
-        });
     };
 
     useEffect(() => {
@@ -40,7 +32,7 @@ const AddPermissionScreen: React.FC<AddPermissionScreenProps> = ({onClose}) => {
             Swal.fire({
                 position: "center",
                 icon: "success",
-                title: `Permission updated successfully`,
+                title: `Permission created successfully`,
                 showConfirmButton: false,
                 timer: 2500,
                 width: "65rem",

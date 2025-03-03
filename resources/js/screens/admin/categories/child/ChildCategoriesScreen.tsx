@@ -1,38 +1,38 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Dialog, DialogActions, Paper, MenuItem, ListItemIcon} from "@mui/material";
+import {Dialog, DialogActions, Paper, ListItemIcon, MenuItem} from "@mui/material";
 import Swal from "sweetalert2";
 import Loader from "@/components/alert/Loader.js";
 import Message from "@/components/alert/Message.js";
 import {AppDispatch, RootState} from "@/store";
-import {
-    deletePermission,
-    fetchPermissions,
-    Permission,
-    resetAddPermissionSuccess,
-    resetEditPermissionSuccess
-} from "@/features/permission/permissionSlice";
 import {useNavigate} from "react-router-dom";
 import {getUserRolesPermissions} from "@/features/user/userSlice";
-import {StyledButton, StyledDivider} from "@/styles/muiStyles";
+import{
+    ChildCategorySlice,
+    deleteChildCategory,
+    fetchChildCategories,
+    resetAddChildCategorySuccess,
+    resetEditChildCategorySuccess
+} from "@/features/categories/childCategorySlice";
 import {MaterialReactTable, MRT_ColumnDef, useMaterialReactTable} from "material-react-table";
 import {format} from "date-fns";
+import {StyledButton, StyledDivider} from "@/styles/muiStyles";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddPermissionScreen from "@/screens/admin/users/permissions/AddPermissionScreen";
-import UpdatePermissionScreen from "@/screens/admin/users/permissions/UpdatePermissionScreen";
+import AddChildCategoryScreen from "@/screens/admin/categories/child/AddChildCategoryScreen";
+import UpdateChildCategoryScreen from "@/screens/admin/categories/child/UpdateChildCategoryScreen";
 
-interface PermissionsScreenProps {
+interface ChildCategoriesScreenProps {
 }
 
-const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
+const ChildCategoriesScreen: React.FC<ChildCategoriesScreenProps> = () => {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
     const [isAdmin, setIsAdmin] = useState(false);
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [permissionToBeEdited, setPermissionToBeEdited] = useState<Permission | null>(null);
+    const [categoryToBeEdited, setCategoryToBeEdited] = useState<ChildCategorySlice | null>(null);
 
     const {
         userInfo,
@@ -40,17 +40,17 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
     } = useSelector((state: RootState) => state.user);
 
     const {
-        permissions,
+        childCategories,
         loading,
-        error,
-    } = useSelector((state: RootState) => state.permission);
+        error
+    } = useSelector((state: RootState) => state.childCategory);
 
     useEffect(() => {
         if (!userInfo || userInfo?.data?.is_admin != 1) {
             navigate("/login");
         } else {
             setIsAdmin(true);
-            dispatch(fetchPermissions());
+            dispatch(fetchChildCategories());
         }
     }, [dispatch, userInfo, navigate]);
 
@@ -61,7 +61,7 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
     }, [dispatch, userPermissions]);
 
     useEffect(() => {
-        if (userPermissions && !userPermissions?.includes('admin_view_permissions')) {
+        if (userPermissions && !userPermissions?.includes('admin_view_childcategories')) {
             Swal.fire(
                 "Sorry!",
                 `You don't have access to this action.`,
@@ -73,7 +73,7 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
     }, [dispatch, userPermissions]);
 
     const handleAddDialogOpen = useCallback(() => {
-        if (userPermissions?.includes("admin_create_permissions")) {
+        if (userPermissions?.includes("admin_create_childcategories")) {
             setOpenAddDialog(true);
         } else {
             Swal.fire(
@@ -86,12 +86,12 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
 
     const handleAddDialogClose = useCallback(() => {
         setOpenAddDialog(false);
-        dispatch(resetAddPermissionSuccess());
+        dispatch(resetAddChildCategorySuccess());
     }, []);
 
-    const handleEditDialogOpen = useCallback((permission: any) => {
-        if (userPermissions?.includes("admin_edit_permissions")) {
-            setPermissionToBeEdited(permission);
+    const handleEditDialogOpen = useCallback((childCategory: any) => {
+        if (userPermissions?.includes("admin_edit_childcategories")) {
+            setCategoryToBeEdited(childCategory);
             setOpenEditDialog(true);
         } else {
             Swal.fire(
@@ -100,16 +100,16 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
                 "warning"
             );
         }
-    }, []);
+    }, [userPermissions]);
 
     const handleEditDialogClose = useCallback(() => {
         setOpenEditDialog(false);
-        setPermissionToBeEdited(null);
-        dispatch(resetEditPermissionSuccess());
+        setCategoryToBeEdited(null);
+        dispatch(resetEditChildCategorySuccess());
     }, []);
 
-    const deletePermissionHandler = (id: number) => {
-        if (!userPermissions?.includes("admin_delete_permissions")) {
+    const deleteChildCategoryHandler = (id: number) => {
+        if (!userPermissions?.includes("admin_delete_childcategories")) {
             Swal.fire(
                 "Sorry!",
                 `You don't have access to this action.`,
@@ -117,10 +117,9 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
             );
             return;
         }
-
         Swal.fire({
             title: "Are you sure?",
-            text: `You can't recover this permission after deletion!`,
+            text: `You can't recover this child category after deletion!`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, delete it!",
@@ -129,10 +128,10 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
             reverseButtons: true,
         }).then((result) => {
             if (result.value) {
-                dispatch(deletePermission({id}));
+                dispatch(deleteChildCategory({id}));
                 Swal.fire(
                     "Deleted!",
-                    "The permission with the id " +
+                    "The parent category with the id " +
                     id +
                     " has been deleted.",
                     "success"
@@ -140,18 +139,28 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 Swal.fire(
                     "Cancelled",
-                    `The selected permission is safe, don't worry :)`,
+                    `The selected parent category is safe, don't worry :)`,
                     "error"
                 );
             }
         });
     };
 
-    const columns = useMemo<MRT_ColumnDef<Permission, unknown>[]>(
+    const columns = useMemo<MRT_ColumnDef<ChildCategorySlice, unknown>[]>(
         () => [
             {
                 accessorKey: 'name',
                 header: 'Name',
+                size: 150,
+            },
+            {
+                accessorKey: 'quantity',
+                header: 'Product Quantities',
+                size: 150,
+            },
+            {
+                accessorKey: 'parentCategory.name',
+                header: 'Relation (Parent)',
                 size: 150,
             },
             {
@@ -188,9 +197,9 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
 
     const table = useMaterialReactTable({
         columns,
-        data: permissions || [],
+        data: childCategories || [],
         enableRowActions: true,
-        enableExpanding: true,
+        enableExpanding: false,
         positionActionsColumn: 'last',
         renderTopToolbarCustomActions: () => (
             <StyledButton
@@ -198,7 +207,7 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
                 onClick={handleAddDialogOpen}
                 sx={{marginLeft: '10px'}}
             >
-                Add Permission
+                Add Child Category
             </StyledButton>
         ),
         renderRowActionMenuItems: ({row, closeMenu}) => [
@@ -218,7 +227,7 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
             <MenuItem
                 key={1}
                 onClick={() => {
-                    deletePermissionHandler(row.original.id!)
+                    deleteChildCategoryHandler(row.original.id!)
                     closeMenu();
                 }}
                 sx={{m: 0}}
@@ -239,7 +248,7 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
                 </div>
             ) : (
                 <>
-                    <StyledDivider>Permissions</StyledDivider>
+                    <StyledDivider>Child Categories</StyledDivider>
                     {loading ? (
                         <Loader/>
                     ) : error ? (
@@ -255,9 +264,9 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
                         fullWidth
                         disableScrollLock={true}
                     >
-                        <UpdatePermissionScreen
+                        <UpdateChildCategoryScreen
                             onClose={handleEditDialogClose}
-                            permissionData={permissionToBeEdited}
+                            childCategoryData={categoryToBeEdited}
                         />
 
                         <DialogActions>
@@ -278,7 +287,7 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
                         fullWidth
                         disableScrollLock={true}
                     >
-                        <AddPermissionScreen
+                        <AddChildCategoryScreen
                             onClose={handleAddDialogClose}
                         />
 
@@ -298,4 +307,4 @@ const PermissionsScreen: React.FC<PermissionsScreenProps> = () => {
     );
 };
 
-export default PermissionsScreen;
+export default ChildCategoriesScreen;

@@ -11,10 +11,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property-read int $id
- * @property-read string $slug
  * @property-read string $name
  * @property-read Carbon $created_at
  * @property-read Carbon $updated_at
+ * @property-read int $products_count
  * @property-read Collection<Product> $products
  * @property-read Collection<ChildCategory> $childCategories
  */
@@ -30,14 +30,11 @@ class ParentCategoryIndexResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'slug' => $this->slug,
             'name' => $this->name,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'products' => $this->whenLoaded('products'),
-            'childCat' => $this->whenLoaded('childCategories', function () {
-                return $this->childCategories->pluck('name');
-            }),
+            'products_count' => $this->products_count,
+            'childCategories' => $this->whenLoaded('childCategories'),
         ];
     }
 }

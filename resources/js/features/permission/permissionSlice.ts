@@ -180,7 +180,7 @@ export const deletePermission = createAsyncThunk<
                 }
             };
 
-            await axios.delete(`/api/permissions/${id}`, config);
+            await axios.delete(`/api/admin/permissions/${id}`, config);
 
             return id;
         } catch (error: any) {
