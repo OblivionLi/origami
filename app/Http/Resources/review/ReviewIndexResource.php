@@ -39,8 +39,8 @@ class ReviewIndexResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'product' => $this->product,
-            'user' => $this->user,
+            'product' => $this->whenLoaded('product'),
+            'user' => $this->whenLoaded('user'),
         ];
     }
 }

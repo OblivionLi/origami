@@ -9,12 +9,14 @@ export interface Review {
     user_comment: string;
     created_at: string;
     updated_at: string;
-    admin_name: string | null;
-    admin_comment: string | null;
-    product: {
-        slug: string;
-        name: string
-    }
+    admin_name: string | undefined;
+    admin_comment: string | undefined;
+    product: ReviewProduct | null;
+}
+
+export interface ReviewProduct {
+    slug: string;
+    name: string;
 }
 
 export interface PaginationLinks {
@@ -113,6 +115,7 @@ export const fetchAdminReviewsList = createAsyncThunk<
             };
 
             const {data} = await axios.get('/api/admin/reviews', config);
+            console.log(data.data);
             return data.data;
         } catch (error: any) {
             const message =
@@ -232,7 +235,7 @@ export const createReview = createAsyncThunk<
 
 export const updateReview = createAsyncThunk<
     Review,
-    { id: number, user_comment: string, admin_comment: string },
+    { id: number | undefined, user_comment: string | undefined, admin_comment: string | undefined },
     { state: RootState, rejectValue: string }
 >(
     'review/updateReview',
@@ -251,7 +254,6 @@ export const updateReview = createAsyncThunk<
             };
 
             const {data} = await axios.patch<Review>(`/api/admin/reviews/${id}`, {
-                id,
                 user_comment,
                 admin_comment
             }, config);

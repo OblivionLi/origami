@@ -143,18 +143,26 @@ Route::middleware('auth:api')->group(function () {
 
         });
 
+        // Review Management
+        Route::controller(ReviewController::class)->group(function () {
+            Route::get('admin/reviews', 'indexAdmin');
+            Route::patch('admin/reviews/{review}', 'update');
+            Route::delete('admin/reviews/{review}', 'destroy');
+        });
+
         // Product Management
-        Route::apiResource('admin/products', ProductController::class)->except(['show']);
+        Route::controller(ProductController::class)->group(function () {
+            Route::get('admin/products', 'indexAdmin');
+            Route::patch('admin/products/{product}', 'update');
+            Route::delete('admin/products/{product}', 'destroy');
+        });
 
         // Product Image Management
         Route::controller(ProductImageController::class)->group(function () {
-            Route::post('admin/products/{productId}/images', 'store');
+            Route::post('admin/products/{product}/image', 'store');
             Route::patch('admin/product-images/{imageId}', 'update');
             Route::delete('admin/product-images/{imageId}', 'destroy');
         });
-
-        // Review Management
-        Route::apiResource('admin/reviews', ReviewController::class)->except(['store']);
 
         // Order Management
         Route::controller(OrderController::class)->group(function () {

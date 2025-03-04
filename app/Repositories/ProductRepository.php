@@ -8,7 +8,6 @@ use App\Models\ProductImage;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -22,6 +21,17 @@ class ProductRepository
     public function getProductWithRelations(): Builder
     {
         return Product::with(['parentCategory', 'childCategory', 'user', 'productImages', 'reviews']);
+    }
+
+    /**
+     * @return Builder
+     */
+    public function getAdminProductWithRelations(): Builder
+    {
+        return Product::query()
+            ->select(['id', 'name', 'slug', 'user_id', 'product_code', 'special_offer', 'discount', 'price', 'total_quantities', 'rating', 'description', 'created_at', 'updated_at', 'parent_category_id', 'child_category_id'])
+            ->with(['user:id,name', 'parentCategory:id,name', 'childCategory:id,name', 'productImages'])
+            ->withCount('reviews');
     }
 
     /**
@@ -124,15 +134,15 @@ class ProductRepository
 
     /**
      * @param array $requestData
-     * @param string $slug
+     * @param int $id
      * @return Product|null
      */
-    public function updateProduct(array $requestData, string $slug): ?Product
+    public function updateProduct(array $requestData, int $id): ?Product
     {
         DB::beginTransaction();
 
         try {
-            $product = Product::findBySlug($slug);
+            $product = Product::find($id);
             if (!$product) {
                 return null;
             }
@@ -144,7 +154,7 @@ class ProductRepository
             $product->discount = $requestData['discount'] ? ($requestData['discount'] > 0 ? $requestData['discount'] : null) : null;
             $product->special_offer = $requestData['special_offer'];
             $product->product_code = $requestData['product_code'];
-            $product->total_quantities = $requestData['quantity'];
+            $product->total_quantities = $requestData['total_quantities'];
 
             $product->save();
 
@@ -166,15 +176,15 @@ class ProductRepository
     }
 
     /**
-     * @param string $slug
+     * @param int $id
      * @return bool
      */
-    public function deleteProduct(string $slug): bool
+    public function deleteProduct(int $id): bool
     {
         DB::beginTransaction();
 
         try {
-            $product = Product::findBySlug($slug);
+            $product = Product::find($id);
             if (!$product) {
                 Log::warning("Product Not Found");
                 return false;
@@ -246,7 +256,7 @@ class ProductRepository
      */
     public function getProductBySlug(string $slug): ?Product
     {
-        return Product::with(['reviews' => function($query) {
+        return Product::with(['reviews' => function ($query) {
             $query->limit(5);
         }, 'productImages'])->where('slug', $slug)->first();
     }

@@ -59,6 +59,8 @@ import RolesScreen from "@/screens/admin/users/roles/RolesScreen";
 import PermissionsScreen from "@/screens/admin/users/permissions/PermissionsScreen";
 import ParentCategoriesScreen from "@/screens/admin/categories/parent/ParentCategoriesScreen";
 import ChildCategoriesScreen from "@/screens/admin/categories/child/ChildCategoriesScreen";
+import ReviewsScreen from "@/screens/admin/reviews/ReviewsScreen";
+import ProductsScreen from "@/screens/admin/products/ProductsScreen";
 
 interface AdminScreenProps {
 }
@@ -366,8 +368,8 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                             <Route path="/users/permissions" element={<PermissionsScreen/>}/>
                             <Route path="/parent-categories" element={<ParentCategoriesScreen />} />
                             <Route path="/child-categories" element={<ChildCategoriesScreen />} />
-                            {/*<Route path="/admin/products" element={<ProductsScreen />} />*/}
-                            {/*<Route path="/admin/products/reviews" element={<ReviewsScreen />} />*/}
+                            <Route path="/products" element={<ProductsScreen />} />
+                            <Route path="/products/reviews" element={<ReviewsScreen />} />
                             {/*<Route path="/admin/orders" element={<OrderScreen />} />*/}
 
                             <Route path="*" element={<Navigate to="/admin" replace/>}/>

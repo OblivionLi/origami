@@ -27,6 +27,14 @@ class ProductController extends Controller
     }
 
     /**
+     * @return AnonymousResourceCollection
+     */
+    public function indexAdmin(): AnonymousResourceCollection
+    {
+        return $this->productService->getAdminProductsWithRelations();
+    }
+
+    /**
      * @param ProductStoreRequest $request
      * @return JsonResponse
      */
@@ -46,21 +54,21 @@ class ProductController extends Controller
 
     /**
      * @param ProductUpdateRequest $request
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function update(ProductUpdateRequest $request, string $slug): JsonResponse
+    public function update(ProductUpdateRequest $request, int $id): JsonResponse
     {
-        return $this->productService->updateProduct($request, $slug);
+        return $this->productService->updateProduct($request, $id);
     }
 
     /**
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy(string $slug): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        return $this->productService->destroyProduct($slug);
+        return $this->productService->destroyProduct($id);
     }
 
     /**

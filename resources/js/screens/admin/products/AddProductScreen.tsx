@@ -14,84 +14,62 @@ import {
     FormGroup,
     FormControlLabel,
     Checkbox,
-} from "@material-ui/core";
+} from "@mui/material";
 import Swal from "sweetalert2";
-import { makeStyles } from "@material-ui/core/styles";
-import {
-    PRODUCT_SHOW_RESET,
-    PRODUCT_UPDATE_RESET,
-} from "../../../constants/productConstants";
-import {
-    getProductsList,
-    editProduct,
-    getProduct,
-} from "./../../../actions/productActions";
 import NumberFormat from "react-number-format";
-import Loader from "../../../components/alert/Loader.js";
-import Message from "../../../components/alert/Message.js";
-import { getChildCatsList } from "./../../../actions/childCategoryActions";
+import Dropzone from "react-dropzone";
+import Loader from "@/components/alert/Loader.js";
+import Message from "@/components/alert/Message.js";
+import {AppDispatch} from "@/store";
 
-const useStyles = makeStyles((theme) => ({
-    button: {
-        fontFamily: "Quicksand",
-        backgroundColor: "#855C1B",
+interface AddProductScreenProps {
+    onClose: () => void;
+}
 
-        "&:hover": {
-            backgroundColor: "#388667",
-        },
-    },
-}));
+const AddProductScreen: React.FC<AddProductScreenProps> = ({ onClose }) => {
+    const dispatch = useDispatch<AppDispatch>();
 
-const UpdateProductScreen = ({
-    setOpenEditDialog,
-    setRequestData,
-    productId,
-}) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
-
-    const [childCategoryId, setChildCategoryId] = useState("");
     const [name, setName] = useState("");
-    const [productCode, setProductCode] = useState("");
+    const [childCategoryId, setChildCategoryId] = useState("");
+    const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
     const [discount, setDiscount] = useState("");
-    const [description, setDescription] = useState("");
     const [isSpecialOffer, setIsSpecialOffer] = useState(0);
-    const [qty, setQty] = useState(0);
-
+    const [productCode, setProductCode] = useState("");
     const [successModal, setSuccessModal] = useState(false);
+    const [images, setImages] = useState();
+    const dropzoneRef = createRef();
     const [isChildCatEmpty, setIsChildCatEmpty] = useState(true);
 
-    const productShow = useSelector((state) => state.productShow);
-    const { loading, error, product } = productShow;
-    const { data } = product;
-
-    const productUpdate = useSelector((state) => state.productUpdate);
-    const { success } = productUpdate;
+    const productStore = useSelector((state) => state.productStore);
+    const { loading, success, error } = productStore;
 
     const childCatList = useSelector((state) => state.childCatList);
     const { childCats } = childCatList;
 
     useEffect(() => {
-        if (isChildCatEmpty) {
-            dispatch(getProduct(productId));
-            dispatch(getChildCatsList());
-            setIsChildCatEmpty(false);
-        } else {
-            if (data) {
-                setName(data.name);
-                setProductCode(data.product_code);
-                setDescription(data.description);
-                setPrice(data.price);
-                setDiscount(data.discount);
-                setIsSpecialOffer(data.special_offer);
-                setChildCategoryId(data.child_category.id);
-                setQty(data.total_quantities);
-            }
+        if (successModal && success) {
+            dispatch({ type: PRODUCT_LIST_RESET });
+            dispatch(getProductsList());
         }
 
-        successModal && dispatch(getProductsList());
-    }, [dispatch, data, isChildCatEmpty, successModal]);
+        if (isChildCatEmpty) {
+            dispatch(getChildCatsList());
+            setIsChildCatEmpty(false);
+        }
+    }, [dispatch, isChildCatEmpty, success, successModal]);
+
+    const openDialog = () => {
+        // Note that the ref is set async,
+        // so it might be null at some point
+        if (dropzoneRef.current) {
+            dropzoneRef.current.open();
+        }
+    };
+
+    const handleImages = (acceptedFiles) => {
+        setImages(acceptedFiles);
+    };
 
     const handleSpecialOfferCheckbox = (e) => {
         let isSpecialOffer;
@@ -102,28 +80,31 @@ const UpdateProductScreen = ({
     const submitHandler = (e) => {
         e.preventDefault();
 
-        dispatch(
-            editProduct(
-                productId,
-                childCategoryId,
-                name,
-                productCode,
-                price,
-                discount,
-                description,
-                isSpecialOffer,
-                qty
-            )
-        );
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("product_code", productCode);
+        formData.append("special_offer", isSpecialOffer);
+        formData.append("price", price);
+        formData.append("discount", discount);
+        formData.append("description", description);
+        formData.append("child_category_id", childCategoryId);
+
+        if (images) {
+            for (let i = 0; i < images.length; i++) {
+                formData.append(`images[${i}]`, images[i]);
+            }
+        }
+
+        dispatch(createProduct(formData));
 
         setRequestData(new Date());
         setSuccessModal(true);
-        setOpenEditDialog(false);
+        setOpenAddDialog(false);
 
         Swal.fire({
             position: "center",
             icon: "success",
-            title: `Product updated successfully`,
+            title: `Product created successfully`,
             showConfirmButton: false,
             timer: 2500,
             width: "65rem",
@@ -132,9 +113,7 @@ const UpdateProductScreen = ({
 
     return (
         <>
-            <DialogTitle id="draggable-dialog-title">
-                Update Product
-            </DialogTitle>
+            <DialogTitle id="draggable-dialog-title">Add Product</DialogTitle>
             <Divider />
             <DialogContent>
                 {loading ? (
@@ -156,7 +135,6 @@ const UpdateProductScreen = ({
                                         onChange={(e) =>
                                             setChildCategoryId(e.target.value)
                                         }
-                                        defaultValue={""}
                                     >
                                         {childCats.data &&
                                             childCats.data.map((child) => (
@@ -214,11 +192,6 @@ const UpdateProductScreen = ({
                                                         style={{
                                                             color: "#388667",
                                                         }}
-                                                        checked={
-                                                            isSpecialOffer == 1
-                                                                ? true
-                                                                : false
-                                                        }
                                                     />
                                                 }
                                                 label="Special Offer?"
@@ -252,7 +225,6 @@ const UpdateProductScreen = ({
                                     fullWidth
                                     customInput={TextField}
                                     decimalScale={2}
-                                    value={price}
                                     onChange={(e) => setPrice(e.target.value)}
                                     required
                                     renderText={(formattedValue) => (
@@ -278,15 +250,62 @@ const UpdateProductScreen = ({
                             </div>
 
                             <div className="form__field">
-                                <TextField
-                                    variant="outlined"
-                                    name="qty"
-                                    label="Quantity"
-                                    fullWidth
-                                    value={qty}
-                                    type="number"
-                                    onChange={(e) => setQty(e.target.value)}
-                                />
+                                <Dropzone
+                                    ref={dropzoneRef}
+                                    noClick
+                                    noKeyboard
+                                    onDrop={handleImages}
+                                >
+                                    {({
+                                        getRootProps,
+                                        getInputProps,
+                                        acceptedFiles,
+                                    }) => {
+                                        return (
+                                            <div className="drop">
+                                                <div
+                                                    {...getRootProps({
+                                                        className: "dropzone",
+                                                    })}
+                                                >
+                                                    <input
+                                                        {...getInputProps()}
+                                                    />
+                                                    <p>
+                                                        Drag and drop the
+                                                        product images here
+                                                    </p>
+                                                    <Button
+                                                        variant="contained"
+                                                        type="button"
+                                                        onClick={openDialog}
+                                                    >
+                                                        Open File Dialog
+                                                    </Button>
+                                                </div>
+                                                <aside>
+                                                    <h4>Files</h4>
+                                                    <ul>
+                                                        {acceptedFiles.map(
+                                                            (file) => (
+                                                                <li
+                                                                    key={
+                                                                        file.path
+                                                                    }
+                                                                >
+                                                                    {file.path}{" "}
+                                                                    -{" "}
+                                                                    {file.size}{" "}
+                                                                    bytes
+                                                                </li>
+                                                            )
+                                                        )}
+                                                    </ul>
+                                                </aside>
+                                            </div>
+                                        );
+                                    }}
+                                </Dropzone>
                             </div>
                         </div>
 
@@ -298,7 +317,7 @@ const UpdateProductScreen = ({
                             fullWidth
                             className={classes.button}
                         >
-                            Update Product
+                            Add Product
                         </Button>
                     </form>
                 )}
@@ -307,4 +326,4 @@ const UpdateProductScreen = ({
     );
 };
 
-export default UpdateProductScreen;
+export default AddProductScreen;

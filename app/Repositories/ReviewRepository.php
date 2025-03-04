@@ -145,4 +145,14 @@ class ReviewRepository
             return false;
         }
     }
+
+    /**
+     * @return Builder
+     */
+    public function getReviewAdminList(): Builder
+    {
+        return Review::query()
+            ->select(['id', 'product_id', 'rating', 'user_name', 'user_comment', 'admin_name', 'admin_comment', 'created_at', 'updated_at'])
+            ->with(['product:id,name,slug']);
+    }
 }

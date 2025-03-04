@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\review\ReviewStoreRequest;
 use App\Http\Requests\review\ReviewUpdateRequest;
-use App\Http\Resources\review\ReviewIndexResource;
 use App\Http\Resources\review\ReviewShowResource;
 use App\Services\ReviewService;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -27,6 +25,14 @@ class ReviewController extends Controller
     public function index(int $productId): AnonymousResourceCollection
     {
         return $this->reviewService->getReviewWithRelations($productId);
+    }
+
+    /**
+     * @return AnonymousResourceCollection
+     */
+    public function indexAdmin(): AnonymousResourceCollection
+    {
+        return $this->reviewService->getReviewWithRelations();
     }
 
     /**

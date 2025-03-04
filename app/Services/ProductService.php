@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\product\ProductStoreRequest;
 use App\Http\Requests\product\ProductUpdateRequest;
+use App\Http\Resources\product\ProductAdminIndexResource;
 use App\Http\Resources\product\ProductIndexResource;
 use App\Http\Resources\product\ProductShowResource;
 use App\Models\ChildCategory;
@@ -42,6 +43,14 @@ class ProductService
     }
 
     /**
+     * @return AnonymousResourceCollection
+     */
+    public function getAdminProductsWithRelations(): AnonymousResourceCollection
+    {
+        return ProductAdminIndexResource::collection($this->productRepository->getAdminProductWithRelations()->get());
+    }
+
+    /**
      * @param ProductStoreRequest $request
      * @return JsonResponse
      */
@@ -71,12 +80,12 @@ class ProductService
 
     /**
      * @param ProductUpdateRequest $request
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function updateProduct(ProductUpdateRequest $request, string $slug): JsonResponse
+    public function updateProduct(ProductUpdateRequest $request, int $id): JsonResponse
     {
-        $product = $this->productRepository->updateProduct($request->validated(), $slug);
+        $product = $this->productRepository->updateProduct($request->validated(), $id);
         if (!$product) {
             return response()->json(['message' => 'Failed to update product.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -85,12 +94,12 @@ class ProductService
     }
 
     /**
-     * @param string $slug
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroyProduct(string $slug): JsonResponse
+    public function destroyProduct(int $id): JsonResponse
     {
-        $tryToDeleteProduct = $this->productRepository->deleteProduct($slug);
+        $tryToDeleteProduct = $this->productRepository->deleteProduct($id);
         if (!$tryToDeleteProduct) {
             return response()->json(['message' => 'Failed to delete product.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

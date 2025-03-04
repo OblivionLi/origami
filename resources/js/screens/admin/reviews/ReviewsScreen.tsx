@@ -1,19 +1,25 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Dialog, DialogActions, Paper, Button} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
-import MaterialTable from "material-table";
-import Moment from "react-moment";
+import {Dialog, DialogActions, Paper, MenuItem, ListItemIcon, Box, Typography} from "@mui/material";
 import Swal from "sweetalert2";
-import {getReviewsList, deleteReview} from "./../../../actions/reviewActions";
 import UpdateReviewScreen from "./UpdateReviewScreen";
-import Loader from "../../../components/alert/Loader.js";
-import Message from "../../../components/alert/Message.js";
+import Loader from "@/components/alert/Loader.js";
+import Message from "@/components/alert/Message.js";
 import {Link, useNavigate} from "react-router-dom";
 import {AppDispatch, RootState} from "@/store";
-import {fetchReviews, Review} from "@/features/review/reviewSlice";
-import {fetchChildCategories} from "@/features/categories/childCategorySlice";
+import {
+    deleteReview,
+    fetchAdminReviewsList,
+    resetEditReviewSuccess,
+    Review,
+    ReviewProduct
+} from "@/features/review/reviewSlice";
 import {getUserRolesPermissions} from "@/features/user/userSlice";
+import {StyledButton, StyledDivider} from "@/styles/muiStyles";
+import {MaterialReactTable, MRT_ColumnDef, useMaterialReactTable} from "material-react-table";
+import {format} from "date-fns";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface ReviewsScreenProps {
 }
@@ -42,7 +48,7 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
             navigate("/login");
         } else {
             setIsAdmin(true);
-            dispatch(fetchReviews());
+            dispatch(fetchAdminReviewsList());
         }
     }, [dispatch, userInfo, navigate]);
 
@@ -104,7 +110,7 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
             reverseButtons: true,
         }).then((result) => {
             if (result.value) {
-                dispatch(deleteReview(id));
+                dispatch(deleteReview({id}));
                 Swal.fire(
                     "Deleted!",
                     "The review with the id " + id + " has been deleted.",
@@ -120,6 +126,153 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
         });
     };
 
+    const columns = useMemo<MRT_ColumnDef<Review, unknown>[]>(
+        () => [
+            {
+                accessorKey: 'product',
+                header: 'Product Review',
+                size: 150,
+                Cell: ({cell}) => {
+                    const product = cell.getValue<ReviewProduct>();
+
+                    return <Link
+                        to={`/product/${product.slug}`}
+                        style={{
+                            color: "#855C1B",
+                            fontWeight: "600",
+                            textDecoration: "none",
+                            transition: "color 0.2s ease-in-out",
+                        }}
+                        onMouseEnter={(e) => (e.target.style.color = "#388667")}
+                        onMouseLeave={(e) => (e.target.style.color = "#855C1B")}
+                    >
+                        {product.name}
+                    </Link>
+                }
+            },
+            {
+                accessorKey: 'user_name',
+                header: 'Review By',
+                size: 150,
+            },
+            {
+                accessorKey: 'admin_name',
+                header: 'Review Edit By (admin)',
+                size: 150,
+                Cell: ({cell}) => {
+                    const adminName = cell.getValue<string>();
+                    return adminName ? adminName : ' - ';
+                }
+            },
+            {
+                accessorKey: 'created_at',
+                header: 'Created At',
+                size: 150,
+                Cell: ({cell}) => {
+                    const createdAt = cell.getValue<string>();
+
+                    if (!createdAt) {
+                        return <span>"--/--/---- --/--"</span>;
+                    }
+
+                    return <span>{format(new Date(createdAt), 'dd/MM/yyyy HH:mm')}</span>
+                }
+            },
+            {
+                accessorKey: 'updated_at',
+                header: 'Updated At',
+                size: 150,
+                Cell: ({cell}) => {
+                    const updated_at = cell.getValue<string>();
+
+                    if (!updated_at) {
+                        return <span>"--/--/---- --/--"</span>;
+                    }
+
+                    return <span>{format(new Date(updated_at), 'dd/MM/yyyy HH:mm')}</span>
+                }
+            },
+        ],
+        [],
+    );
+
+    const table = useMaterialReactTable({
+        columns,
+        data: reviews || [],
+        enableRowActions: true,
+        enableExpanding: true,
+        positionActionsColumn: 'last',
+        renderRowActionMenuItems: ({row, closeMenu}) => [
+            <MenuItem
+                key={0}
+                onClick={() => {
+                    handleEditDialogOpen(row.original)
+                    closeMenu();
+                }}
+                sx={{m: 0}}
+            >
+                <ListItemIcon>
+                    <EditIcon/>
+                </ListItemIcon>
+                Edit
+            </MenuItem>,
+            <MenuItem
+                key={1}
+                onClick={() => {
+                    deleteReviewHandler(row.original.id!)
+                    closeMenu();
+                }}
+                sx={{m: 0}}
+            >
+                <ListItemIcon>
+                    <DeleteIcon/>
+                </ListItemIcon>
+                Delete
+            </MenuItem>,
+        ],
+        renderDetailPanel: ({row}) => (
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    maxWidth: '1000px',
+                    width: '100%',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    backgroundColor: '#f5f5f5',
+                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'
+                }}
+            >
+                <Typography
+                    variant="h5"
+                    sx={{
+                        marginBottom: '16px',
+                        fontWeight: 'bold',
+                        borderBottom: '2px solid #855C1B',
+                        paddingBottom: '8px'
+                    }}
+                >
+                    User's Review comment:
+                </Typography>
+                <Typography></Typography>
+                <Typography>{row.original.user_comment ? row.original.user_comment : " - "}</Typography>
+
+                <Typography
+                    variant="h5"
+                    sx={{
+                        marginBottom: '16px',
+                        fontWeight: 'bold',
+                        borderBottom: '2px solid #855C1B',
+                        paddingBottom: '8px'
+                    }}
+                >
+                    Admin's Review comment:
+                </Typography>
+                <Typography>{row.original.admin_comment ? row.original.admin_comment : " - "}</Typography>
+            </Box>
+        ),
+    });
+
     return (
         <Paper className="admin-content">
             {!isAdmin ? (
@@ -128,125 +281,13 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
                 </div>
             ) : (
                 <>
-                    <h2 className={classes.divider}>Reviews</h2>
+                    <StyledDivider>Reviews</StyledDivider>
                     {loading ? (
                         <Loader/>
                     ) : error ? (
                         <Message variant="error">{error}</Message>
                     ) : (
-                        <MaterialTable
-                            title="Reviews List"
-                            components={{
-                                Container: (props) => (
-                                    <Paper
-                                        className={classes.materialTable}
-                                        {...props}
-                                    />
-                                ),
-                            }}
-                            columns={[
-                                {
-                                    title: "Review By",
-                                    field: "user.name",
-                                },
-                                {
-                                    title: "Product Reviewed",
-                                    field: "product.name",
-                                    render: (reviews) => {
-                                        return (
-                                            <Link
-                                                to={`/product/${reviews.product.slug}`}
-                                                className={classes.link}
-                                                target="_blank"
-                                            >
-                                                {reviews.product.name}
-                                            </Link>
-                                        );
-                                    },
-                                },
-                                {
-                                    title: "Review Edit By (admin)",
-                                    field: "product.name",
-                                    render: (reviews) => {
-                                        return reviews.admin_name == null
-                                            ? " - "
-                                            : reviews.admin_name;
-                                    },
-                                },
-                                {
-                                    title: "Created At",
-                                    field: "created_at",
-                                    render: (reviews) => {
-                                        return (
-                                            <Moment format="DD/MM/YYYY HH:mm">
-                                                {reviews.created_at}
-                                            </Moment>
-                                        );
-                                    },
-                                },
-                                {
-                                    title: "Updated At",
-                                    field: "updated_at",
-                                    render: (reviews) => {
-                                        return (
-                                            <Moment format="DD/MM/YYYY HH:mm">
-                                                {reviews.created_at}
-                                            </Moment>
-                                        );
-                                    },
-                                },
-                            ]}
-                            data={reviews && reviews.data}
-                            actions={[
-                                (rowData) => ({
-                                    icon: "edit",
-                                    tooltip: "Edit Review",
-                                    onClick: (event, rowData) => {
-                                        handleEditDialogOpen(rowData.id);
-                                    },
-                                }),
-
-                                (rowData) => ({
-                                    icon: "delete",
-                                    tooltip: "Delete Review",
-                                    onClick: (event, rowData) => {
-                                        deleteReviewHandler(rowData.id);
-                                    },
-                                }),
-                            ]}
-                            options={{
-                                actionsColumnIndex: -1,
-                                headerStyle: {
-                                    color: "#855C1B",
-                                    fontFamily: "Quicksand",
-                                    fontSize: "1.2rem",
-                                    backgroundColor: "#FDF7E9",
-                                },
-                            }}
-                            detailPanel={(rowData) => {
-                                return (
-                                    <div className="table-detail">
-                                        <h2 className="table-detail--title">
-                                            User's Review Comment
-                                        </h2>
-                                        <div className="table-detail--par">
-                                            {rowData.user_comment}
-                                        </div>
-
-                                        {rowData.admin_comment && (
-                                            <>
-                                                <h2 className="table-detail--title">
-                                                    Admin's Review Comment
-                                                </h2>
-                                                <div className="table-detail--par">
-                                                    {rowData.admin_comment}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                );
-                            }}
-                        />
+                        <MaterialReactTable table={table} />
                     )}
 
                     <Dialog
@@ -257,20 +298,18 @@ const ReviewsScreen: React.FC<ReviewsScreenProps> = () => {
                         disableScrollLock={true}
                     >
                         <UpdateReviewScreen
-                            setOpenEditDialog={setOpenEditDialog}
-                            setRequestData={setRequestData}
-                            reviewId={reviewId}
+                            onClose={handleEditDialogClose}
+                            reviewData={reviewToBeEdited}
                         />
 
                         <DialogActions>
-                            <Button
+                            <StyledButton
                                 onClick={handleEditDialogClose}
                                 variant="contained"
                                 color="secondary"
-                                className={classes.button}
                             >
                                 Cancel
-                            </Button>
+                            </StyledButton>
                         </DialogActions>
                     </Dialog>
                 </>

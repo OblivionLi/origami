@@ -1,152 +1,120 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {
     TextField,
-    Button,
     Divider,
     DialogContent,
     DialogTitle,
-} from "@material-ui/core";
+} from "@mui/material";
 import Swal from "sweetalert2";
-import { makeStyles } from "@material-ui/core/styles";
-import {
-    getReviewsList,
-    getReview,
-    editReview,
-} from "./../../../actions/reviewActions";
-import Loader from "../../../components/alert/Loader.js";
-import Message from "../../../components/alert/Message.js";
+import {fetchAdminReviewsList, Review, updateReview} from "@/features/review/reviewSlice";
+import {AppDispatch, RootState} from "@/store";
+import {StyledButton} from "@/styles/muiStyles";
 
-const useStyles = makeStyles((theme) => ({
-    button: {
-        fontFamily: "Quicksand",
-        backgroundColor: "#855C1B",
+interface UpdateReviewScreenProps {
+    onClose: () => void;
+    reviewData: Review | null;
+}
 
-        "&:hover": {
-            backgroundColor: "#388667",
-        },
-    },
-}));
+const UpdateReviewScreen: React.FC<UpdateReviewScreenProps> = ({onClose, reviewData}) => {
+    const dispatch = useDispatch<AppDispatch>();
 
-const UpdateReviewScreen = ({
-    setOpenEditDialog,
-    setRequestData,
-    reviewId,
-}) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
+    const [userComment, setUserComment] = useState<string | undefined>("");
+    const [adminComment, setAdminComment] = useState<string | undefined>("");
 
-    const [comment, setComment] = useState("");
-    const [adminComment, setAdminComment] = useState("");
-
-    const [successModal, setSuccessModal] = useState(false);
-    const [reviewEmpty, setReviewEmpty] = useState(true);
-
-    const reviewShow = useSelector((state) => state.reviewShow);
-    const { loading, error, review } = reviewShow;
-    const { data } = review;
-
-    const reviewUpdate = useSelector((state) => state.reviewUpdate);
-    const {
-        loading: loadingUpdate,
-        error: errorUpdate,
-        success: successUpdate,
-    } = reviewUpdate;
+    const {editReviewSuccess} = useSelector((state: RootState) => state.review);
 
     useEffect(() => {
-        if (reviewEmpty) {
-            dispatch(getReview(reviewId));
-            setReviewEmpty(false);
-        } else {
-            if (data) {
-                setComment(data.user_comment);
-                setAdminComment(data.admin_comment);
-            }
+        if (!reviewData) {
+            onClose();
         }
 
-        if (successModal) {
-            dispatch(getReviewsList());
-        }
-    }, [reviewEmpty, data, successModal]);
+        setUserComment(reviewData?.user_comment);
+        setAdminComment(reviewData?.admin_comment);
 
-    const submitHandler = (e) => {
+    }, [reviewData]);
+
+    const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
-        dispatch(editReview(reviewId, comment, adminComment));
+        dispatch(updateReview({id: reviewData?.id, user_comment: userComment, admin_comment: adminComment}));
 
-        setRequestData(new Date());
-        setSuccessModal(true);
-        setOpenEditDialog(false);
-
-        Swal.fire({
+        Swal.mixin({
+            toast: true,
             position: "center",
-            icon: "success",
-            title: `Review updated successfully`,
             showConfirmButton: false,
-            timer: 2500,
-            width: "65rem",
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener("mouseenter", Swal.stopTimer);
+                toast.addEventListener("mouseleave", Swal.resumeTimer);
+            },
         });
     };
+
+    useEffect(() => {
+        if (editReviewSuccess) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: `Review updated successfully`,
+                showConfirmButton: false,
+                timer: 2500,
+                width: "65rem",
+            });
+            onClose();
+            dispatch(fetchAdminReviewsList());
+        }
+    }, [editReviewSuccess, onClose, dispatch]);
 
     return (
         <>
             <DialogTitle id="draggable-dialog-title">Update Review</DialogTitle>
-            <Divider />
+            <Divider/>
             <DialogContent>
-                {loadingUpdate && <Loader />}
-                {errorUpdate && (
-                    <Message variant="error">{errorUpdate}</Message>
-                )}
-                {loading ? (
-                    <Loader />
-                ) : error ? (
-                    <Message variant="error">{error}</Message>
-                ) : (
-                    <form onSubmit={submitHandler}>
-                        <div className="form">
-                            <div className="form__field">
-                                <TextField
-                                    variant="outlined"
-                                    name="comment"
-                                    label="User Comment"
-                                    multiline
-                                    rows={4}
-                                    fullWidth
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div className="form__field">
-                                <TextField
-                                    variant="outlined"
-                                    name="admin_comment"
-                                    label="Admin Comment"
-                                    multiline
-                                    rows={4}
-                                    fullWidth
-                                    value={adminComment ? adminComment : ""}
-                                    onChange={(e) =>
-                                        setAdminComment(e.target.value)
-                                    }
-                                    required
-                                />
-                            </div>
+                <form onSubmit={submitHandler}>
+                    <div className="form">
+                        <div className="form__field">
+                            <TextField
+                                variant="outlined"
+                                name="comment"
+                                label="User Comment"
+                                multiline
+                                rows={4}
+                                fullWidth
+                                value={userComment}
+                                onChange={(e) => setUserComment(e.target.value)}
+                                required
+                            />
                         </div>
 
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            value="submit"
-                            type="submit"
-                            fullWidth
-                            className={classes.button}
-                        >
-                            Update Review
-                        </Button>
-                    </form>
-                )}
+                        <div className="form__field">
+                            <TextField
+                                variant="outlined"
+                                name="admin_comment"
+                                label="Admin Comment"
+                                multiline
+                                rows={4}
+                                fullWidth
+                                value={adminComment ? adminComment : ""}
+                                onChange={(e) =>
+                                    setAdminComment(e.target.value)
+                                }
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <StyledButton
+                        variant="contained"
+                        color="primary"
+                        value="submit"
+                        type="submit"
+                        fullWidth
+                    >
+                        Update Review
+                    </StyledButton>
+                </form>
             </DialogContent>
         </>
     );

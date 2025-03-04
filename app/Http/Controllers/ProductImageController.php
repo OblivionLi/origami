@@ -17,12 +17,13 @@ class ProductImageController extends Controller
     }
 
     /**
+     * @param int $productId
      * @param ProductImageStoreRequest $request
      * @return JsonResponse
      */
-    public function store(ProductImageStoreRequest $request): JsonResponse
+    public function store(ProductImageStoreRequest $request, int $productId): JsonResponse
     {
-        return $this->productImageService->storeProductImage($request);
+        return $this->productImageService->storeProductImage($request, $productId);
     }
 
     /**

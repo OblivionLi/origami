@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Requests\ProductImageStoreRequest;
 use App\Http\Requests\productImg\ProductImageUpdateRequest;
+use App\Models\ProductImage;
 use App\Repositories\ProductImageRepository;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -20,13 +21,13 @@ class ProductImageService
     }
 
     /**
+     * @param int $productId
      * @param ProductImageStoreRequest $request
      * @return JsonResponse
      */
-    public function storeProductImage(ProductImageStoreRequest $request): JsonResponse
+    public function storeProductImage(ProductImageStoreRequest $request, int $productId): JsonResponse
     {
-        $id = $request->product_id;
-        $imageCount = $this->productImageRepository->getProductImageCount($id);
+        $imageCount = $this->productImageRepository->getProductImageCount($productId);
         if ($imageCount >= 5) {
             return response()->json(['message' => 'Images list reached its limit.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -43,15 +44,15 @@ class ProductImageService
             $imgFileName = basename($path);
 
             $data = [
-                'product_id' => $id,
+                'product_id' => $productId,
                 'name' => $imgFileName,
                 'path' => $path
             ];
-
-            $this->productImageRepository->createProductImage($data);
+            ProductImage::create($data);
+//            $this->productImageRepository->createProductImage($data);
             return response()->json(['message' => 'Image uploaded successfully.'], Response::HTTP_CREATED);
         } catch (Exception $e) {
-            Log::error("Image upload failed for product ID $id: " . $e->getMessage());
+            Log::error("Image upload failed for product ID $productId: " . $e->getMessage());
             return response()->json(['message' => 'Failed to upload image.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

@@ -22,16 +22,11 @@ class ReviewService
     }
 
     /**
-     * @param int|string|null $productId
      * @return AnonymousResourceCollection
      */
-    public function getReviewWithRelations(int|string|null $productId): AnonymousResourceCollection
+    public function getReviewWithRelations(): AnonymousResourceCollection
     {
-        if ($productId) {
-            return ReviewIndexResource::collection($this->reviewRepository->getReviewWithRelations($productId)->paginate(5));
-        }
-
-        return ReviewIndexResource::collection($this->reviewRepository->getReviewWithRelations(null)->get());
+        return ReviewIndexResource::collection($this->reviewRepository->getReviewAdminList()->get());
     }
 
     /**
