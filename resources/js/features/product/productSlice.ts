@@ -141,7 +141,6 @@ export const fetchAdminProductsList = createAsyncThunk<
             };
 
             const {data} = await axios.get('/api/admin/products', config);
-            console.log(data.data);
             return data.data;
         } catch (error: any) {
             const message =
@@ -188,19 +187,11 @@ export const fetchProductBySlug = createAsyncThunk<
 
 export const createProduct = createAsyncThunk<
     Product,
-    {
-        name: string;
-        child_category_id?: number;
-        product_code?: string,
-        price?: number,
-        discount?: number,
-        description?: string,
-        special_offer?: number,
-        total_quantities?: number
-    }, { state: RootState, rejectValue: string }
+    { formData: FormData },
+    { state: RootState, rejectValue: string }
 >(
     'product/createProduct',
-    async ({name, child_category_id, product_code, price, discount, description, special_offer, total_quantities}, thunkAPI) => {
+    async ({formData}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -210,20 +201,11 @@ export const createProduct = createAsyncThunk<
 
             const config = {
                 headers: {
-                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                    Authorization: `Bearer ${userInfo.data.access_token}`
                 }
             };
 
-            const {data} = await axios.post<Product>(`/api/products`, {
-                name,
-                child_category_id,
-                product_code,
-                price,
-                discount,
-                description,
-                special_offer,
-                total_quantities
-            }, config);
+            const {data} = await axios.post<Product>(`/api/admin/products`, formData, config);
 
             return data;
         } catch (error: any) {
@@ -252,7 +234,17 @@ export const updateProduct = createAsyncThunk<
     { state: RootState, rejectValue: string }
 >(
     'product/updateProduct',
-    async ({id, name, child_category_id, product_code, price, discount, description, special_offer, total_quantities}, thunkAPI) => {
+    async ({
+               id,
+               name,
+               child_category_id,
+               product_code,
+               price,
+               discount,
+               description,
+               special_offer,
+               total_quantities
+           }, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
 
@@ -357,11 +349,11 @@ export const createProductImage = createAsyncThunk<
 
 export const replaceProductImage = createAsyncThunk<
     any,
-    { productReplaceImageId: number, formData: FormData },
+    { imageId: number | undefined, formData: FormData },
     { state: RootState, rejectValue: string }
 >(
     'products/replaceProductImage',
-    async ({productReplaceImageId, formData}, thunkAPI) => {
+    async ({imageId, formData}, thunkAPI) => {
         try {
             const {user: {userInfo}} = thunkAPI.getState();
             if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
@@ -375,7 +367,7 @@ export const replaceProductImage = createAsyncThunk<
             };
 
             const {data} = await axios.post(
-                `/api/RproductImage/${productReplaceImageId}`,
+                `/api/admin/products/image/${imageId}/replace`,
                 formData,
                 config
             )
@@ -405,7 +397,7 @@ export const deleteProductImage = createAsyncThunk<
                 }
             };
 
-            const {data} = await axios.delete(`/api/productImage/${id}`, config);
+            const {data} = await axios.delete(`/api/admin/products/image/${id}`, config);
             return data;
         } catch (error: any) {
             const message = error.response?.data?.message || error.message;
@@ -497,7 +489,7 @@ const productSlice = createSlice({
             .addCase(deleteProductImage.fulfilled, (state, action) => {
                 state.loading = false;
                 // Assuming your API returns { productId, imageId } after deletion.
-                const { productId, imageId } = action.payload; // Destructure
+                const {productId, imageId} = action.payload; // Destructure
 
                 // Find the product.
                 const productIndex = state.adminProductsList.findIndex(p => p.id === productId);
@@ -627,5 +619,12 @@ const productSlice = createSlice({
     },
 });
 
-export const {resetProductState, clearCurrentProduct, resetAddProductSuccess, resetEditProductSuccess, resetEditProductImageSuccess, resetAddProductImageSuccess} = productSlice.actions;
+export const {
+    resetProductState,
+    clearCurrentProduct,
+    resetAddProductSuccess,
+    resetEditProductSuccess,
+    resetEditProductImageSuccess,
+    resetAddProductImageSuccess
+} = productSlice.actions;
 export default productSlice.reducer;

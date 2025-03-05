@@ -153,6 +153,7 @@ Route::middleware('auth:api')->group(function () {
         // Product Management
         Route::controller(ProductController::class)->group(function () {
             Route::get('admin/products', 'indexAdmin');
+            Route::post('admin/products', 'store');
             Route::patch('admin/products/{product}', 'update');
             Route::delete('admin/products/{product}', 'destroy');
         });
@@ -160,13 +161,13 @@ Route::middleware('auth:api')->group(function () {
         // Product Image Management
         Route::controller(ProductImageController::class)->group(function () {
             Route::post('admin/products/{product}/image', 'store');
-            Route::patch('admin/product-images/{imageId}', 'update');
-            Route::delete('admin/product-images/{imageId}', 'destroy');
+            Route::post('admin/products/image/{image}/replace', 'update');
+            Route::delete('admin/products/image/{image}', 'destroy');
         });
 
         // Order Management
         Route::controller(OrderController::class)->group(function () {
-            Route::get('admin/orders', 'index');
+            Route::get('admin/orders', 'indexAdmin');
             Route::patch('admin/orders/{order}/deliver', 'updateOrderToDelivered');
             Route::delete('admin/orders/{order}', 'destroy');
         });

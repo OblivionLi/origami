@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createRef, useCallback } from "react";
+import React, {useEffect, useState, createRef, useCallback, useRef} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     TextField,
@@ -16,11 +16,11 @@ import {
     Checkbox,
 } from "@mui/material";
 import Swal from "sweetalert2";
-import NumberFormat from "react-number-format";
-import Dropzone from "react-dropzone";
-import Loader from "@/components/alert/Loader.js";
-import Message from "@/components/alert/Message.js";
-import {AppDispatch} from "@/store";
+import {AppDispatch, RootState} from "@/store";
+import {createProduct, fetchAdminProductsList} from "@/features/product/productSlice";
+import {StyledButton} from "@/styles/muiStyles";
+import {NumericFormat} from "react-number-format";
+import {fetchChildCategories} from "@/features/categories/childCategorySlice";
 
 interface AddProductScreenProps {
     onClose: () => void;
@@ -36,91 +36,68 @@ const AddProductScreen: React.FC<AddProductScreenProps> = ({ onClose }) => {
     const [discount, setDiscount] = useState("");
     const [isSpecialOffer, setIsSpecialOffer] = useState(0);
     const [productCode, setProductCode] = useState("");
-    const [successModal, setSuccessModal] = useState(false);
-    const [images, setImages] = useState();
-    const dropzoneRef = createRef();
-    const [isChildCatEmpty, setIsChildCatEmpty] = useState(true);
+    const [images, setImages] = useState<File[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const {addProductSuccess} = useSelector((state: RootState) => state.product);
 
-    const productStore = useSelector((state) => state.productStore);
-    const { loading, success, error } = productStore;
+    const {
+        childCategories
+    } = useSelector((state: RootState) => state.childCategory);
 
-    const childCatList = useSelector((state) => state.childCatList);
-    const { childCats } = childCatList;
+    const handleSpecialOfferCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsSpecialOffer(e.target.checked ? 1 : 0);
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const selectedFiles = Array.from(e.target.files).slice(0, 5);
+            setImages(selectedFiles);
+        }
+    };
 
     useEffect(() => {
-        if (successModal && success) {
-            dispatch({ type: PRODUCT_LIST_RESET });
-            dispatch(getProductsList());
-        }
+        dispatch(fetchChildCategories());
+    }, [dispatch]);
 
-        if (isChildCatEmpty) {
-            dispatch(getChildCatsList());
-            setIsChildCatEmpty(false);
-        }
-    }, [dispatch, isChildCatEmpty, success, successModal]);
-
-    const openDialog = () => {
-        // Note that the ref is set async,
-        // so it might be null at some point
-        if (dropzoneRef.current) {
-            dropzoneRef.current.open();
-        }
-    };
-
-    const handleImages = (acceptedFiles) => {
-        setImages(acceptedFiles);
-    };
-
-    const handleSpecialOfferCheckbox = (e) => {
-        let isSpecialOffer;
-        e.target.checked ? (isSpecialOffer = 1) : (isSpecialOffer = 0);
-        setIsSpecialOffer(isSpecialOffer);
-    };
-
-    const submitHandler = (e) => {
+    const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
 
         const formData = new FormData();
         formData.append("name", name);
         formData.append("product_code", productCode);
-        formData.append("special_offer", isSpecialOffer);
+        formData.append("special_offer", String(isSpecialOffer));
         formData.append("price", price);
         formData.append("discount", discount);
         formData.append("description", description);
         formData.append("child_category_id", childCategoryId);
 
-        if (images) {
-            for (let i = 0; i < images.length; i++) {
-                formData.append(`images[${i}]`, images[i]);
-            }
-        }
-
-        dispatch(createProduct(formData));
-
-        setRequestData(new Date());
-        setSuccessModal(true);
-        setOpenAddDialog(false);
-
-        Swal.fire({
-            position: "center",
-            icon: "success",
-            title: `Product created successfully`,
-            showConfirmButton: false,
-            timer: 2500,
-            width: "65rem",
+        images.forEach((file, index) => {
+            formData.append(`images[]`, file);
         });
+
+        dispatch(createProduct({formData}));
     };
+
+    useEffect(() => {
+        if (addProductSuccess) {
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: `Product updated successfully`,
+                showConfirmButton: false,
+                timer: 2500,
+                width: "65rem",
+            });
+            onClose();
+            dispatch(fetchAdminProductsList());
+        }
+    }, [addProductSuccess, onClose, dispatch]);
 
     return (
         <>
             <DialogTitle id="draggable-dialog-title">Add Product</DialogTitle>
             <Divider />
             <DialogContent>
-                {loading ? (
-                    <Loader />
-                ) : error ? (
-                    <Message variant="error">{error}</Message>
-                ) : (
                     <form onSubmit={submitHandler}>
                         <div className="form">
                             <div className="form__field">
@@ -136,8 +113,8 @@ const AddProductScreen: React.FC<AddProductScreenProps> = ({ onClose }) => {
                                             setChildCategoryId(e.target.value)
                                         }
                                     >
-                                        {childCats.data &&
-                                            childCats.data.map((child) => (
+                                        {childCategories &&
+                                            childCategories.map((child) => (
                                                 <MenuItem
                                                     key={child.id}
                                                     value={child.id}
@@ -180,18 +157,16 @@ const AddProductScreen: React.FC<AddProductScreenProps> = ({ onClose }) => {
                                     <FormLabel component="legend">
                                         Is this product a special offer?
                                     </FormLabel>
-                                    <FormGroup
-                                        row
-                                        onChange={handleSpecialOfferCheckbox}
-                                    >
+                                    <FormGroup row>
                                         <div className="form__field--checkboxes">
                                             <FormControlLabel
-                                                value={isSpecialOffer}
                                                 control={
                                                     <Checkbox
                                                         style={{
                                                             color: "#388667",
                                                         }}
+                                                        checked={!!isSpecialOffer}
+                                                        onChange={handleSpecialOfferCheckbox}
                                                     />
                                                 }
                                                 label="Special Offer?"
@@ -218,18 +193,17 @@ const AddProductScreen: React.FC<AddProductScreenProps> = ({ onClose }) => {
                             </div>
 
                             <div className="form__field">
-                                <NumberFormat
+                                <NumericFormat
                                     variant="outlined"
                                     name="price"
                                     label="Price €"
                                     fullWidth
                                     customInput={TextField}
                                     decimalScale={2}
-                                    onChange={(e) => setPrice(e.target.value)}
+                                    thousandSeparator={true}
+                                    prefix={'€'}
+                                    onValueChange={(values) => setPrice(values.floatValue?.toString() || "")}
                                     required
-                                    renderText={(formattedValue) => (
-                                        <Text>{formattedValue}</Text>
-                                    )}
                                 />
                             </div>
 
@@ -250,77 +224,26 @@ const AddProductScreen: React.FC<AddProductScreenProps> = ({ onClose }) => {
                             </div>
 
                             <div className="form__field">
-                                <Dropzone
-                                    ref={dropzoneRef}
-                                    noClick
-                                    noKeyboard
-                                    onDrop={handleImages}
-                                >
-                                    {({
-                                        getRootProps,
-                                        getInputProps,
-                                        acceptedFiles,
-                                    }) => {
-                                        return (
-                                            <div className="drop">
-                                                <div
-                                                    {...getRootProps({
-                                                        className: "dropzone",
-                                                    })}
-                                                >
-                                                    <input
-                                                        {...getInputProps()}
-                                                    />
-                                                    <p>
-                                                        Drag and drop the
-                                                        product images here
-                                                    </p>
-                                                    <Button
-                                                        variant="contained"
-                                                        type="button"
-                                                        onClick={openDialog}
-                                                    >
-                                                        Open File Dialog
-                                                    </Button>
-                                                </div>
-                                                <aside>
-                                                    <h4>Files</h4>
-                                                    <ul>
-                                                        {acceptedFiles.map(
-                                                            (file) => (
-                                                                <li
-                                                                    key={
-                                                                        file.path
-                                                                    }
-                                                                >
-                                                                    {file.path}{" "}
-                                                                    -{" "}
-                                                                    {file.size}{" "}
-                                                                    bytes
-                                                                </li>
-                                                            )
-                                                        )}
-                                                    </ul>
-                                                </aside>
-                                            </div>
-                                        );
-                                    }}
-                                </Dropzone>
+                                <input type="file" multiple accept="image/*" ref={fileInputRef} onChange={handleFileUpload} hidden />
+                                <Button variant="contained" onClick={() => fileInputRef.current?.click()}>Upload Images</Button>
+                                <div>
+                                    {images.map((file, index) => (
+                                        <p key={index}>{file.name} ({(file.size / 1024).toFixed(2)} KB)</p>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
-                        <Button
+                        <StyledButton
                             variant="contained"
                             color="primary"
                             value="submit"
                             type="submit"
                             fullWidth
-                            className={classes.button}
                         >
                             Add Product
-                        </Button>
+                        </StyledButton>
                     </form>
-                )}
             </DialogContent>
         </>
     );

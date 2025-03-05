@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Dialog, DialogActions, Paper} from "@mui/material";
+import {Box, Button, Card, CardContent, CardMedia, Dialog, DialogActions, Paper, Typography} from "@mui/material";
 import Swal from "sweetalert2";
 import UpdateProductScreen from "./UpdateProductScreen";
 import Loader from "@/components/alert/Loader.js";
@@ -10,14 +10,14 @@ import {AppDispatch, RootState} from "@/store";
 import {getUserRolesPermissions} from "@/features/user/userSlice";
 import {
     AdminProduct,
-    deleteProduct,
-    fetchAdminProductsList,
+    deleteProduct, deleteProductImage,
+    fetchAdminProductsList, ProductImage,
     resetAddProductImageSuccess,
-    resetAddProductSuccess,
+    resetAddProductSuccess, resetEditProductImageSuccess,
     resetEditProductSuccess
 } from "@/features/product/productSlice";
 import {StyledButton, StyledDivider} from "@/styles/muiStyles";
-import {MaterialReactTable, MRT_ColumnDef, useMaterialReactTable} from "material-react-table";
+import {MaterialReactTable, MRT_ColumnDef, MRT_Row, useMaterialReactTable} from "material-react-table";
 import {format} from "date-fns";
 import {ListItemIcon, MenuItem} from "@mui/material";
 import StarIcon from '@mui/icons-material/Star';
@@ -25,6 +25,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddProductImageScreen from "@/screens/admin/products/AddProductImageScreen";
 import AddAPhotoIcon from '@mui/icons-material/AddAPhoto';
+import {ASSET_URL} from "@/config";
+import ReplaceProductImageScreen from "@/screens/admin/products/ReplaceProductImageScreen";
+import AddProductScreen from "@/screens/admin/products/AddProductScreen";
 
 interface ProductsScreenProps {
 }
@@ -36,16 +39,13 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [productId, setProductId] = useState<number>(0);
 
-    const [productReplaceImageId, setProductReplaceImageId] = useState(null);
-    const [productReplaceProductId, setProductReplaceProductId] =
-        useState(null);
-
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [productToBeEdited, setProductToBeEdited] = useState<AdminProduct | null>(null);
+    const [productImageToBeEdited, setProductImageToBeEdited] = useState<ProductImage | null>(null);
 
     const [openAddProductImageDialog, setOpenAddProductImageDialog] = useState(false);
-    const [openReplaceDialog, setOpenReplaceDialog] = useState(false);
+    const [openImageReplaceDialog, setOpenImageReplaceDialog] = useState(false);
 
     const {
         userInfo,
@@ -139,24 +139,23 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
         dispatch(resetAddProductImageSuccess())
     }, []);
 
+    const handleReplaceDialogOpen = useCallback((image: ProductImage) => {
+        if (userPermissions?.includes("admin_edit_productimages")) {
+            setProductImageToBeEdited(image);
+            setOpenImageReplaceDialog(true);
+        } else {
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
+        }
+    }, [userPermissions]);
 
-    // const handleReplaceDialogOpen = (imageId, productId) => {
-    //     if (user_perms.includes("admin_edit_products")) {
-    //         setOpenReplaceDialog(true);
-    //         setProductReplaceImageId(imageId);
-    //         setProductReplaceProductId(productId);
-    //     } else {
-    //         Swal.fire(
-    //             "Sorry!",
-    //             `You don't have access to this action.`,
-    //             "warning"
-    //         );
-    //     }
-    // };
-    //
-    // const handleReplaceDialogClose = (e) => {
-    //     setOpenReplaceDialog(false);
-    // };
+    const handleReplaceDialogClose = useCallback(() => {
+        setOpenImageReplaceDialog(false);
+        dispatch(resetEditProductImageSuccess());
+    }, []);
 
     const deleteProductHandler = (id: number) => {
         if (!userPermissions?.includes("admin_delete_products")) {
@@ -195,42 +194,44 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
         });
     };
 
-    // const deleteProductImageHandler = (id) => {
-    //     user_perms.includes("admin_delete_products")
-    //         ? Swal.fire({
-    //             title: "Are you sure?",
-    //             text: "You can't recover this product image after deletion!",
-    //             icon: "warning",
-    //             showCancelButton: true,
-    //             confirmButtonText: "Yes, delete it!",
-    //             cancelButtonText: "No, cancel!",
-    //             cancelButtonColor: "#d33",
-    //             reverseButtons: true,
-    //         }).then((result) => {
-    //             if (result.value) {
-    //                 dispatch(deleteProductImage(id));
-    //                 setRequestData(new Date());
-    //                 Swal.fire(
-    //                     "Deleted!",
-    //                     "The product image with the id " +
-    //                     id +
-    //                     " has been deleted.",
-    //                     "success"
-    //                 );
-    //             } else if (result.dismiss === Swal.DismissReason.cancel) {
-    //                 Swal.fire(
-    //                     "Cancelled",
-    //                     `The selected product image is safe, don't worry :)`,
-    //                     "error"
-    //                 );
-    //             }
-    //         })
-    //         : Swal.fire(
-    //             "Sorry!",
-    //             `You don't have access to this action.`,
-    //             "warning"
-    //         );
-    // };
+    const deleteProductImageHandler = (id: number) => {
+        if (!userPermissions?.includes("admin_delete_productimages")) {
+            Swal.fire(
+                "Sorry!",
+                `You don't have access to this action.`,
+                "warning"
+            );
+            return;
+        }
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You can't recover this product image after deletion!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "No, cancel!",
+            cancelButtonColor: "#d33",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.value) {
+                dispatch(deleteProductImage({id}));
+                Swal.fire(
+                    "Deleted!",
+                    "The product image with the id " +
+                    id +
+                    " has been deleted.",
+                    "success"
+                );
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire(
+                    "Cancelled",
+                    `The selected product image is safe, don't worry :)`,
+                    "error"
+                );
+            }
+        })
+    };
 
     const columns = useMemo<MRT_ColumnDef<AdminProduct, unknown>[]>(
         () => [
@@ -338,6 +339,125 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
         [],
     );
 
+    const StyledButtonDetailPanel = ({children, ...props}: {
+        children: React.ReactNode
+    } & React.ComponentProps<typeof Button>) => (
+        <Button sx={{mr: 1}} {...props}>
+            {children}
+        </Button>
+    );
+
+    const DetailPanelContainer = ({children}: { children: React.ReactNode }) => (
+        <Box
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                maxWidth: '1000px',
+                width: '100%',
+                padding: '16px',
+                borderRadius: '8px',
+                backgroundColor: '#f5f5f5',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+            }}
+        >
+            {children}
+        </Box>
+    );
+
+    const SectionTitle = ({children}: { children: React.ReactNode }) => (
+        <Typography
+            variant="h5"
+            style={{
+                marginBottom: '16px',
+                fontWeight: 'bold',
+                borderBottom: '2px solid #855C1B',
+                paddingBottom: '8px',
+            }}
+        >
+            {children}
+        </Typography>
+    );
+
+    const SectionContent = ({children}: { children: React.ReactNode }) => (
+        <Typography style={{marginBottom: '16px'}}>{children}</Typography>
+    );
+
+    const ProductImageContainer = ({children}: { children: React.ReactNode }) => (
+        <Card style={{marginBottom: '16px', width: 'fit-content'}}>
+            {children}
+        </Card>
+    );
+
+    interface RenderDetailPanelProps {
+        row: MRT_Row<AdminProduct>;
+    }
+
+    const renderDetailPanel = ({row}: RenderDetailPanelProps) => {
+        const {original} = row;
+
+        return (
+            <>
+                <DetailPanelContainer>
+                    <SectionTitle>Parent Category:</SectionTitle>
+                    <SectionContent>{original?.parentCategory?.name || " - "}</SectionContent>
+
+                    <SectionTitle>Child Category:</SectionTitle>
+                    <SectionContent>{original?.childCategory?.name || " - "}</SectionContent>
+
+                    <SectionTitle>Description:</SectionTitle>
+                    <SectionContent>{original?.description || " - "}</SectionContent>
+                </DetailPanelContainer>
+
+                <DetailPanelContainer>
+                    <SectionTitle>Product Images:</SectionTitle>
+                    <Box sx={{display: 'flex', flexWrap: 'wrap'}}>
+                        {original?.images && original.images.length > 0 ? (
+                            original.images.map((image) => (
+                                <ProductImageContainer key={image.id}>
+                                    <CardMedia
+                                        component="img"
+                                        image={`${ASSET_URL}/${image.path}`}
+                                        alt="Product Image"
+                                        style={{
+                                            width: '100px',
+                                            height: 'auto',
+                                        }}
+                                    />
+                                    <CardContent>
+                                        <StyledDivider/>
+                                        <div style={{
+                                            display: 'flex',
+                                            marginTop: '8px',
+                                            justifyContent: 'space-between'
+                                        }}>
+                                            <StyledButtonDetailPanel
+                                                variant="outlined"
+                                                startIcon={<EditIcon/>}
+                                                onClick={() => handleReplaceDialogOpen(image)}
+                                            >
+                                                Replace
+                                            </StyledButtonDetailPanel>
+                                            <StyledButtonDetailPanel
+                                                variant="outlined"
+                                                color="secondary"
+                                                startIcon={<DeleteIcon/>}
+                                                onClick={() => deleteProductImageHandler(image.id)}
+                                            >
+                                                Delete
+                                            </StyledButtonDetailPanel>
+                                        </div>
+                                    </CardContent>
+                                </ProductImageContainer>
+                            ))
+                        ) : (
+                            <SectionContent>No images available</SectionContent>
+                        )}
+                    </Box>
+                </DetailPanelContainer>
+            </>
+        );
+    };
+
     const table = useMaterialReactTable({
         columns,
         data: adminProductsList || [],
@@ -394,6 +514,7 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
                 Add Product Image
             </MenuItem>,
         ],
+        renderDetailPanel: renderDetailPanel,
     });
 
     return (
@@ -411,243 +532,6 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
                         <Message variant="error">{error}</Message>
                     ) : (
                         <MaterialReactTable table={table}/>
-                        // <MaterialTable
-                        //     title="Products List"
-                        //     components={{
-                        //         Container: (props) => (
-                        //             <Paper
-                        //                 className={classes.materialTable}
-                        //                 {...props}
-                        //             />
-                        //         ),
-                        //     }}
-                        //     columns={[
-                        //         {
-                        //             title: "Name",
-                        //             field: "name",
-                        //             render: (products) => {
-                        //                 return (
-                        //                     <Link
-                        //                         to={`/product/${products.slug}`}
-                        //                         className={classes.link}
-                        //                         target="_blank"
-                        //                     >
-                        //                         {products.name}
-                        //                     </Link>
-                        //                 );
-                        //             },
-                        //         },
-                        //         {
-                        //             title: "Added by",
-                        //             field: "user.name",
-                        //         },
-                        //         {
-                        //             title: "Product Code",
-                        //             field: "product_code",
-                        //         },
-                        //         {
-                        //             title: "Discount",
-                        //             field: "discount",
-                        //             render: (products) => {
-                        //                 return `${products.discount} %`;
-                        //             },
-                        //         },
-                        //         {
-                        //             title: "Price",
-                        //             field: "price",
-                        //             render: (products) => {
-                        //                 return `${products.discount} €`;
-                        //             },
-                        //         },
-                        //         {
-                        //             title: "Total Quantities",
-                        //             field: "total_quantities",
-                        //         },
-                        //         {
-                        //             title: "Reviews",
-                        //             field: "total_reviews",
-                        //         },
-                        //         {
-                        //             title: "Rating",
-                        //             field: "rating",
-                        //             render: (products) => {
-                        //                 return (
-                        //                     <>
-                        //                         {products.rating}{" "}
-                        //                         <StarRateIcon/>
-                        //                     </>
-                        //                 );
-                        //             },
-                        //         },
-                        //         {
-                        //             title: "Updated At",
-                        //             field: "updated_at",
-                        //             render: (products) => {
-                        //                 return (
-                        //                     <Moment format="DD/MM/YYYY HH:mm">
-                        //                         {products.created_at}
-                        //                     </Moment>
-                        //                 );
-                        //             },
-                        //         },
-                        //     ]}
-                        //     data={products && products.data}
-                        //     actions={[
-                        //         {
-                        //             icon: "add",
-                        //             tooltip: "Add Product",
-                        //             isFreeAction: true,
-                        //             onClick: (event) =>
-                        //                 handleAddDialogOpen(event),
-                        //         },
-                        //         {
-                        //             icon: "photo",
-                        //             tooltip: "Add Product Image",
-                        //             onClick: (event, rowData) => {
-                        //                 handleAddProductImageDialogOpen(
-                        //                     rowData.id,
-                        //                     rowData.slug
-                        //                 );
-                        //             },
-                        //         },
-                        //         (rowData) => ({
-                        //             icon: "edit",
-                        //             tooltip: "Edit Product",
-                        //             onClick: (event, rowData) => {
-                        //                 handleEditDialogOpen(rowData.slug);
-                        //             },
-                        //         }),
-                        //
-                        //         (rowData) => ({
-                        //             icon: "delete",
-                        //             tooltip: "Delete Product",
-                        //             onClick: (event, rowData) => {
-                        //                 deleteProductHandler(rowData.slug);
-                        //             },
-                        //         }),
-                        //     ]}
-                        //     options={{
-                        //         actionsColumnIndex: -1,
-                        //         headerStyle: {
-                        //             color: "#855C1B",
-                        //             fontFamily: "Quicksand",
-                        //             fontSize: "1.2rem",
-                        //             backgroundColor: "#FDF7E9",
-                        //         },
-                        //     }}
-                        //     detailPanel={(rowData) => {
-                        //         return (
-                        //             <>
-                        //                 <div className="table-detail">
-                        //                     <div>
-                        //                         <h2 className="table-detail--title">
-                        //                             Product Parent Category
-                        //                         </h2>
-                        //                         <div className="table-detail--par">
-                        //                             <h4>
-                        //                                 {
-                        //                                     rowData[
-                        //                                         "parent_category"
-                        //                                         ].name
-                        //                                 }
-                        //                             </h4>
-                        //                         </div>
-                        //                     </div>
-                        //                     <div>
-                        //                         <h2 className="table-detail--title">
-                        //                             Product Child Category
-                        //                         </h2>
-                        //                         <div className="table-detail--par">
-                        //                             <h4>
-                        //                                 {
-                        //                                     rowData[
-                        //                                         "child_category"
-                        //                                         ].name
-                        //                                 }
-                        //                             </h4>
-                        //                         </div>
-                        //                     </div>
-                        //                     <div>
-                        //                         <h2 className="table-detail--title">
-                        //                             Product Description
-                        //                         </h2>
-                        //                         <div className="table-detail--par">
-                        //                             <p>{rowData.description}</p>
-                        //                         </div>
-                        //                     </div>
-                        //
-                        //                     <div>
-                        //                         <h2 className="table-detail--title">
-                        //                             Product Images
-                        //                         </h2>
-                        //                         <div className="table-detail--par">
-                        //                             {rowData.images &&
-                        //                                 rowData.images.map(
-                        //                                     (image) => {
-                        //                                         return (
-                        //                                             <div
-                        //                                                 className="product__table-image"
-                        //                                                 key={
-                        //                                                     image.id
-                        //                                                 }
-                        //                                             >
-                        //                                                 <img
-                        //                                                     className="product__table-image--img"
-                        //                                                     src={`http://127.0.0.1:8000/storage/${image.path}`}
-                        //                                                     alt={
-                        //                                                         rowData.name
-                        //                                                     }
-                        //                                                 />
-                        //
-                        //                                                 <hr className="product__table-hr"/>
-                        //
-                        //                                                 <div className="product__table-image--btns">
-                        //                                                     <Button
-                        //                                                         variant="outlined"
-                        //                                                         startIcon={
-                        //                                                             <EditIcon/>
-                        //                                                         }
-                        //                                                         onClick={(
-                        //                                                             e
-                        //                                                         ) =>
-                        //                                                             handleReplaceDialogOpen(
-                        //                                                                 image.id,
-                        //                                                                 image.product_id
-                        //                                                             )
-                        //                                                         }
-                        //                                                     >
-                        //                                                         Replace
-                        //                                                         Image
-                        //                                                     </Button>
-                        //                                                     <Button
-                        //                                                         variant="outlined"
-                        //                                                         color="secondary"
-                        //                                                         startIcon={
-                        //                                                             <DeleteIcon/>
-                        //                                                         }
-                        //                                                         onClick={(
-                        //                                                             e
-                        //                                                         ) =>
-                        //                                                             deleteProductImageHandler(
-                        //                                                                 image.id
-                        //                                                             )
-                        //                                                         }
-                        //                                                     >
-                        //                                                         Delete
-                        //                                                         Image
-                        //                                                     </Button>
-                        //                                                 </div>
-                        //                                             </div>
-                        //                                         );
-                        //                                     }
-                        //                                 )}
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //             </>
-                        //         );
-                        //     }}
-                        // />
                     )}
 
                     <Dialog
@@ -673,27 +557,27 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
                         </DialogActions>
                     </Dialog>
 
-                    {/*<Dialog*/}
-                    {/*    open={openAddDialog}*/}
-                    {/*    aria-labelledby="draggable-dialog-title"*/}
-                    {/*    onClose={handleAddDialogClose}*/}
-                    {/*    fullWidth*/}
-                    {/*    disableScrollLock={true}*/}
-                    {/*>*/}
-                    {/*    <AddProductScreen*/}
-                    {/*        onClose={handleAddDialogClose}*/}
-                    {/*    />*/}
+                    <Dialog
+                        open={openAddDialog}
+                        aria-labelledby="draggable-dialog-title"
+                        onClose={handleAddDialogClose}
+                        fullWidth
+                        disableScrollLock={true}
+                    >
+                        <AddProductScreen
+                            onClose={handleAddDialogClose}
+                        />
 
-                    {/*    <DialogActions>*/}
-                    {/*        <StyledButton*/}
-                    {/*            onClick={handleAddDialogClose}*/}
-                    {/*            variant="contained"*/}
-                    {/*            color="secondary"*/}
-                    {/*        >*/}
-                    {/*            Cancel*/}
-                    {/*        </StyledButton>*/}
-                    {/*    </DialogActions>*/}
-                    {/*</Dialog>*/}
+                        <DialogActions>
+                            <StyledButton
+                                onClick={handleAddDialogClose}
+                                variant="contained"
+                                color="secondary"
+                            >
+                                Cancel
+                            </StyledButton>
+                        </DialogActions>
+                    </Dialog>
 
                     <Dialog
                         open={openAddProductImageDialog}
@@ -717,34 +601,27 @@ const ProductsScreen: React.FC<ProductsScreenProps> = () => {
                         </DialogActions>
                     </Dialog>
 
-                    {/*<Dialog*/}
-                    {/*    open={openReplaceDialog}*/}
-                    {/*    aria-labelledby="draggable-dialog-title"*/}
-                    {/*    onClose={handleReplaceDialogClose}*/}
-                    {/*    fullWidth*/}
-                    {/*>*/}
-                    {/*    <ReplaceProductImageScreen*/}
-                    {/*        setOpenReplaceDialog={setOpenReplaceDialog}*/}
-                    {/*        setRequestData={setRequestData}*/}
-                    {/*        productReplaceImageId={*/}
-                    {/*            productReplaceImageId && productReplaceImageId*/}
-                    {/*        }*/}
-                    {/*        productReplaceProductId={*/}
-                    {/*            productReplaceImageId && productReplaceProductId*/}
-                    {/*        }*/}
-                    {/*    />*/}
+                    <Dialog
+                        open={openImageReplaceDialog}
+                        aria-labelledby="draggable-dialog-title"
+                        onClose={handleReplaceDialogClose}
+                        fullWidth
+                    >
+                        <ReplaceProductImageScreen
+                            onClose={handleReplaceDialogClose}
+                            imageData={productImageToBeEdited}
+                        />
 
-                    {/*    <DialogActions>*/}
-                    {/*        <Button*/}
-                    {/*            onClick={handleReplaceDialogClose}*/}
-                    {/*            variant="contained"*/}
-                    {/*            color="secondary"*/}
-                    {/*            className={classes.button}*/}
-                    {/*        >*/}
-                    {/*            Cancel*/}
-                    {/*        </Button>*/}
-                    {/*    </DialogActions>*/}
-                    {/*</Dialog>*/}
+                        <DialogActions>
+                            <StyledButton
+                                onClick={handleReplaceDialogClose}
+                                variant="contained"
+                                color="secondary"
+                            >
+                                Cancel
+                            </StyledButton>
+                        </DialogActions>
+                    </Dialog>
                 </>
             )}
         </Paper>

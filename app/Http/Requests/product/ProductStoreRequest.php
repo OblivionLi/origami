@@ -36,13 +36,13 @@ class ProductStoreRequest extends FormRequest
     {
         return [
             'name' => 'string|required|max:50',
-            'child_category_id' => 'numeric|exists:child_category,id',
+            'child_category_id' => 'numeric',
             'description' => 'required',
             'price' => 'required|numeric|between:0.01,9999.99',
             'discount' => 'required|numeric|between:0,100',
             'special_offer' => 'required|boolean',
             'product_code' => 'required|string|max:20',
-            'images' => 'required|array',
+            'images' => 'required|array|min:1|max:5',
             'images.*' => 'image|mimes:jpg,png,jpeg|max:10000'
         ];
     }

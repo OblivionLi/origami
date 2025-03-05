@@ -28,7 +28,7 @@ class Order extends Model
         'is_paid',
         'is_delivered',
         'paid_at',
-        'delivered_at'
+        'delivered_at',
     ];
 
     public function user(): BelongsTo
@@ -40,4 +40,10 @@ class Order extends Model
     {
         return $this->belongsToMany(Product::class, 'order_product')->withPivot('qty');
     }
+
+    public function address(): BelongsTo
+    {
+        return $this->belongsTo(Address::class, 'address_id');
+    }
+
 }

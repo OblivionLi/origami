@@ -46,7 +46,7 @@ class ProductImageRepository
     public function deleteImagesIfExist(int $id): bool
     {
         try {
-            $currentImage = ProductImage::find($id)->first();
+            $currentImage = ProductImage::find($id);
             if (!$currentImage) {
                 return false;
             }
@@ -63,6 +63,24 @@ class ProductImageRepository
             Log::warning('Error replacing product images: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function deleteImageFile(string $path): bool
+    {
+        try {
+            $imagePath = public_path('/storage/' . $path);
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+                return true;
+            }
+        } catch (Exception $e) {
+            Log::warning('Error deleting product image: ' . $e->getMessage());
+        }
+        return false;
     }
 
     /**

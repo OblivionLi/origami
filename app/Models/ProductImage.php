@@ -19,7 +19,7 @@ class ProductImage extends Model
      * @var array[int, string]
      */
     protected $fillable = [
-        'name', 'path', 'product_id'
+        'id', 'name', 'path', 'product_id'
     ];
 
     public function product(): BelongsTo

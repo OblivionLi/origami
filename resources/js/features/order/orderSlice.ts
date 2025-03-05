@@ -4,6 +4,7 @@ import {RootState} from "@/store";
 import {CartItem} from "@/features/cart/cartSlice";
 import {User} from "@/features/user/userSlice";
 import {Product} from "@/features/product/productSlice";
+import {Address} from "@/features/address/addressSlice";
 
 export interface Order {
     id: number;
@@ -25,8 +26,30 @@ export interface Order {
     products: Product[];
 }
 
+interface AdminTempUserObject {
+    id: number;
+    name: string;
+    address: Address | null;
+}
+
+export interface AdminOrder {
+    id: number;
+    user: AdminTempUserObject;
+    order_id: string;
+    status: string;
+    total_price: number;
+    is_paid: boolean;
+    is_delivered: boolean;
+    paid_at: string | null;
+    delivered_at: string | null;
+    created_at: string;
+    updated_at: string;
+    products_count: number;
+}
+
 interface OrderState {
     order: Order[];
+    adminOrdersList: AdminOrder[];
     createdOrder: Order | null;
     loading: boolean;
     error: string | null;
@@ -39,6 +62,7 @@ interface OrderState {
 
 const initialState: OrderState = {
     order: [],
+    adminOrdersList: [],
     createdOrder: null,
     loading: false,
     error: null,
@@ -72,6 +96,38 @@ export const fetchOrders = createAsyncThunk<
             const {data} = await axios.get<Order[]>('/api/orders', config);
 
             return data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const fetchAdminOrdersList = createAsyncThunk<
+    AdminOrder[],
+    void,
+    { state: RootState, rejectValue: string }
+>(
+    'order/fetchAdminOrdersList',
+    async (_, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
+            const {data} = await axios.get('/api/admin/orders', config);
+            return data.data;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -255,7 +311,7 @@ export const deliverOrder = createAsyncThunk<
 export const createPDFOrder = createAsyncThunk<
     string,
     {
-        id: number;
+        id: string;
     },
     { state: RootState, rejectValue: string }
 >(
@@ -275,7 +331,19 @@ export const createPDFOrder = createAsyncThunk<
                 responseType: 'blob',
             });
 
-            return window.URL.createObjectURL(new Blob([response.data]));
+            // return window.URL.createObjectURL(new Blob([response.data]));
+
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Order-${id}-Invoice.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            return url;
         } catch (error: any) {
             const message =
                 error.response && error.response.data.message
@@ -370,6 +438,20 @@ const orderSlice = createSlice({
                 state.order = action.payload;
             })
             .addCase(fetchOrders.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
+            // Handle fetchOrder
+            .addCase(fetchAdminOrdersList.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAdminOrdersList.fulfilled, (state, action: PayloadAction<AdminOrder[]>) => {
+                state.loading = false;
+                state.adminOrdersList = action.payload;
+            })
+            .addCase(fetchAdminOrdersList.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ? action.payload : "Unknown error";
             })

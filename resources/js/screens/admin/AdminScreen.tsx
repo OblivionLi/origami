@@ -1,26 +1,19 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import clsx from "clsx";
 import {
-    Drawer,
-    AppBar,
-    Toolbar,
     List,
     CssBaseline,
-    Typography,
     Divider,
     IconButton,
     ListItemIcon,
     ListItemText,
-    Button,
     Collapse,
     Menu,
     MenuItem, ListItem, ListItemButton,
 } from "@mui/material";
-import {BrowserRouter as Router, Route, Link, useNavigate, Routes, Navigate} from "react-router-dom";
+import {Route, useNavigate, Routes, Navigate} from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
@@ -61,6 +54,7 @@ import ParentCategoriesScreen from "@/screens/admin/categories/parent/ParentCate
 import ChildCategoriesScreen from "@/screens/admin/categories/child/ChildCategoriesScreen";
 import ReviewsScreen from "@/screens/admin/reviews/ReviewsScreen";
 import ProductsScreen from "@/screens/admin/products/ProductsScreen";
+import OrderScreen from "@/screens/admin/orders/OrderScreen";
 
 interface AdminScreenProps {
 }
@@ -370,7 +364,7 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                             <Route path="/child-categories" element={<ChildCategoriesScreen />} />
                             <Route path="/products" element={<ProductsScreen />} />
                             <Route path="/products/reviews" element={<ReviewsScreen />} />
-                            {/*<Route path="/admin/orders" element={<OrderScreen />} />*/}
+                            <Route path="/orders" element={<OrderScreen />} />
 
                             <Route path="*" element={<Navigate to="/admin" replace/>}/>
                         </Routes>

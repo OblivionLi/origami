@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\order\OrderStoreRequest;
+use App\Http\Resources\order\OrderAdminIndexResource;
 use App\Http\Resources\order\OrderIndexResource;
 use App\Http\Resources\order\OrderShowResource;
 use App\Models\Order;
@@ -31,6 +32,14 @@ class OrderService
     public function getOrderWithRelations(): AnonymousResourceCollection
     {
         return OrderIndexResource::collection($this->orderRepository->getOrderWithRelations(null)->get());
+    }
+
+    /**
+     * @return AnonymousResourceCollection
+     */
+    public function getAdminOrderWithRelations(): AnonymousResourceCollection
+    {
+        return OrderAdminIndexResource::collection($this->orderRepository->getAdminOrderWithRelations()->get());
     }
 
     /**
@@ -109,20 +118,21 @@ class OrderService
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @return Response|JsonResponse
      */
-    public function createOrderPDF(int $id): Response|JsonResponse
+    public function createOrderPDF(string $id): Response|JsonResponse
     {
-        // TODO:: this needs cleaning
         try {
-            $order = $this->orderRepository->getOrderWithRelations($id);
-
+            $order = $this->orderRepository->getOrderWithRelations($id)->first();
+            $user = $order->user;
             view()->share('order', $order);
-            $pdf = PDF::loadView('invoice.orderPDF', [$order]);
+            view()->share('user', $user);
 
-            return $pdf->download('Your-Order-Invoice.pdf');
-            // return $pdf->stream();
+            $pdf = app('dompdf.wrapper');
+            $pdf->loadView('invoice.orderPDF', compact('order'));
+
+            return $pdf->download("Order-$id-Invoice.pdf");
         } catch (ModelNotFoundException $e) {
             Log::error($e->getMessage());
             return response()->json(['message' => 'Order not found.'], Response::HTTP_NOT_FOUND);

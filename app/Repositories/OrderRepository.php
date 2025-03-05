@@ -6,7 +6,6 @@ use App\Models\Order;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,12 +20,41 @@ class OrderRepository
     public function getOrderWithRelations(string|null $id): Builder
     {
         if ($id) {
-            return Order::with(['user', 'user.addresses', 'products' => function ($query) {
-                $query->select('products.id', 'products.name', 'products.slug', 'products.product_code', 'products.discount', 'products.price', 'order_product.qty as quantity');
-            }])->where('order_id', $id);
+            return Order::with([
+                'user',
+                'user.addresses',
+                'products'
+            ])->where('order_id', $id);
         }
 
         return Order::with(['user', 'products', 'user.addresses']);
+    }
+
+    /**
+     * @return Builder
+     */
+    public function getAdminOrderWithRelations(): Builder
+    {
+        return Order::query()
+            ->select([
+                'id',
+                'user_id',
+                'address_id',
+                'order_id',
+                'status',
+                'total_price',
+                'is_paid',
+                'is_delivered',
+                'paid_at',
+                'delivered_at',
+                'created_at',
+                'updated_at',
+            ])
+            ->with([
+                'user:id,name',
+                'address:id,name,surname,country,city,address,postal_code,phone_number',
+            ])
+            ->withCount('products');
     }
 
     /**

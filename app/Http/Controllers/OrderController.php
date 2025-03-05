@@ -29,6 +29,14 @@ class OrderController extends Controller
     }
 
     /**
+     * @return AnonymousResourceCollection
+     */
+    public function indexAdmin(): AnonymousResourceCollection
+    {
+        return $this->orderService->getAdminOrderWithRelations();
+    }
+
+    /**
      * @param OrderStoreRequest $request
      * @return JsonResponse
      */
@@ -74,10 +82,10 @@ class OrderController extends Controller
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @return JsonResponse|Response
      */
-    public function createPDF(int $id): JsonResponse|Response
+    public function createPDF(string $id): JsonResponse|Response
     {
         return $this->orderService->createOrderPDF($id);
     }

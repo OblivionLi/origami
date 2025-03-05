@@ -49,7 +49,6 @@ class ProductImageService
                 'path' => $path
             ];
             ProductImage::create($data);
-//            $this->productImageRepository->createProductImage($data);
             return response()->json(['message' => 'Image uploaded successfully.'], Response::HTTP_CREATED);
         } catch (Exception $e) {
             Log::error("Image upload failed for product ID $productId: " . $e->getMessage());
@@ -68,26 +67,28 @@ class ProductImageService
             return response()->json(['message' => 'Request image payload is empty.'], Response::HTTP_BAD_REQUEST);
         }
 
+        $imageToReplace = ProductImage::find($id);
+
+        if (!$imageToReplace) {
+            return response()->json(['message' => 'Image not found.'], Response::HTTP_NOT_FOUND);
+        }
+
         $file = $request->file('image');
         $directory = 'productImages';
 
+        $this->productImageRepository->deleteImageFile($imageToReplace->path);
 
-        $path = $this->productImageRepository->storeImage($file, $directory);
-        $imgFileName = basename($path);
+        $newPath = $this->productImageRepository->storeImage($file, $directory);
 
-        $data = [
-            'product_id' => $id,
-            'name' => $imgFileName,
-            'path' => $path
-        ];
+        $imageToReplace->name = basename($newPath);
+        $imageToReplace->path = $newPath;
 
-        $tryToCreateProductImages = $this->productImageRepository->createProductImage($data);
-        if (!$tryToCreateProductImages) {
+        try {
+            $imageToReplace->save();
+        } catch (Exception $e) {
+            Log::error('Failed to update image record: ' . $e->getMessage());
             return response()->json(['message' => 'Failed to upload image.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        // TODO:: this might need cleaning
-        $this->productImageRepository->deleteImagesIfExist($id);
 
         return response()->json(['message' => 'Image updated successfully.'], Response::HTTP_OK);
     }
