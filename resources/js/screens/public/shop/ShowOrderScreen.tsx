@@ -26,8 +26,8 @@ import {getUserAddress} from "@/features/user/userSlice";
 import {deliverOrder, fetchOrderById} from "@/features/order/orderSlice";
 import {Product} from "@/features/product/productSlice";
 
-// const PUBLIC_KEY = import.meta.env.VITE_STRIPE_KEY;
-// const stripePromise = loadStripe(PUBLIC_KEY);
+const PUBLIC_KEY = import.meta.env.VITE_STRIPE_KEY;
+const stripePromise = loadStripe(PUBLIC_KEY);
 
 interface ShowOrderScreen {
 }
@@ -303,19 +303,19 @@ const ShowOrderScreen: React.FC<ShowOrderScreen> = () => {
                                     </div>
 
                                     <div className="show__paper--div">
-                                        {/*{order.is_paid == 0 && (*/}
-                                        {/*    <div>*/}
-                                        {/*        <Elements*/}
-                                        {/*            stripe={stripePromise}*/}
-                                        {/*        >*/}
-                                        {/*            <CheckoutFormScreen*/}
-                                        {/*                orderId={order.order_id}*/}
-                                        {/*                addressId={order.address_id}*/}
-                                        {/*                totalPrice={order.total_price}*/}
-                                        {/*            />*/}
-                                        {/*        </Elements>*/}
-                                        {/*    </div>*/}
-                                        {/*)}*/}
+                                        {order.is_paid == 0 && (
+                                            <div>
+                                                <Elements
+                                                    stripe={stripePromise}
+                                                >
+                                                    <CheckoutFormScreen
+                                                        orderId={order.order_id}
+                                                        addressId={order.address_id}
+                                                        totalPrice={order.total_price}
+                                                    />
+                                                </Elements>
+                                            </div>
+                                        )}
                                     </div>
                                 </Paper>
                             </div>

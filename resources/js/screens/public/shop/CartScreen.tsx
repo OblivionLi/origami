@@ -19,7 +19,6 @@ import {
 } from "@mui/material";
 import {
     StyledButton,
-    StyledDivider, StyledDivider2,
     StyledDivider3,
     StyledLink
 } from "@/styles/muiStyles";

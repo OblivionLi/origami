@@ -11,7 +11,7 @@ import {
     TableHead,
     TableRow,
     TableCell,
-    TableBody, Button
+    TableBody
 } from "@mui/material";
 import NavbarCategories from "@/components/NavbarCategories.js";
 import Navbar from "@/components/Navbar.js";
