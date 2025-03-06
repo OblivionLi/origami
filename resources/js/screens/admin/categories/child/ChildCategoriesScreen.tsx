@@ -7,10 +7,9 @@ import Message from "@/components/alert/Message.js";
 import {AppDispatch, RootState} from "@/store";
 import {useNavigate} from "react-router-dom";
 import {getUserRolesPermissions} from "@/features/user/userSlice";
-import{
+import {
     ChildCategorySlice,
-    deleteChildCategory,
-    fetchChildCategories,
+    deleteChildCategory, fetchAdminChildCategories,
     resetAddChildCategorySuccess,
     resetEditChildCategorySuccess
 } from "@/features/categories/childCategorySlice";
@@ -50,7 +49,7 @@ const ChildCategoriesScreen: React.FC<ChildCategoriesScreenProps> = () => {
             navigate("/login");
         } else {
             setIsAdmin(true);
-            dispatch(fetchChildCategories());
+            dispatch(fetchAdminChildCategories());
         }
     }, [dispatch, userInfo, navigate]);
 

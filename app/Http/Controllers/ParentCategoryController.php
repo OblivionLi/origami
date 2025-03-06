@@ -27,6 +27,14 @@ class ParentCategoryController extends Controller
     }
 
     /**
+     * @return AnonymousResourceCollection
+     */
+    public function indexAdmin(): AnonymousResourceCollection
+    {
+        return $this->parentCategoryService->getAdminParentCategoriesWithRelations();
+    }
+
+    /**
      * @param ParentCategoryStoreRequest $request
      * @return JsonResponse
      */

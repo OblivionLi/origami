@@ -2,8 +2,10 @@
 
 use App\Http\Requests\ProductImageStoreRequest;
 use App\Http\Requests\productImg\ProductImageUpdateRequest;
+use App\Models\ProductImage;
 use App\Repositories\ProductImageRepository;
 use App\Services\ProductImageService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\UploadedFile;
@@ -46,11 +48,16 @@ class ProductImageServiceTest extends TestCase
 
         $this->productImageRepository->shouldReceive('getProductImageCount')->once()->with($productId)->andReturn(0);
         $this->productImageRepository->shouldReceive('storeImage')->once()->with($file, 'productImages')->andReturn($path);
-        $this->productImageRepository->shouldReceive('createProductImage')->once()->with([
-            'product_id' => $productId,
-            'name' => basename($path),
-            'path' => $path
-        ])->andReturn(true);
+
+        $productImageMock = Mockery::mock('alias:App\Models\ProductImage');
+        $productImageMock->shouldReceive('create')
+            ->once()
+            ->with([
+                'product_id' => $productId,
+                'name' => basename($path),
+                'path' => $path
+            ])
+            ->andReturn(new ProductImage());
 
         $request = new ProductImageStoreRequest();
         $request->merge([
@@ -59,7 +66,7 @@ class ProductImageServiceTest extends TestCase
         $request->files->set('image', $file);
         $request->setContainer($this->app)->validateResolved();
 
-        $response = $this->productImageService->storeProductImage($request);
+        $response = $this->productImageService->storeProductImage($request, $productId);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(201, $response->getStatusCode());
@@ -84,7 +91,7 @@ class ProductImageServiceTest extends TestCase
         $request->files->set('image', $file);
         $request->setContainer($this->app)->validateResolved();
 
-        $response = $this->productImageService->storeProductImage($request);
+        $response = $this->productImageService->storeProductImage($request, $productId);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(422, $response->getStatusCode());
@@ -106,7 +113,7 @@ class ProductImageServiceTest extends TestCase
         ]);
         $request->setContainer($this->app);
 
-        $response = $this->productImageService->storeProductImage($request);
+        $response = $this->productImageService->storeProductImage($request, $productId);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(400, $response->getStatusCode());
@@ -134,21 +141,42 @@ class ProductImageServiceTest extends TestCase
     {
         Storage::fake('public');
         $productId = 1;
+        $imageId = 1;
         $file = UploadedFile::fake()->image('test-image.jpg');
-        $path = 'productImages/1678886400.test-image.jpg';
+        $oldPath = 'productImages/old-image.jpg';
+        $newPath = 'productImages/1678886400.test-image.jpg';
 
-        $this->productImageRepository->shouldReceive('storeImage')->once()->with($file, 'productImages')->andReturn($path);
-        $this->productImageRepository->shouldReceive('createProductImage')->once()->with([
-            'product_id' => $productId,
-            'name' => basename($path),
-            'path' => $path
-        ])->andReturn(true);
-
-        $this->productImageRepository->shouldReceive('deleteImagesIfExist')
+        $mockProductImage = Mockery::mock('alias:App\Models\ProductImage', Model::class);
+        $mockProductImage->shouldReceive('find')
             ->once()
-            ->with(1)
+            ->with($imageId)
+            ->andReturn($mockProductImage);
+
+        $mockProductImage->id = $imageId;
+        $mockProductImage->product_id = $productId;
+        $mockProductImage->path = $oldPath;
+        $mockProductImage->name = basename($oldPath);
+
+        $this->productImageRepository->shouldReceive('storeImage')
+            ->once()
+            ->with($file, 'productImages')
+            ->andReturn($newPath);
+
+        $this->productImageRepository->shouldReceive('deleteImageFile')
+            ->once()
+            ->with($oldPath)
             ->andReturn();
 
+        $mockProductImage->shouldReceive('save')
+            ->once()
+            ->andReturn(true);
+
+        $mockProductImage->shouldReceive('setAttribute')
+            ->with('name',basename($newPath));
+        $mockProductImage->shouldReceive('setAttribute')
+            ->with('path',$newPath);
+
+        // Create and populate the request
         $request = new ProductImageUpdateRequest();
         $request->merge([
             'product_id' => $productId
@@ -156,7 +184,7 @@ class ProductImageServiceTest extends TestCase
         $request->files->set('image', $file);
         $request->setContainer($this->app)->validateResolved();
 
-        $response = $this->productImageService->updateProductImage($request, 1);
+        $response = $this->productImageService->updateProductImage($request, $imageId);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());

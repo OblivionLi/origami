@@ -27,6 +27,19 @@ class ParentCategoryService
      */
     public function getParentCategoriesWithRelations(): JsonResponse|AnonymousResourceCollection
     {
+        $parentCategories = $this->parentCategoryRepository->getParentCategoryWithRelations()->get();
+        if ($parentCategories->isEmpty()) {
+            return response()->json(['Could not fetch parent categories with relations.'], Response::HTTP_NOT_FOUND);
+        }
+
+        return ParentCategoryIndexResource::collection($parentCategories);
+    }
+
+    /**
+     * @return JsonResponse|AnonymousResourceCollection
+     */
+    public function getAdminParentCategoriesWithRelations(): JsonResponse|AnonymousResourceCollection
+    {
         $parentCategories = $this->parentCategoryRepository->getAdminParentCategoryList()->get();
         if ($parentCategories->isEmpty()) {
             return response()->json(['Could not fetch parent categories with relations.'], Response::HTTP_NOT_FOUND);

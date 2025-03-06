@@ -165,15 +165,15 @@ class ChildCategoryServiceTest extends TestCase
             ->once()
             ->andReturn(['name' => 'Updated Category', 'parent_category_id' => 1]);
 
-        $slug = 'existing-slug';
+        $id = 1;
         $childCategory = ChildCategory::factory()->make(['name' => 'Updated Category']);
 
         $this->childCategoryRepository->shouldReceive('updateChildCategory')
             ->once()
-            ->with(['name' => 'Updated Category', 'parent_category_id' => 1], $slug)
+            ->with(['name' => 'Updated Category', 'parent_category_id' => 1], $id)
             ->andReturn($childCategory);
 
-        $response = $this->childCategoryService->updateChildCategory($request, $slug);
+        $response = $this->childCategoryService->updateChildCategory($request, $id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -189,14 +189,14 @@ class ChildCategoryServiceTest extends TestCase
             ->once()
             ->andReturn(['name' => 'Updated Category', 'parent_category_id' => 1]);
 
-        $slug = 'non-existing-slug';
+        $id = -1;
 
         $this->childCategoryRepository->shouldReceive('updateChildCategory')
             ->once()
-            ->with(['name' => 'Updated Category', 'parent_category_id' => 1], $slug)
+            ->with(['name' => 'Updated Category', 'parent_category_id' => 1], $id)
             ->andReturn(null);
 
-        $response = $this->childCategoryService->updateChildCategory($request, $slug);
+        $response = $this->childCategoryService->updateChildCategory($request, $id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(422, $response->getStatusCode());
@@ -205,14 +205,14 @@ class ChildCategoryServiceTest extends TestCase
     public function test_delete_child_category_success(): void
     {
         Log::shouldReceive('error')->zeroOrMoreTimes();
-        $slug = 'existing-slug';
+        $id = 1;
 
         $this->childCategoryRepository->shouldReceive('deleteChildCategory')
             ->once()
-            ->with($slug)
+            ->with($id)
             ->andReturn(true);
 
-        $response = $this->childCategoryService->deleteChildCategory($slug);
+        $response = $this->childCategoryService->deleteChildCategory($id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -222,14 +222,14 @@ class ChildCategoryServiceTest extends TestCase
     {
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
-        $slug = 'non-existing-slug';
+        $id = 1;
 
         $this->childCategoryRepository->shouldReceive('deleteChildCategory')
             ->once()
-            ->with($slug)
+            ->with($id)
             ->andReturn(false);
 
-        $response = $this->childCategoryService->deleteChildCategory($slug);
+        $response = $this->childCategoryService->deleteChildCategory($id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());

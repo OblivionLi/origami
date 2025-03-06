@@ -165,15 +165,15 @@ class ParentCategoryServiceTest extends TestCase
             ->once()
             ->andReturn(['name' => 'Updated Category']);
 
-        $slug = 'existing-slug';
+        $id = 1;
         $parentCategory = ParentCategory::factory()->make(['name' => 'Updated Category']);
 
         $this->parentCategoryRepository->shouldReceive('updateParentCategory')
             ->once()
-            ->with(['name' => 'Updated Category'], $slug)
+            ->with(['name' => 'Updated Category'], $id)
             ->andReturn($parentCategory);
 
-        $response = $this->parentCategoryService->updateParentCategory($request, $slug);
+        $response = $this->parentCategoryService->updateParentCategory($request, $id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -189,14 +189,14 @@ class ParentCategoryServiceTest extends TestCase
             ->once()
             ->andReturn(['name' => 'Updated Category']);
 
-        $slug = 'non-existing-slug';
+        $id = -1;
 
         $this->parentCategoryRepository->shouldReceive('updateParentCategory')
             ->once()
-            ->with(['name' => 'Updated Category'], $slug)
+            ->with(['name' => 'Updated Category'], $id)
             ->andReturn(null);
 
-        $response = $this->parentCategoryService->updateParentCategory($request, $slug);
+        $response = $this->parentCategoryService->updateParentCategory($request, $id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(422, $response->getStatusCode());
@@ -205,14 +205,14 @@ class ParentCategoryServiceTest extends TestCase
     public function test_delete_parent_category_success(): void
     {
         Log::shouldReceive('error')->zeroOrMoreTimes();
-        $slug = 'existing-slug';
+        $id = 1;
 
         $this->parentCategoryRepository->shouldReceive('deleteParentCategory')
             ->once()
-            ->with($slug)
+            ->with($id)
             ->andReturn(true);
 
-        $response = $this->parentCategoryService->deleteParentCategory($slug);
+        $response = $this->parentCategoryService->deleteParentCategory($id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -222,14 +222,14 @@ class ParentCategoryServiceTest extends TestCase
     {
         Log::shouldReceive('error')->zeroOrMoreTimes();
 
-        $slug = 'non-existing-slug';
+        $id = -1;
 
         $this->parentCategoryRepository->shouldReceive('deleteParentCategory')
             ->once()
-            ->with($slug)
+            ->with($id)
             ->andReturn(false);
 
-        $response = $this->parentCategoryService->deleteParentCategory($slug);
+        $response = $this->parentCategoryService->deleteParentCategory($id);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());

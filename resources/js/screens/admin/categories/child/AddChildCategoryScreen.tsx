@@ -13,7 +13,10 @@ import {
 } from "@mui/material";
 import Swal from "sweetalert2";
 import {AppDispatch, RootState} from "@/store";
-import {createChildCategory, fetchChildCategories} from "@/features/categories/childCategorySlice";
+import {
+    createChildCategory,
+    fetchAdminChildCategories
+} from "@/features/categories/childCategorySlice";
 import {
     fetchParentCategories,
     ParentCategory,
@@ -52,7 +55,7 @@ const AddChildCategoryScreen: React.FC<AddChildCategoryScreenProps> = ({onClose}
             });
             onClose();
             dispatch(resetParentCategoryState());
-            dispatch(fetchChildCategories());
+            dispatch(fetchAdminChildCategories());
         }
     }, [dispatch, onClose, addChildCategorySuccess]);
 

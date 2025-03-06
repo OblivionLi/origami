@@ -60,9 +60,8 @@ class ReviewServiceTest extends TestCase
             ->once()
             ->andReturn($collection);
 
-        $this->reviewRepository->shouldReceive('getReviewWithRelations')
+        $this->reviewRepository->shouldReceive('getReviewAdminList')
             ->once()
-            ->with(null)
             ->andReturn($mockBuilder);
 
         $result = $this->reviewService->getReviewWithRelations(null);
@@ -80,13 +79,13 @@ class ReviewServiceTest extends TestCase
             ->once()
             ->andReturn(['user_comment' => 'Review Test comment']);
 
-        $slug = 'review-slug';
+        $productId = 1;
         $this->reviewRepository->shouldReceive('createReview')
             ->once()
-            ->with(['user_comment' => 'Review Test comment'], $slug)
+            ->with(['user_comment' => 'Review Test comment'], $productId)
             ->andReturn(true);
 
-        $response = $this->reviewService->storeReview($request, $slug);
+        $response = $this->reviewService->storeReview($request, $productId);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(201, $response->getStatusCode());
@@ -100,17 +99,22 @@ class ReviewServiceTest extends TestCase
             ->once()
             ->andReturn(['user_comment' => 'Review Test comment']);
 
-        $slug = 'review-slug';
+        $productId = 1;
         $this->reviewRepository->shouldReceive('createReview')
             ->once()
-            ->with(['user_comment' => 'Review Test comment'], $slug)
+            ->with(['user_comment' => 'Review Test comment'], $productId)
             ->andReturn(false);
 
-        $response = $this->reviewService->storeReview($request, $slug);
+        $response = $this->reviewService->storeReview($request, $productId);
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(['message' => 'Failed to create review.'], $response->getData(true));
+        $this->assertEquals([
+            'message' => '
+                Failed to create review.
+                Verify that you did not post a review for this product already.
+                Only 1 review per customer for each product allowed.'
+        ], $response->getData(true));
     }
 
     public function test_show_review_with_relations_success(): void

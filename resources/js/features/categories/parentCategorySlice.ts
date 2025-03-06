@@ -52,6 +52,38 @@ export const fetchParentCategories = createAsyncThunk<
                 }
             };
 
+            const {data} = await axios.get('/api/parent-categories', config);
+            return data.data;
+        } catch (error: any) {
+            const message =
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message;
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const fetchAdminParentCategories = createAsyncThunk<
+    ParentCategory[],
+    void,
+    { state: RootState, rejectValue: string }
+>(
+    'parentCategory/fetchAdminParentCategories',
+    async (_, thunkAPI) => {
+        try {
+            const {user: {userInfo}} = thunkAPI.getState();
+
+            if (!userInfo || !userInfo.data || !userInfo.data.access_token) {
+                return thunkAPI.rejectWithValue("User not logged in or token missing.");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.data.access_token}`,
+                }
+            };
+
             const {data} = await axios.get('/api/admin/parent-categories', config);
             return data.data;
         } catch (error: any) {
@@ -215,6 +247,20 @@ const parentCategorySlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Handle fetchAdminParentCategories
+            .addCase(fetchAdminParentCategories.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAdminParentCategories.fulfilled, (state, action: PayloadAction<ParentCategory[]>) => {
+                state.loading = false;
+                state.parentCategories = action.payload;
+            })
+            .addCase(fetchAdminParentCategories.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ? action.payload : "Unknown error";
+            })
+
             // Handle fetchParentCategories
             .addCase(fetchParentCategories.pending, (state) => {
                 state.loading = true;

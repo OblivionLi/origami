@@ -127,7 +127,7 @@ Route::middleware('auth:api')->group(function () {
 
         // Parent Category Management
         Route::controller(ParentCategoryController::class)->group(function () {
-            Route::get('admin/parent-categories', 'index');
+            Route::get('admin/parent-categories', 'indexAdmin');
             Route::post('admin/parent-categories', 'store');
             Route::patch('admin/parent-categories/{category}', 'update');
             Route::delete('admin/parent-categories/{category}', 'destroy');
@@ -136,7 +136,7 @@ Route::middleware('auth:api')->group(function () {
 
         // Child Category Management
         Route::controller(ChildCategoryController::class)->group(function () {
-            Route::get('admin/child-categories', 'index');
+            Route::get('admin/child-categories', 'indexAdmin');
             Route::post('admin/child-categories', 'store');
             Route::patch('admin/child-categories/{category}', 'update');
             Route::delete('admin/child-categories/{category}', 'destroy');

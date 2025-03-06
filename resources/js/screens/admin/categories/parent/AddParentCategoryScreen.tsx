@@ -8,7 +8,10 @@ import {
 } from "@mui/material";
 import Swal from "sweetalert2";
 import {AppDispatch, RootState} from "@/store";
-import {createParentCategory, fetchParentCategories} from "@/features/categories/parentCategorySlice";
+import {
+    createParentCategory,
+    fetchAdminParentCategories
+} from "@/features/categories/parentCategorySlice";
 import {StyledButton} from "@/styles/muiStyles";
 
 interface AddParentCategoryScreenProps {
@@ -32,7 +35,7 @@ const AddParentCategoryScreen: React.FC<AddParentCategoryScreenProps> = ({onClos
                 width: "65rem",
             });
             onClose();
-            dispatch(fetchParentCategories());
+            dispatch(fetchAdminParentCategories());
         }
     }, [dispatch, onClose, addParentCategorySuccess]);
 

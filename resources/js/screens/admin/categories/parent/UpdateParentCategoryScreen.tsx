@@ -7,7 +7,11 @@ import {
     DialogTitle,
 } from "@mui/material";
 import Swal from "sweetalert2";
-import {fetchParentCategories, ParentCategory, updateParentCategory} from "@/features/categories/parentCategorySlice";
+import {
+    fetchAdminParentCategories,
+    ParentCategory,
+    updateParentCategory
+} from "@/features/categories/parentCategorySlice";
 import {AppDispatch, RootState} from "@/store";
 import {StyledButton} from "@/styles/muiStyles";
 
@@ -49,7 +53,7 @@ const UpdateParentCategoryScreen: React.FC<UpdateParentCategoryScreenProps> = ({
                 width: "65rem",
             });
             onClose();
-            dispatch(fetchParentCategories());
+            dispatch(fetchAdminParentCategories());
         }
     }, [editParentCategorySuccess, onClose, dispatch]);
 

@@ -7,8 +7,7 @@ import Message from "@/components/alert/Message.js";
 import {AppDispatch, RootState} from "@/store";
 import {useNavigate} from "react-router-dom";
 import {
-    deleteParentCategory,
-    fetchParentCategories,
+    deleteParentCategory, fetchAdminParentCategories,
     ParentCategory,
     resetAddParentCategorySuccess, resetEditParentCategorySuccess
 } from "@/features/categories/parentCategorySlice";
@@ -52,7 +51,7 @@ const ParentCategoriesScreen: React.FC<ParentCategoriesScreenProps> = () => {
             navigate("/login");
         } else {
             setIsAdmin(true);
-            dispatch(fetchParentCategories());
+            dispatch(fetchAdminParentCategories());
         }
     }, [dispatch, userInfo, navigate]);
 
