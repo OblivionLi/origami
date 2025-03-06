@@ -23,8 +23,8 @@ jobs:
       db:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: ${{ env.DB_DATABASE }}
-          MYSQL_USER: ${{ env.DB_USERNAME }}
+          MYSQL_DATABASE: ${{ secrets.DB_DATABASE }}
+          MYSQL_USER: ${{ secrets.DB_USERNAME }}
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 3306:3306
