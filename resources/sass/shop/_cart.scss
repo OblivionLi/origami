@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .cart {
     display: flex;
     justify-content: space-evenly;
@@ -16,14 +18,14 @@
         width: 70%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
-        font-family: $Quicksand;
-        background-color: $background-color !important;
-        color: $primary-color !important;
-        box-shadow: $primary-shadow !important;
+        font-family: v.$Quicksand;
+        background-color: v.$background-color !important;
+        color: v.$primary-color !important;
+        box-shadow: v.$primary-shadow !important;
     }
 }
 
 .MuiBadge-badge {
-    background-color: $secondary-color !important;
+    background-color: v.$secondary-color !important;
     color: wheat !important;
 }

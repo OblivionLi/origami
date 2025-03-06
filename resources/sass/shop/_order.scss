@@ -1,13 +1,15 @@
+@use '../variables' as v;
+
 .order {
 
     &__container {
         width: 70%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
-        font-family: $Quicksand;
-        background-color: $background-color !important;
-        color: $primary-color !important;
-        box-shadow: $primary-shadow !important;
+        font-family: v.$Quicksand;
+        background-color: v.$background-color !important;
+        color: v.$primary-color !important;
+        box-shadow: v.$primary-shadow !important;
 
         &--po {
             &-left {
@@ -20,9 +22,9 @@
                 &-detail {
                     width: 100%;
                     &--title {
-                        border-bottom: 1px solid $border;
+                        border-bottom: 1px solid v.$border;
                     }
-                    
+
                     &--par {
                         margin-bottom: 2rem;
 

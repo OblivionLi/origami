@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .chart {
     display: flex;
     flex-direction: column;
@@ -11,24 +13,24 @@
         flex-wrap: wrap;
 
         &-item {
-            background-color: $secondary-color;
+            background-color: v.$secondary-color;
             color: wheat;
             padding: 2rem;
             border-radius: 5px;
-            box-shadow: $primary-shadow;
-            border: $border;
-            font-family: $Quicksand;
+            box-shadow: v.$primary-shadow;
+            border: v.$border;
+            font-family: v.$Quicksand;
             height: 100%;
 
             h3 {
-                border-bottom: 1px solid $primary-color;
+                border-bottom: 1px solid v.$primary-color;
                 padding-bottom: 10px;
             }
 
             p {
                 font-size: 1.4rem;
                 font-weight: 600;
-                color: $second;
+                color: v.$second;
             }
         }
     }
@@ -40,7 +42,7 @@
 
         &-item {
             width: 50rem;
-            background-color: $background-color;
+            background-color: v.$background-color;
         }
     }
 }

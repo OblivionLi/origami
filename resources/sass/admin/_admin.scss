@@ -1,13 +1,15 @@
+@use '../variables' as v;
+
 .admin {
 
     &--links {
-        font-family: $Quicksand;
-        color: $primary-color;
+        font-family: v.$Quicksand;
+        color: v.$primary-color;
         font-size: 1.3rem;
 
         &:hover {
             text-decoration: none;
-            color: $secondary-color;
+            color: v.$secondary-color;
         }
     }
 }
@@ -37,7 +39,7 @@
 }
 
 .table-detail {
-    
+
     &--par {
         padding: 2rem;
         display: flex;
@@ -45,8 +47,8 @@
         flex-wrap: wrap;
         gap: 1rem;
 
-        color: $secondary-color;
-        font-family: $Quicksand;
+        color: v.$secondary-color;
+        font-family: v.$Quicksand;
         font-weight: 600;
     }
 
@@ -55,10 +57,10 @@
         margin: 0 auto;
         text-align: center;
 
-        color: $primary-color;
+        color: v.$primary-color;
         margin-top: 1rem;
         padding-bottom: 1rem;
-        border-bottom: 1px solid $primary-color;
+        border-bottom: 1px solid v.$primary-color;
     }
 }
 
@@ -73,7 +75,7 @@
 .product__table {
 
     &-image {
-        border: 1px solid $primary-color;
+        border: 1px solid v.$primary-color;
         border-radius: 2px;
         display: flex;
         flex-direction: column;
@@ -98,13 +100,13 @@
             margin-top: auto;
         }
 
-        
+
     }
 
     &-hr {
         width: 60%;
         margin: 1rem auto;
-        border: 1px solid $primary-color;
+        border: 1px solid v.$primary-color;
     }
 }
 
@@ -125,7 +127,7 @@
 }
 
 .admin-content {
-    background-color: $background-color !important;
+    background-color: v.$background-color !important;
     padding: 2rem 2rem;
-    box-shadow: $primary-shadow !important;
+    box-shadow: v.$primary-shadow !important;
 }

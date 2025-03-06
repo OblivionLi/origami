@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .footer {
     width: 100%;
     margin: 2rem auto 0 auto;
@@ -18,15 +20,15 @@
         }
 
         &--title {
-            border-bottom: 1px solid $border;
+            border-bottom: 1px solid v.$border;
             text-align: center;
-            color: $primary-color;
+            color: v.$primary-color;
             letter-spacing: 2px;
         }
 
         ul {
             list-style-type: none;
-            
+
             li {
                 display: flex;
                 align-content: center;
@@ -42,11 +44,11 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-size: 18px;
-            color: $primary-color;
-            
+            color: v.$primary-color;
+
 
             &:hover {
-                color: $secondary-color;
+                color: v.$secondary-color;
                 transform: scale(1.1);
             }
         }
@@ -56,7 +58,7 @@
         text-align: center;
         padding-top: 1rem;
         font-size: 18px;
-        color: $primary-color;
+        color: v.$primary-color;
         letter-spacing: 3px;
         margin-bottom: 0;
     }

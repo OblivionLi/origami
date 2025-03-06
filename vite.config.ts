@@ -15,7 +15,9 @@ export default defineConfig(({command, mode}) => {
                 ],
                 refresh: true,
             }),
-            react(),
+            react({
+                jsxRuntime: 'automatic',
+            }),
         ],
         resolve: {
             alias: {

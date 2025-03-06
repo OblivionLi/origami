@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .show {
     margin-top: 2rem;
     width: 100%;
@@ -22,20 +24,20 @@
         padding: 1.5rem 3rem;
         width: 20rem;
         height: 100%;
-        font-family: $Quicksand;
-        color: $primary-color !important;
-        background-color: $background-color !important;
-        box-shadow: $primary-shadow !important;
+        font-family: v.$Quicksand;
+        color: v.$primary-color !important;
+        background-color: v.$background-color !important;
+        box-shadow: v.$primary-shadow !important;
 
         &--alternate{
             padding: 1.5rem 3rem;
             width: 90%;
             height: 100%;
             margin: 0 auto;
-            font-family: $Quicksand;
-            color: $primary-color !important;
-            background-color: $background-color !important;
-            box-shadow: $primary-shadow !important;
+            font-family: v.$Quicksand;
+            color: v.$primary-color !important;
+            background-color: v.$background-color !important;
+            box-shadow: v.$primary-shadow !important;
         }
 
         &--rating {
@@ -56,7 +58,7 @@
         &--p {
             font-size: 1.2rem;
             font-weight: 600;
-            color: $secondary-color;
+            color: v.$secondary-color;
         }
 
         &--div {
@@ -68,21 +70,21 @@
         width: 70%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
-        font-family: $Quicksand;
-        background-color: $background-color !important;
-        color: $primary-color !important;
-        box-shadow: $primary-shadow !important;
+        font-family: v.$Quicksand;
+        background-color: v.$background-color !important;
+        color: v.$primary-color !important;
+        box-shadow: v.$primary-shadow !important;
 
         &--content {
             padding: 1.5rem 3rem;
-            background-color: $background-color-2 !important;
+            background-color: v.$background-color-2 !important;
         }
     }
 
 }
 
 .inStock {
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .notInStock {
@@ -90,7 +92,7 @@
 }
 
 .divider {
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid v.$border;
 }
 
 .reviews-form {
@@ -104,7 +106,7 @@
     margin-top: 15px;
 
     &:not(:last-child) {
-        border-bottom: 1px solid $border;
+        border-bottom: 1px solid v.$border;
         margin: 20px 0;
     }
 
@@ -123,7 +125,7 @@
         margin-top: 10px;
 
         &--comment {
-          text-indent: 20px;  
+          text-indent: 20px;
         }
 
         &--date {
@@ -132,7 +134,7 @@
     }
 
     &-card {
-        border: 1px solid $border;
+        border: 1px solid v.$border;
         padding: 10px;
     }
 
@@ -147,19 +149,19 @@
 }
 
 .MuiRating-iconFilled {
-    color: $secondary-color !important;
+    color: v.$secondary-color !important;
 }
 
 .isPaid {
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .notPaid {
-    color: $indianred;
+    color: v.$indianred;
 }
 
 .delivered {
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .failed {

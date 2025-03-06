@@ -1,12 +1,14 @@
+@use '../variables' as v;
+
 .auth {
     margin-top: 3rem;
-    background-color: $background-color;
-    box-shadow: $primary-shadow;
+    background-color: v.$background-color;
+    box-shadow: v.$primary-shadow;
 
     &-title {
         width: 80%;
-        color: $primary-color;
-        font-family: $Quicksand;
+        color: v.$primary-color;
+        font-family: v.$Quicksand;
     }
 
     &-form {
@@ -14,16 +16,16 @@
         &--action {
             margin-top: 1rem;
             letter-spacing: 1px;
-        
+
             &__link {
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-size: 18px;
-                color: $primary-color;
-                font-family: $Quicksand;
+                color: v.$primary-color;
+                font-family: v.$Quicksand;
 
                 &:hover {
-                    color: $secondary-color;
+                    color: v.$secondary-color;
                 }
             }
         }

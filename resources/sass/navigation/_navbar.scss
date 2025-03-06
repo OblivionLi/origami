@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .navigation {
     display: flex;
     justify-content: center;
@@ -20,7 +22,7 @@
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: $primary-color;
+            color: v.$primary-color;
 
             svg {
                 height: 100%;
@@ -30,7 +32,7 @@
             }
 
             &:hover {
-                color: $secondary-color;
+                color: v.$secondary-color;
                 transform: scale(1.1);
             }
         }
@@ -50,7 +52,7 @@
                 text-align: center;
                 text-transform: uppercase;
                 letter-spacing: 2px;
-                color: $primary-color;
+                color: v.$primary-color;
 
                 svg {
                     height: 100%;
@@ -60,7 +62,7 @@
                 }
 
                 &:hover {
-                    color: $secondary-color;
+                    color: v.$secondary-color;
                     transform: scale(1.1);
                 }
             }
@@ -82,18 +84,17 @@
             &--item {
                 &-menu {
                     font-size: 1.25rem;
-                    color: $primary-color;
+                    color: v.$primary-color;
                     font-weight: 600;
-                    font-family: $Playfair;
                     letter-spacing: 1px;
                     text-decoration: none;
                     transition: all 0.2s ease-in-out;
 
                     &:hover {
                         padding-bottom: 5px;
-                        border-bottom: 3px solid $border;
+                        border-bottom: 3px solid v.$border;
                         text-decoration: none;
-                        color: $secondary-color;
+                        color: v.$secondary-color;
                     }
                 }
             }
@@ -102,12 +103,12 @@
 }
 
 .nav-links {
-    font-family: $Quicksand;
-    color: $primary-color;
+    font-family: v.$Quicksand;
+    color: v.$primary-color;
     font-weight: 600;
 
     &:hover {
-        color: $secondary-color;
+        color: v.$secondary-color;
     }
 }
 

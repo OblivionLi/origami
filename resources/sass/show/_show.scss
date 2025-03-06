@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .product {
     margin-top: 2rem;
     display: flex;
@@ -17,12 +19,12 @@
 
     &__paper {
         padding: 1.5rem 3rem;
-        background-color: $background-color !important;
+        background-color: v.$background-color !important;
         width: 20rem;
         height: 100%;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
+        color: v.$primary-color !important;
+        font-family: v.$Quicksand;
+        box-shadow: v.$primary-shadow !important;
 
         &--rating {
             margin-bottom: 1rem;
@@ -42,7 +44,7 @@
         &--p {
             font-size: 1.2rem;
             font-weight: 600;
-            color: $secondary-color;
+            color: v.$secondary-color;
         }
 
         &--div {
@@ -52,10 +54,10 @@
 
     &__paper2 {
         padding: 1.5rem 3rem;
-        background-color: $background-color !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
+        background-color: v.$background-color !important;
+        color: v.$primary-color !important;
+        font-family: v.$Quicksand;
+        box-shadow: v.$primary-shadow !important;
         width: 100%;
     }
 
@@ -64,10 +66,10 @@
         width: 70%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
-        background-color: $background-color !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
+        background-color: v.$background-color !important;
+        color: v.$primary-color !important;
+        font-family: v.$Quicksand;
+        box-shadow: v.$primary-shadow !important;
 
         &--po {
 
@@ -80,8 +82,8 @@
                     width: 100%;
 
                     &--title {
-                        color: $primary-color;
-                        border-bottom: 1px solid $primary-color;
+                        color: v.$primary-color;
+                        border-bottom: 1px solid v.$primary-color;
                     }
 
                     &--par {
@@ -90,9 +92,9 @@
                         justify-content: space-evenly;
                         flex-wrap: wrap;
                         gap: 1rem;
-                
-                        color: $secondary-color;
-                        font-family: $Quicksand;
+
+                        color: v.$secondary-color;
+                        font-family: v.$Quicksand;
                         font-weight: 600;
                     }
                 }
@@ -108,25 +110,25 @@
         width: 70%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
-        background-color: $background-color-2 !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
+        background-color: v.$background-color-2 !important;
+        color: v.$primary-color !important;
+        font-family: v.$Quicksand;
+        box-shadow: v.$primary-shadow !important;
     }
 
     &__container3 {
         width: 100%;
         margin: 2rem auto;
         padding: 1.5rem 3rem;
-        background-color: $background-color-2 !important;
-        color: $primary-color !important;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow !important;
+        background-color: v.$background-color-2 !important;
+        color: v.$primary-color !important;
+        font-family: v.$Quicksand;
+        box-shadow: v.$primary-shadow !important;
     }
 }
 
 .inStock {
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .notInStock {
@@ -134,7 +136,7 @@
 }
 
 .divider {
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid v.$border;
 }
 
 .reviews-form {
@@ -148,7 +150,7 @@
     margin-top: 15px;
 
     &:not(:last-child) {
-        border-bottom: 1px solid $border;
+        border-bottom: 1px solid v.$border;
         margin: 20px 0;
     }
 
@@ -167,7 +169,7 @@
         margin-top: 10px;
 
         &--comment {
-          text-indent: 20px;  
+          text-indent: 20px;
         }
 
         &--date {
@@ -176,7 +178,7 @@
     }
 
     &-card {
-        border: 1px solid $border;
+        border: 1px solid v.$border;
         padding: 10px;
     }
 
@@ -191,19 +193,19 @@
 }
 
 .MuiRating-iconFilled {
-    color: $secondary-color !important;
+    color: v.$secondary-color !important;
 }
 
 .isPaid {
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .notPaid {
-    color: $indianred;
+    color: v.$indianred;
 }
 
 .delivered {
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .failed {

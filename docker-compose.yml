@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: your-app-name
+        container_name: your-app-container
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+            - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        environment:
+            APP_NAME: "Laravel App"
+            APP_ENV: local
+            APP_KEY: ${APP_KEY:-base64:HnNZ6akS52s9hiL5KKokZcYsFiABACY/JJwXqLaA+k0=}
+            APP_DEBUG: ${APP_DEBUG:-true}
+            APP_URL: http://localhost:8000 # Adjust as needed
+            DB_CONNECTION: mysql
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: ${DB_DATABASE:-laravel}
+            DB_USERNAME: ${DB_USERNAME:-sail}
+            DB_PASSWORD: ${DB_PASSWORD:-password}
+            VITE_STRIPE_KEY: ${VITE_STRIPE_KEY}
+            VITE_STRIPE_SECRET: ${VITE_STRIPE_SECRET}
+            VITE_STRIPE_DESCRIPTION: ${VITE_STRIPE_DESCRIPTION}
+
+        networks:
+            - app-network
+        depends_on:
+            - db
+
+    webserver:
+        image: nginx:alpine
+        container_name: your-app-nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www/html
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - app-network
+        depends_on:
+            - app
+
+    db:
+        image: mysql:8.0
+        container_name: your-app-db
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+            MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+            MYSQL_USER: ${DB_USERNAME:-sail}
+            MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - app-network
+        ports:
+            - "3306:3306"
+volumes:
+    dbdata:
+
+networks:
+    app-network:
+        driver: bridge

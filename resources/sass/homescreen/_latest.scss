@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .content {
     width: 70%;
     margin: 0 auto;
@@ -5,7 +7,6 @@
 
     position: relative;
 
-    font-family: $Playfair;
 
     &__products {
         display: grid;
@@ -30,18 +31,18 @@
         width: 80%;
         margin: 0 auto;
         padding: 1.5rem 3rem;
-        background-color: $background-color !important;
+        background-color: v.$background-color !important;
 
-        color: $primary-color !important;
-        font-family: $Quicksand;
+        color: v.$primary-color !important;
+        font-family: v.$Quicksand;
 
-        box-shadow: $primary-shadow !important;
+        box-shadow: v.$primary-shadow !important;
     }
 }
 
 .card-content {
-    border-top: 1px solid $border;
-    background-color: $background-color;
+    border-top: 1px solid v.$border;
+    background-color: v.$background-color;
     color: wheat;
 
     display: flex;
@@ -49,36 +50,36 @@
     flex-wrap: wrap;
 
     &-top {
-        border-top: 1px solid $border;
-        background-color: $background-color;
+        border-top: 1px solid v.$border;
+        background-color: v.$background-color;
         color: wheat;
-        
+
         p, h2{
-            font-family: $Quicksand;
+            font-family: v.$Quicksand;
             letter-spacing: 1px;
-            color: $primary-color;
+            color: v.$primary-color;
         }
     }
-    
+
 
     a {
         color: wheat;
-        background-color: $primary-color;
-        font-family: $Quicksand;
+        background-color: v.$primary-color;
+        font-family: v.$Quicksand;
         letter-spacing: 1px;
         text-decoration: none;
         padding: 5px;
         border-radius: 5px;
 
         &:hover {
-            background-color: $secondary-color;
+            background-color: v.$secondary-color;
             color: wheat;
             text-decoration: none;
         }
     }
 
     &--span {
-        background-color: $primary-color;
+        background-color: v.$primary-color;
         color: wheat;
         padding: 5px;
         border-radius: 5px;
@@ -86,30 +87,30 @@
     }
 
     &--span2 {
-        background-color: $primary-color;
+        background-color: v.$primary-color;
         color: wheat;
         padding: 5px;
         border-radius: 5px;
         cursor: pointer;
-        font-family: $Quicksand;
+        font-family: v.$Quicksand;
         letter-spacing: 1px;
     }
 
 }
 
 .bc {
-    color: $primary-color;
+    color: v.$primary-color;
     font-weight: 600;
 
     &:hover {
         cursor: pointer;
-        color: $secondary-color;
+        color: v.$secondary-color;
     }
 
     &-p {
         font-weight: 600 !important;
         font-size: 20px !important;
-        color: $secondary-color !important;
+        color: v.$secondary-color !important;
     }
 }
 

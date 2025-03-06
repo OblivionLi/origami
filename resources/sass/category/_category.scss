@@ -1,3 +1,5 @@
+@use '../variables' as v;
+
 .category {
     display: flex;
     justify-content: space-between;
@@ -7,18 +9,18 @@
     &--sidebar {
         flex-grow: 1;
 
-        background-color: $background-color;
+        background-color: v.$background-color;
         padding: 1.5rem 3rem;
-        color: $primary-color;
-        font-family: $Quicksand;
-        box-shadow: $primary-shadow;
+        color: v.$primary-color;
+        font-family: v.$Quicksand;
+        box-shadow: v.$primary-shadow;
         height: 100%;
         min-width: 18rem;
         max-width: 18rem;
 
         &-title {
             h4 {
-                border-bottom: 1px solid $primary-color;
+                border-bottom: 1px solid v.$primary-color;
                 padding-bottom: 10px;
             }
 
@@ -26,10 +28,10 @@
                 a {
                     font-weight: 600;
                     text-transform: uppercase;
-                    color: $primary-color;
+                    color: v.$primary-color;
 
                     &:hover {
-                        color: $secondary-color;
+                        color: v.$secondary-color;
                     }
                 }
 
@@ -38,17 +40,17 @@
                     font-weight: 600;
                     text-transform: capitalize;
                     margin-bottom: 16px;
-                    color: $secondary-color;
+                    color: v.$secondary-color;
 
                     &:hover {
-                        color: $primary-color;
+                        color: v.$primary-color;
                         text-decoration: none;
                     }
                 }
             }
 
             &-item:not(:last-child) {
-                border-bottom: 1px solid $primary-color;
+                border-bottom: 1px solid v.$primary-color;
                 padding-bottom: 10px;
             }
         }
@@ -79,15 +81,15 @@
                 justify-content: center;
                 align-items: center;
                 gap: 1rem;
-                font-family: $Quicksand;
+                font-family: v.$Quicksand;
                 font-size: 1.5rem;
-                color: $primary-color;
+                color: v.$primary-color;
 
                 a {
                     cursor: pointer;
 
                     &:hover {
-                        color: $secondary-color;
+                        color: v.$secondary-color;
                     }
                 }
             }
@@ -95,24 +97,24 @@
             &--previous,
             &--next,
             .page-link {
-                color: $primary-color;
+                color: v.$primary-color;
                 background-color: transparent;
                 border: 0;
                 padding: 0;
                 border-radius: 0;
 
                 &:hover {
-                    color: $secondary-color;
+                    color: v.$secondary-color;
                 }
             }
 
             &--disabled {
-                color: $dark;
+                color: v.$dark;
             }
 
             &--active,
             .page-item.active .page-link {
-                color: $indianred;
+                color: v.$indianred;
                 background-color: transparent;
                 border: 0;
                 padding: 0;
@@ -125,12 +127,12 @@
 .active {
     font-weight: 600;
     text-transform: uppercase;
-    color: $secondary-color;
+    color: v.$secondary-color;
     cursor: pointer;
 }
 
 .info {
-    color: $indianred;
+    color: v.$indianred;
     font-weight: 600;
 }
 
@@ -140,7 +142,7 @@
     text-transform: capitalize;
 
     &:hover {
-        color: $secondary-color;
+        color: v.$secondary-color;
         text-decoration: none;
     }
 }

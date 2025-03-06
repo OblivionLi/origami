@@ -1,5 +1,6 @@
+@use 'variables' as v;
+
 body {
-    font-family: $Playfair;
     background: url('http://127.0.0.1:8000/storage/back.jpg') no-repeat center center fixed;
     background-size: cover;
     padding-right: 0;
@@ -9,18 +10,18 @@ body {
 .divider2 {
     width: 80%;
     margin: 2rem auto 0 auto;
-    border: 1px solid $border;
+    border: 1px solid v.$border;
 }
 
 .divider3 {
     width: 40%;
     margin: 2rem auto 0 auto;
-    border: 1px solid $border;
+    border: 1px solid v.$border;
 }
 
 .icon {
     font-size: 25px;
-    color: $secondary-color;
+    color: v.$secondary-color;
 }
 
 .center-loader {
@@ -32,11 +33,11 @@ body {
 }
 
 .MuiCircularProgress-circle {
-    color: $secondary-color !important;
+    color: v.$secondary-color !important;
 }
 
 .MuiAlert-message {
-    font-family: $Quicksand;
+    font-family: v.$Quicksand;
 }
 
 .loaderCenter {

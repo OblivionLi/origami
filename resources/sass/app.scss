@@ -1,22 +1,23 @@
-// Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
-
 // Variables
-@import 'variables';
+@use 'variables';
 
 // Components
-@import 'base';
-@import 'navigation/navbar';
-@import 'homescreen/homescreen';
-@import 'footer/footer';
-@import 'auth/auth';
-@import 'admin/admin';
-// @import 'show/show';
-@import 'show/showProduct';
-@import 'shop/cart';
-@import 'shop/order';
-@import 'category/category';
-@import 'chart/chart';
+@use 'base';
+@use 'navigation/navbar';
+@use 'homescreen/homescreen';
+@use 'footer/footer';
+@use 'auth/auth';
+@use 'admin/admin';
+// @use 'show/show';
+@use 'show/showProduct';
+@use 'shop/cart';
+@use 'shop/order';
+@use 'category/category';
+@use 'chart/chart';
 
 // Bootstrap
-//@import '~bootstrap/scss/bootstrap';
+//@use '~bootstrap/scss/bootstrap';
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800;900&family=Quicksand:wght@300;400;500;600;700&display=swap');
