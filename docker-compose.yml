@@ -5,7 +5,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: your-app-name
+        image: my-origami
         container_name: your-app-container
         restart: unless-stopped
         working_dir: /var/www/html
@@ -35,7 +35,7 @@ services:
 
     webserver:
         image: nginx:alpine
-        container_name: your-app-nginx
+        container_name: my-nginx
         restart: unless-stopped
         ports:
             - "8000:80"
@@ -48,8 +48,8 @@ services:
             - app
 
     db:
-        image: mysql:8.0
-        container_name: your-app-db
+        image: mysql:latest
+        container_name: my-db-mysql
         restart: unless-stopped
         environment:
             MYSQL_DATABASE: ${DB_DATABASE:-laravel}
