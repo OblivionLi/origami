@@ -85,7 +85,8 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
 
       - name: Run PHPUnit tests
-        run: php artisan test
+        run: |
+          ./vendor/bin/phpunit
 
       - name: Build Docker image
         if: github.event_name == 'push'
