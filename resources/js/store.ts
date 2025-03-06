@@ -11,6 +11,7 @@ import parentCategoryReducer from '@/features/categories/parentCategorySlice';
 import childCategoryReducer from '@/features/categories/childCategorySlice';
 import categoryProductReducer from '@/features/categories/categorySlice';
 import checkoutReducer from '@/features/checkout/checkoutSlice';
+import chartReducer from '@/features/chart/chartSlice';
 
 export const store = configureStore({
     reducer: {
@@ -26,6 +27,7 @@ export const store = configureStore({
         childCategory: childCategoryReducer,
         categoryProduct: categoryProductReducer,
         checkout: checkoutReducer,
+        chart: chartReducer,
     },
     // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger), // Example of adding extra middleware
     devTools: import.meta.env.VITE_NODE_ENV !== 'production',

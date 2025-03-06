@@ -31,6 +31,19 @@ class OrderRepository
     }
 
     /**
+     * @return Order|null
+     */
+    public function fetchOrderStats(): ?Order
+    {
+        return Order::selectRaw('
+            COUNT(*) as order_count,
+            SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH) THEN total_price ELSE 0 END) as revenue_last_month,
+            SUM(total_price) as revenue_all_time,
+            AVG(total_price) as average_revenue
+        ')->first();
+    }
+
+    /**
      * @return Builder
      */
     public function getAdminOrderWithRelations(): Builder

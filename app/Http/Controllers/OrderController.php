@@ -6,6 +6,7 @@ use App\Http\Requests\order\OrderStoreRequest;
 use App\Http\Requests\order\OrderUpdateStatusRequest;
 use App\Http\Resources\order\OrderIndexResource;
 use App\Http\Resources\order\OrderShowResource;
+use App\Http\Resources\order\OrderStatsResource;
 use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -91,9 +92,9 @@ class OrderController extends Controller
     }
 
     /**
-     * @return JsonResponse
+     * @return OrderStatsResource
      */
-    public function orderCharts(): JsonResponse
+    public function orderCharts(): OrderStatsResource
     {
         return $this->orderService->prepareOrderData();
     }

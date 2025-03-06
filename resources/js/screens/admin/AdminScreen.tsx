@@ -55,6 +55,7 @@ import ChildCategoriesScreen from "@/screens/admin/categories/child/ChildCategor
 import ReviewsScreen from "@/screens/admin/reviews/ReviewsScreen";
 import ProductsScreen from "@/screens/admin/products/ProductsScreen";
 import OrderScreen from "@/screens/admin/orders/OrderScreen";
+import DashboardScreen from "@/screens/admin/DashboardScreen";
 
 interface AdminScreenProps {
 }
@@ -208,24 +209,31 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                     <StyledDrawer variant="permanent" open={open}>
                         <StyledToolbar>
                             <IconButton onClick={handleDrawerClose}>
-                                {/*{theme.direction === "rtl" ? (*/}
-                                {/*    <ChevronRightIcon />*/}
-                                {/*) : (*/}
-                                {/*    <ChevronLeftIcon />*/}
-                                {/*)}*/}
                                 <ChevronLeftIcon/>
                             </IconButton>
                         </StyledToolbar>
                         <Divider/>
                         <List component={'nav'}>
-                            <ListItem component={AdminLink} to="/admin">
+
+                            <ListItemButton
+                                onClick={() => handleListItemClick("/")}
+                            >
                                 <ListItemIcon>
                                     <DashboardIcon sx={iconStyle}/>
                                 </ListItemIcon>
                                 <ListItemText primary="Dashboard"/>
-                            </ListItem>
+                            </ListItemButton>
 
                             <Divider/>
+
+                            <ListItemButton
+                                onClick={() => handleListItemClick("products/reviews")}
+                            >
+                                <ListItemIcon>
+                                    <ReviewsIcon sx={iconStyle}/>
+                                </ListItemIcon>
+                                <ListItemText primary="Reviews"/>
+                            </ListItemButton>
 
                             <ListItemButton
                                 onClick={() => handleListItemClick("products")}
@@ -235,20 +243,6 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
                                 </ListItemIcon>
                                 <ListItemText primary="Products"/>
                             </ListItemButton>
-
-                            {/*<ListItem component={AdminLink} to="/admin/products">*/}
-                            {/*    <ListItemIcon>*/}
-                            {/*        <NoteIcon sx={iconStyle} />*/}
-                            {/*    </ListItemIcon>*/}
-                            {/*    <ListItemText primary="Products"/>*/}
-                            {/*</ListItem>*/}
-
-                            <ListItem component={AdminLink} to="/admin/products/reviews">
-                                <ListItemIcon>
-                                    <ReviewsIcon sx={iconStyle}/>
-                                </ListItemIcon>
-                                <ListItemText primary="Reviews"/>
-                            </ListItem>
 
                             <ListItem onClick={handleCategoryMenu} style={{cursor: "pointer"}}>
                                 <ListItemIcon>
@@ -345,18 +339,20 @@ const AdminScreen: React.FC<AdminScreenProps> = () => {
 
                             <Divider/>
 
-                            <ListItem component={AdminLink} to="/admin/orders">
+                            <ListItemButton
+                                onClick={() => handleListItemClick("orders")}
+                            >
                                 <ListItemIcon>
                                     <ReceiptIcon sx={iconStyle}/>
                                 </ListItemIcon>
                                 <ListItemText primary="Orders"/>
-                            </ListItem>
+                            </ListItemButton>
                         </List>
                     </StyledDrawer>
                     <Content>
                         <StyledToolbar/>
                         <Routes>
-                            {/*<Route path="/admin" element={<DashboardScreen />} />*/}
+                            <Route path="/" element={<DashboardScreen />} />
                             <Route path="/users" element={<UsersScreen/>}/>
                             <Route path="/users/roles" element={<RolesScreen/>}/>
                             <Route path="/users/permissions" element={<PermissionsScreen/>}/>

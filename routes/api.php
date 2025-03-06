@@ -100,7 +100,7 @@ Route::middleware('auth:api')->group(function () {
     // Admin Routes (Admin Role Required)
     Route::middleware('isAdmin')->group(function () {
         // Dashboard
-        Route::get('admin/dashboard/order-charts', [OrderController::class, 'orderCharts']);
+        Route::get('admin/order-charts', [OrderController::class, 'orderCharts']);
 
         // User Management
         Route::controller(UserController::class)->group(function () {

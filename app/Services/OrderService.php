@@ -6,10 +6,12 @@ use App\Http\Requests\order\OrderStoreRequest;
 use App\Http\Resources\order\OrderAdminIndexResource;
 use App\Http\Resources\order\OrderIndexResource;
 use App\Http\Resources\order\OrderShowResource;
+use App\Http\Resources\order\OrderStatsResource;
 use App\Models\Order;
 use App\Models\User;
 use App\Repositories\OrderRepository;
 use Barryvdh\DomPDF\PDF;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -140,26 +142,23 @@ class OrderService
     }
 
     /**
-     * @return JsonResponse
+     * @return OrderStatsResource
      */
-    public function prepareOrderData(): JsonResponse
+    public function prepareOrderData(): OrderStatsResource
     {
-        // TODO:: this needs cleaning
-        $orderCount = Order::orderCount();
-        $revenueLastMonth = Order::revenueLastMonth();
-        $revenueAllTime = Order::revenueAllTime();
-        $averageRevenue = Order::averageRevenue();
-        $userCount = User::userCount();
+        $orderStats = $this->orderRepository->fetchOrderStats();
+        $lastMonthName = Carbon::now()->subMonth()->format('F');
+        $userCount = User::count();
 
         $data = [
-            'orderCount' => $orderCount,
+            'orderCount' => $orderStats->order_count,
             'userCount' => $userCount,
-            'revenueLastMonth' => $revenueLastMonth,
-            'revenueAllTime' => $revenueAllTime,
-            'averageRevenue' => $averageRevenue,
-
+            'revenueLastMonth' => $orderStats->revenue_last_month,
+            'revenueLastMonthName' => $lastMonthName,
+            'revenueAllTime' => $orderStats->revenue_all_time,
+            'averageRevenue' => $orderStats->average_revenue,
         ];
 
-        return response()->json($data);
+        return new OrderStatsResource($data);
     }
 }
