@@ -61,11 +61,16 @@ COPY --chown=www-data:www-data . .
 # Copy built frontend assets from the previous stage
 COPY --from=frontend-builder /var/www/html/frontend/public/build ./public/build
 
-# Install composer dependencies *without* running scripts.
-RUN composer install --optimize-autoloader --no-dev --no-scripts
+# Install composer dependencies WITH running scripts.
+RUN composer install --optimize-autoloader --no-dev
 
-# --- CLEAR CACHES BEFORE COMPOSER INSTALL ---
+# --- CLEAR CACHES AFTER COMPOSER INSTALL ---
 RUN php artisan optimize:clear
+
+# Remove dev dependencies, if in production
+RUN if [ "$APP_ENV" = "production" ]; then \
+    composer install --optimize-autoloader --no-dev --no-interaction --no-scripts; \
+    fi;
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
