@@ -9,12 +9,16 @@ The project has undergone significant improvements in January 2025:
 - Implemented requests and resources (response) classes for all API calls
 - Fixed and optimized code and updated composer packages to their newest version (as of January 2025)
 - Added tests for service layer
+- Added models factory seeders
 
 ### Frontend Refactor
 - Added TypeScript support and used React Redux Toolkit
 - Updated all packages and optimized React component code
 - Removed redundant files
 - Updated the Redux workflow store
+
+#### Note
+- Frontend might be missing some background and logo images and design in some areas is changed (unlike as seen in the old video presentation)
 
 ## Getting Started
 
