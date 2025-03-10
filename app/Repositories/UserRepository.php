@@ -82,11 +82,9 @@ class UserRepository
         try {
             return User::where('email', $email)->first();
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error("Database error retrieving user by email: " . $e->getMessage());
             return null;
         } catch (Exception $e) {
-            DB::rollBack();
             Log::error("Error retrieving user: " . $e->getMessage());
             throw $e;
         }

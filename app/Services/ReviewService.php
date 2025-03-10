@@ -7,7 +7,6 @@ use App\Http\Requests\review\ReviewUpdateRequest;
 use App\Http\Resources\review\ReviewIndexResource;
 use App\Http\Resources\review\ReviewShowResource;
 use App\Repositories\ReviewRepository;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Symfony\Component\HttpFoundation\Response;
