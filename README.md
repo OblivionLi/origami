@@ -24,7 +24,7 @@ The project has undergone significant improvements in January 2025:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/origami-shop.git
+git clone https://github.com/OblivionLi/origami-shop.git
 cd origami-shop
 
 # Install PHP dependencies
